@@ -444,10 +444,10 @@ git commit -m ‘描述’
 git pull origin yyy （拉取要合并的分支代码）
 ```
 
-解决冲突
+与同事协商，解决冲突
 
 ```sh
-git push origin wyn
+git push -u origin wyn
 ```
 
 

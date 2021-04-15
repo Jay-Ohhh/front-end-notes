@@ -228,9 +228,15 @@ axios 使用 post 发送数据时，默认是直接把 json 放到请求体中�
 2. Content-Type: application/x-www-form-urlencoded：请求体中的数据会以普通表单形式（键值对）发送到后端
 3. Content-Type: multipart/form-data： 它会将请求体的数据处理为一条消息，以标签为单元，用分隔符分开。既可以上传键值对，也可以上传文件。
 
-#### 取消请求
+#### 取消重复请求
+
+假设页面中有一个按钮，用户点击按钮后会发起一个 AJAX 请求。如果未对该按钮进行控制，当用户快速点击按钮时，则会发出重复请求。
+
+##### 一、取消请求
 
 axios需要取消令牌`cancelToken`才能取消请求，而取消令牌`cancelToken`是保存在config中。
+
+> 例如：axios.get(url[, config]) 的 config 参数。
 
 通过`axios.CancelToken.source`生成取消令牌`cancelToken`和取消方法`cancel`
 
@@ -244,7 +250,7 @@ axios.get('/user/12345', {
   cancelToken: source.token
 }).catch(function (err) {
   // 取消请求、请求失败都会有err
-  // isCancel函数，该函数用来判断异常对象是不是取消原因对象(Cancel的实例)，返回true或false
+  // isCancel函数，该函数用来判断异常对象是不是取消原因对象(Cancel的实例)，即判断是否通过cancel方法取消请求，返回true或false
   if (axios.isCancel(err)) {
     console.log('Request canceled', err.message);
   } else {
@@ -280,6 +286,105 @@ cancel();
 ```
 
 > cancel(message) 可传入提示信息message。
+
+##### 二、如何判断重复请求
+
+当请求方式、请求 URL 地址和请求参数都一样时，我们就可以认为请求是一样的。因此在每次发起请求时，我们就可以根据当前请求的请求方式、请求 URL 地址和请求参数来生成一个唯一的 key，同时为每个请求创建一个专属的 CancelToken，然后把 key 和 cancel 函数以键值对的形式保存到 Map 对象中，使用 Map 的好处是可以快速的判断是否有重复的请求：
+
+```js
+import qs from 'querystring' 
+
+const pendingRequest = new Map();
+// GET -> params；POST -> data
+const requestKey = [method, url, qs.stringify(params), qs.stringify(data)].join('&'); 
+const cancelToken = new CancelToken(function executor(cancel) {
+  if(!pendingRequest.has(requestKey)){
+    pendingRequest.set(requestKey, cancel);
+  }
+})
+```
+
+当出现重复请求的时候，我们就可以使用 cancel 函数来取消前面已经发出的请求，在取消请求之后，我们还需要把取消的请求从 `pendingRequest` 中移除。现在我们已经知道如何取消请求和如何判断重复请求，下面我们来介绍如何取消重复请求。
+
+##### 三、如何取消重复请求
+
+###### 3.1 定义辅助函数
+
+在配置请求拦截器和响应拦截器前，先来定义 3 个辅助函数：
+
+- `enerateReqKey`：用于根据当前请求的信息，生成请求 Key；
+
+```js
+function generateReqKey(config) {
+  const { method, url, params, data } = config;
+  return [method, url, qs.stringify(params), qs.stringify(data)].join("&");
+}
+```
+
+- `addPendingRequest`：用于把当前请求信息添加到pendingRequest对象中；
+
+```js
+const pendingRequest = new Map();
+function addPendingRequest(config) {
+  const requestKey = generateReqKey(config);
+  config.cancelToken = config.cancelToken || new axios.CancelToken((cancel) => {
+    if (!pendingRequest.has(requestKey)) {
+       pendingRequest.set(requestKey, cancel);
+    }
+  });
+}
+```
+
+- `removePendingRequest`：检查是否存在重复请求，若存在则取消已发的请求。
+
+```js
+function removePendingRequest(config) {
+  const requestKey = generateReqKey(config);
+  if (pendingRequest.has(requestKey)) {
+     const cancel = pendingRequest.get(requestKey);
+     // 取消请求
+     cancel(requestKey);
+     pendingRequest.delete(requestKey);
+  }
+}
+```
+
+创建好 `generateReqKey`、`addPendingRequest` 和 `removePendingRequest` 函数之后，我们就可以设置请求拦截器和响应拦截器了。
+
+###### 3.2 设置请求拦截器
+
+```js
+axios.interceptors.request.use(
+  function (config) {
+    removePendingRequest(config); // 检查是否存在重复请求，若存在则取消已发的请求
+    addPendingRequest(config); // 把当前请求信息添加到pendingRequest对象中
+    return config;
+  },
+  (error) => {
+     return Promise.reject(error);
+  }
+);
+```
+
+###### 3.3 设置响应拦截器
+
+```js
+axios.interceptors.response.use(
+  (response) => {
+     removePendingRequest(response.config); // 从pendingRequest对象中移除请求
+     return response;
+   },
+   (error) => {
+      removePendingRequest(error.config || {}); // 从pendingRequest对象中移除请求
+      if (axios.isCancel(error)) {
+        console.log("已取消的重复请求：" + error.message);
+      } else {
+        // 添加异常处理
+      }
+      return Promise.reject(error);
+   }
+);
+```
 
 #### 在开发环境中代理API请求
 
