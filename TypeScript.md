@@ -1016,24 +1016,6 @@ mySearch = function(source, subString) {
 
 对等号左侧进行类型限制之后，可以保证以后对函数名赋值时保证参数个数、参数类型、返回值类型不变，因此可以 = 右边的函数可以省略对输出类型的指定，不过前提是要确认函数的返回值类型与指定的类型一样。
 
-**利用接口重载**
-
-fun 代表的是一个具有重载的函数接口，那么实现显然也必须是重载的函数
-
-```ts
-type fun = {
-  (normal: number): number
-  (normal: number, abnormal: string): string
-}
-function f1(normal: number): number
-function f1(normal: number, abnormal: string): string
-function f1(normal: number, abnormal?: string): number | string {
-  return abnormal || normal
-}
-const f: fun = f1
-```
-
-
 - **可选参数**
 
 前面提到，输入多余的（或者少于要求的）参数，是不允许的。那么如何定义可选的参数呢？
@@ -1168,6 +1150,23 @@ function reverse(x: number | string): number | string {
 上例中，我们重复定义了多次函数 `reverse`，前几次都是函数声明，最后一次是函数定义。在编辑器的代码提示中，可以正确的看到前两个函数给我们的提示。
 
 注意，TypeScript 会优先从最前面的函数声明开始匹配，所以多个函数声明如果有包含关系，需要优先把精确的定义写在前面。
+
+**利用type重载**
+
+fun 代表的是一个具有重载的函数类型，那么实现显然也必须是重载的函数
+
+```ts
+type fun = {
+  (normal: number): number
+  (normal: number, abnormal: string): string
+}
+function f1(normal: number): number
+function f1(normal: number, abnormal: string): string
+function f1(normal: number, abnormal?: string): number | string {
+  return abnormal || normal
+}
+const f: fun = f1
+```
 
 
 

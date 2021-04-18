@@ -327,7 +327,7 @@ function generateReqKey(config) {
 const pendingRequest = new Map();
 function addPendingRequest(config) {
   const requestKey = generateReqKey(config);
-  config.cancelToken = config.cancelToken || new axios.CancelToken((cancel) => {
+  config.cancelToken = new axios.CancelToken((cancel) => {
     if (!pendingRequest.has(requestKey)) {
        pendingRequest.set(requestKey, cancel);
     }

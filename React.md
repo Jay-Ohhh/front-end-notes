@@ -1328,6 +1328,8 @@ render() {
 
 `React.createRef` 创建一个能够通过 ref 属性附加到 React 元素的 [ref](https://react.docschina.org/docs/refs-and-the-dom.html)。
 
+> createRef每次渲染都会返回一个新的引用，而useRef每次都会返回相同的引用。
+
 ```jsx
 class MyComponent extends React.Component {
   constructor(props) {
@@ -7836,6 +7838,8 @@ const refContainer = useRef(initialValue);
 `useRef` 返回一个可变的 ref 对象，其 `.current` 属性被初始化为传入的参数（`initialValue`）。返回的 ref 对象在组件的整个生命周期内保持不变。而且 useRef 实现了类似 class 中的 `this` 的功能。
 
 使用场景：useRef( ).current 可以跨越渲染周期存储数据（在current 上增加属性存储对象，current 可以保存任何可变值，当其被赋值给 DOM 元素或组件的 ref 属性，current 会指向 DOM 元素或组件实例），而且对 current 修改也不会引起组件渲染。
+
+> React.createRef 每次渲染都会返回一个新的引用，而 useRef 每次都会返回相同的引用。
 
 本质上，`useRef` 就像是可以在其 `.current` 属性中保存一个可变值的“盒子”。
 

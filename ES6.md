@@ -1,3 +1,412 @@
+#### var、let、const
+
+如果不用var、let、const声明变量，则会声明为全局变量，在浏览器环境下，相当于在window上增加一个属性。
+
+##### var
+
+如果在方法中声明，则为局部变量（local variable）；如果是在全局域中声明，则为全局变量。
+
+var不支持块级作用域。
+
+#### 变量提升和函数提升
+
+ES6新增了块级作用域。块级作用域由 { } 包括，if 语句和 for 语句里面的{ }也属于块作用域。
+
+变量提升是针对**var**而言。
+
+var不支持块级作用域。
+
+class中不能存在变量提升和函数提升。
+
+```js
+if(true){
+  var a = 1
+}
+console.log(a) // 1
+```
+
+##### 变量提升
+
+变量提升就是变量声明会被提升到作用域的最顶层。
+
+```js
+console.log(a) // undefined
+var a = 1
+console.log(a) // 1
+```
+
+等价于
+
+```js
+var a
+console.log(a)
+a = 1
+console.log(a)
+```
+
+**eg1**
+
+```js
+// 全局作用域
+var a = 10 // 全局变量，函数内部也能访问
+function fn(){
+	console.log(a) // undefined
+	var a = 20; // 在函数作用域中变量提升
+	console.log(a) // 20
+}
+fn()
+console.log(a) // 10
+```
+
+等价于
+
+```js
+// 全局作用域
+var a = 10 // 全局变量，函数内部也能访问
+function fn(){
+	var a 
+	console.log(a) // undefined
+	a = 20  // 在函数作用域中变量提升
+	console.log(a) // 20
+}
+fn()
+console.log(a) // 10
+```
+
+**eg2**
+
+```js
+// 全局作用域
+var a = 10 // 全局变量，函数内部也能访问
+function fn(){
+	console.log(a) // 10
+	a = 20; // 全局变量a重新赋值
+	console.log(a) // 20
+}
+fn()
+console.log(a) // 10
+```
+
+**eg3**
+
+var不支持块级作用域，所以在全局作用域重复声明了两次，第二次声明会被忽略，仅用于赋值。
+
+```js
+// 全局作用域
+var a = 1;
+if(true){
+	console.log(a); // 1
+	var a = 2;
+	console.log(a); // 2
+}
+console.log(a); // 2
+```
+
+##### 函数提升
+
+函数声明式，会将函数的声明和定义一起提升到作用域的最顶上去。
+
+```js
+fn() // 1，此处可以正常调用
+function fn(){
+	console.log(1)
+}
+```
+
+函数表达式
+
+```js
+console.log(fn) // undefined
+var fn = function(){
+	console.log(1)
+}
+console.log(fn) // function(){//...}
+```
+
+等价于
+
+```js
+var fn
+console.log(fn) // undefined
+fn = function(){
+	console.log(1)
+}
+console.log(fn) // function fn(){}
+```
+
+如果函数声明和变量声明使用的是同一变量名称，函数声明的优先级高于变量声明。
+
+```js
+console.log(fn) // function fn(){}
+function(){}
+var fn = 1 // 第二次声明会被忽略，仅用于赋值
+console.log(fn) // 1
+```
+
+##### 总结
+
+1、所有的声明都会提升到作用域的最顶上去。
+
+2、同一个变量只会声明一次，其他的会被忽略掉。
+
+3、函数声明的优先级高于变量申明的优先级。
+
+#### this指向
+
+> 对象没有this，this是在函数里指向对象的。
+
+1、非严格模式，普通函数的this指向全局对象，普通函数是在全局对象里的函数，调用普通函数，其实就是全局对象在调用。
+
+严格模式下的全局作用域中普通函数的this是undefined。
+
+不管是不是严格模式，全局作用域的this都是指向全局对象。全局作用域实际上是在一个全局函数内的作用域。
+
+2、对于方法调用：谁调用方法，this指向谁（方法是写在对象里的函数）
+
+3、构造函数里的this指向它的实例对象。
+
+4、类的constructor的this指向实例对象，类的方法的this指向这个方法的调用者。
+
+5、闭包内部函数和外层函数的this，决定于代码执行时，它们的函数体被引用在哪个作用域（函数体的地址被哪个作用域的变量所引用），即this会指向该方法运行时所在的环境，普通函数和方法被调用时亦如此。
+
+**eg1**
+
+fun访问的是对象obj的b属性，即var fun=function(){console.log(this.a)}。this值要等到代码执行的时候才能确定，上述代码执行时，函数体被引用在全局作用域。
+
+```js
+// 全局作用域
+var obj={
+    a:1,
+    b:function(){console.log(this.a)}
+}
+var fun=obj.b
+fun() // undefined
+```
+
+**eg2**
+
+作为方法调用时，函数体是在obj里被引用。
+
+```js
+// 全局作用域
+var obj={
+    a:1,
+    b:function(){console.log(this.a)}
+}
+obj.b()  // 打印1
+```
+
+6、定时器setTimeout(function(){})里回调函数的this指向window，这是因为function( ){}调用的代码运行在window上，而不是setTimeout所在的执行环境里。
+
+如果定时器setTimeout(( )=>{})里是箭头函数，则箭头函数里的this指向setTimeout的外层函数的this所指向的对象。那么如何找这个setTimeout的外层函数呢？可以找( ){ }这样的结构就可以了
+
+即使是在严格模式下，setTimeout()的function里面的this仍然默认指向window对象， 并不是undefined。
+
+7、箭头函数本身是没有this的，它的this是根据外层函数的this来决定的，它的外层函数可以这样找，向上找到( ){ }这样的函数体结构。
+
+8、嵌套函数的this指向，嵌套的函数不会从调用它的函数中继承this。
+
+（1）如果嵌套函数作为方法调用，其this的值指向调用它的对象。
+
+（2）如果嵌套函数作为函数调用（只要不是方法调用，例如在方法内作为函数调用、在函数内作为函数调用），其this值不是全局对象（非严格模式下）就是undefined（严格模式下）。为什么指向全局对象或者undefined？因为this是指向函数所在的对象，this不能指向函数。
+
+将嵌套函数作为方法调用：
+
+1、例如使用call或apply：
+
+```js
+f.call(o); // f是个嵌套函数
+```
+
+这句相当于在o对象上调用 f 方法。
+
+2、另外一种方法是将函数设置为某个对象的属性，使其成为该对象的方法，例如：
+
+```js
+var o = {};
+function outer() {
+    var inner = function() {
+        console.log(this === o);
+    };
+    o.m = inner;
+}
+outer();
+o.m(); // true
+```
+
+
+
+#### 闭包
+
+##### 定义
+
+**「函数」和「函数内部能访问到的变量」（也叫环境）的总和，就是一个闭包。**
+
+eg
+
+```js
+function foo(){
+  var local = 1
+ 	return function (){
+    console.log(local)
+  }
+}
+// or
+function foo(local){
+	return function (){
+    console.log(local)
+  }
+}
+```
+
+##### 作用
+
+闭包可以用来封装一个需要持久保存的变量，也可以模拟命名空间，避免变量名的污染。
+
+##### 为什么要函数套函数呢？（不是必须的）
+
+是因为需要局部变量，所以才把 local 放在一个函数里，如果不把 local 放在一个函数里，local 就是一个全局变量了，达不到使用闭包的目的——隐藏变量。
+
+所以函数套函数只是为了造出一个局部变量，跟闭包无关。
+
+##### 为什么要return函数呢？
+
+```js
+function foo(){
+  var local = 1
+  function bar(){
+    local++
+    return local
+  }
+  return bar
+}
+```
+
+因为如果不 return，你就无法使用这个闭包。把 return bar 改成 obj.bar = bar 也是一样的，只要让外面可以访问到这个 bar 函数就行了。
+
+所以 return bar 只是为了 bar 能被使用，也跟闭包无关。
+
+##### 闭包会造成内存泄漏？
+
+内存泄露是指用不到（访问不到）的变量，依然占居着内存空间，不能被再次利用起来。
+
+存泄漏在于“浪费”二字，其实闭包会不会发生内存泄漏主要是看你以后会不会对这个闭包里的变量继续进行引用，如果你以后继续引用，这个闭包里的变量跟定义在全局作用域里的作用差不多，只是为了封装成私有不被污染。
+
+如果你以后不再引用则造成内存浪费，需要手动null释放对闭包的引用，即将引用（指向）包含闭包的函数的变量赋值为null。
+
+```js
+function foo(){
+  var local = 1
+  function bar(){
+    local++
+    return local
+  }
+  return bar
+}
+let a = foo()
+// ...
+a = null // 不再引用时
+```
+
+之所以有闭包会造成内存泄漏的谣言，是因为在IE中因为循环引用可能会导致内存泄露。
+
+#### 立即执行函数
+
+```js
+(function foo(){console.log("Hello World!")}())//用括号把整个表达式包起来,正常执行
+(function foo(){console.log("Hello World!")})()//用括号把函数包起来，正常执行
+!function foo(){console.log("Hello World!")}()//使用！，求反，这里只想通过语法检查。
++function foo(){console.log("Hello World!")}()//使用+，正常执行
+-function foo(){console.log("Hello World!")}()//使用-，正常执行
+~function foo(){console.log("Hello World!")}()//使用~，正常执行
+void function foo(){console.log("Hello World!")}()//使用void，正常执行
+new function foo(){console.log("Hello World!")}()//使用new，正常执行
+```
+
+> 原理：让 JS 引擎认为这不是函数声明式
+>
+> 可以把foo省略，写成匿名函数
+
+#### 箭头函数
+
+ES6标准新增了一种新的函数：Arrow Function（箭头函数）
+
+箭头函数没有自己的`this`，`arguments`，`super`或`new.target`。
+
+> **super**关键字用于访问和调用一个对象的父对象上的函数。
+>
+> **new.target**属性允许你检测函数或构造方法是否是通过[new](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Operators/new)运算符被调用的。即箭头函数不能用作构造器，和 new一起用会抛出错误。
+
+```js
+x => x * x
+// 等价于
+function (x) {
+  return x * x;
+}
+```
+
+箭头函数相当于匿名函数，并且简化了函数定义。箭头函数有两种格式，一种像上面的，只包含一个表达式，连{ ... }和return都省略掉了。还有一种可以包含多条语句，这时候就不能省略{ ... }和return：
+
+```js
+x => {
+  if (x > 0) {
+ 		return x * x;
+  }
+  else {
+		return - x * x;
+  }
+}
+```
+
+如果参数不是一个，就需要用括号()括起来：
+
+```js
+// 两个参数:
+(x, y) => x * x + y * y
+
+// 无参数:
+( ) => 3.14
+
+// 可变参数:
+(x, y, ...rest) => {
+  var i, sum = x + y;
+  for (i=0; i<rest.length; i++) {
+		sum += rest[i];
+  }
+  return sum;
+}
+```
+
+如果要返回一个对象，就要注意，如果是单表达式，这么写的话会报错：
+
+```js
+// SyntaxError:
+x => { foo: x }
+// 因为和函数体的{ ... }有语法冲突，所以要改为：
+// ok:
+x => ({ foo: x })
+```
+
+##### **词法作用域**
+
+由书写代码时函数声明的位置来决定的。
+
+箭头函数看上去是匿名函数的一种简写，但实际上，箭头函数和匿名函数有个明显的区别：箭头函数内部的this是词法作用域，由上下文确定。
+
+所以，用bind()、call()或者apply()调用箭头函数时，无法对this进行绑定，即传入的第一个参数被忽略。
+
+箭头函数没有prototype属性。
+
+箭头函数不能用作生成器。
+
+##### 适用场景
+
+1. 箭头函数适合于无复杂逻辑或者无副作用的纯函数场景下，例如用在 map 、 reduce 、 filter 的回调函数定义中；
+
+2. 不要在最外层定义箭头函数，因为在函数内部操作 this 会很容易污染全局作用域。最起码在箭头函数外部包一层普通函数，将 this 控制在可见的范围内；
+
+3. 如开头所述，箭头函数最吸引人的地方是简洁。在有多层函数嵌套的情况下，箭头函数的简洁性并没有很大的提升，反而影响了函数的作用范围的识别度，这种情况不建议使用箭头函数。
+
 #### 高阶函数
 
 高阶函数英文叫 `Higher-order function`。高阶函数是对其他函数进行操作的函数，操作可以是将函数作为参数，或者返回函数。简单总结为高阶函数是一个接收函数作为参数或者将函数作为返回输出的函数。
@@ -1696,6 +2105,226 @@ result.value.then(function(data){
  (1). 如果finally中存在return语句，则返回finally的return结果，代码运行结束。
  (2). 如果finally不存在return语句，则运行catch中的throw语句，代码运行结束。
 
+#### 事件循环
+
+##### 执行机制
+
+![执行机制](http://jay_ohhh.gitee.io/imagehosting/JS/执行机制.png)
+
+
+
+> Event Loop中，每一次循环称为tick
+
+翻开规范《ECMAScript® 2015 Language Specification》，找到事件循环 8.1.6 [Event loops](https://html.spec.whatwg.org/multipage/webappapis.html#event-loops)。
+
+规范中中提到，一个浏览器环境，只能有一个事件循环，而一个事件循环可以多个任务队列，每个任务都有一个任务源（Task source）。
+
+相同任务源的宏任务，只能放到同一个宏任务队列中。
+
+如 setTimeout setInterval setimmediate 会在一个task queue，网络IO会在一个task queue，用户的事件会在一个task queue。
+
+又举了一个例子说，客户端可能实现了一个包含鼠标键盘事件的任务队列，还有其他的任务队列，而给鼠标键盘事件的任务队列更高优先级，例如75%的可能性执行它。这样就能保证流畅的交互性，而且别的任务也能执行到了。同一个任务队列中的任务必须按先进先出的顺序执行，但是不保证多个任务队列中的任务优先级，具体实现可能会交叉执行。
+
+**结论**
+
+一个事件循环可以有多个宏任务队列，队列之间可有不同的优先级，同一队列中的任务按先进先出的顺序执行，但是不保证多个宏任务队列中的任务优先级，具体实现可能会交叉执行。
+
+##### 宏任务、微任务、不同任务队列的优先级
+
+![宏任务和微任务的关系](http://jay_ohhh.gitee.io/imagehosting/JS/宏任务和微任务的关系.png)
+
+> 当我们调用resolve()或reject()的时候，触发promise.then(...)实际上是一个异步操作，这个promise.then(...)并不是在resolve()或reject()的时候就立刻执行的，而也是要重新进入任务队列排队的，不过能直接在当前的事件循环新的执行栈中被取出执行（不用等下次事件循环）。
+
+在JS引擎中，我们可以按性质把任务分为两类，**macrotask**（宏任务）和 **microtask**（微任务）。
+
+**macrotask queue**可以有多个，相同任务源的宏任务，只能放到同一个宏任务队列中。
+
+如 setTimeout setInterval setimmediate 会在一个task queue，网络IO会在一个task queue，用户的事件会在一个task queue。
+
+**microtask queue** 只有一个，因为microtask queue是在当前task queue执行时生成的，在下一个task queue执行时会清空并重新生成。
+
+**优先级**
+
+1、macrotask（按优先级顺序排列）：script(你的全部JS代码，“同步代码”）、 setTimeout、setInterval、setImmediate、 I/O、UI rendering
+
+2、microtask（按优先级顺序排列）：process.nextTick、Promise（这里指浏览器原生实现的 Promise）, Object.observe、 MutationObserver
+
+> microtask任务 也可以生成新的 microtask任务 并且插入到同样的队列中（插入当前microtask）并且在同一个 tick 里执行
+
+3、JS引擎首先从macrotask queue中取出第一个任务，执行完毕后，将microtask queue中的所有任务取出，按顺序全部执行；
+
+4、然后再从macrotask queue（宏任务队列）中取下一个，执行完毕后，再次将microtask queue（微任务队列）中的全部取出；
+
+5、循环往复，直到两个queue中的任务都取完。
+
+
+
+所以，**浏览器环境中**，js执行任务的流程是这样的：
+
+1、第一个事件循环，先执行script中的所有同步代码（即 macrotask 中的第一项任务）
+
+2、再取出 microtask 中的全部任务执行（先清空process.nextTick队列，再清空promise.then队列）
+
+3、下一个事件循环，再回到 macrotask 取其中的下一项任务
+
+4、再重复2
+
+5、反复执行事件循环…
+
+
+
+**宏任务**
+
+|                       | 浏览器 | Node |
+| --------------------- | ------ | ---- |
+| setTimeout            | √      | √    |
+| setInterval           | √      | √    |
+| setImmediate          | x      | √    |
+| requestAnimationFrame | √      | x    |
+
+**微任务**
+
+|                            | 浏览器 | Node |
+| -------------------------- | ------ | ---- |
+| process.nextTick           | x      | √    |
+| MutationObserver           | √      | x    |
+| Promise.then catch finally | √      | √    |
+
+
+
+**eg1**
+
+```js
+setTimeout(() => {
+    //执行后 回调一个宏事件
+    console.log('内层宏事件3')
+}, 0)
+console.log('外层宏事件1');
+
+new Promise((resolve) => {
+    console.log('外层宏事件2');
+    resolve()
+}).then(() => {
+    console.log('微事件1');
+}).then(()=>{
+    console.log('微事件2')
+})
+```
+
+我们看看打印结果
+
+```
+外层宏事件1
+外层宏事件2
+微事件1
+微事件2
+内层宏事件3
+```
+
+• 首先浏览器执行js进入第一个宏任务进入主线程, 遇到 setTimeout 分发到宏任务Event Queue中
+
+• 遇到 console.log() 直接执行 输出 外层宏事件1
+
+• 遇到 Promise， new Promise 直接执行 输出 外层宏事件2
+
+• 执行then 被分发到微任务Event Queue中
+
+•第一轮宏任务执行结束，开始执行微任务 打印 '微事件1' '微事件2'
+
+•第一轮微任务执行完毕，执行第二轮宏事件，打印setTimeout里面内容'内层宏事件3'
+
+**NodeJS引擎中**：
+
+1、先执行script中的所有同步代码，过程中把所有异步任务压进它们各自的队列（假设维护有process.nextTick队列、promise.then队列、setTimeout队列、setImmediate队列等4个队列）
+
+2、按照优先级（process.nextTick > promise.then > setTimeout > setImmediate），选定一个  不为空 的任务队列，按先进先出的顺序，依次执行所有任务，执行过程中新产生的异步任务继续压进各自的队列尾，直到被选定的任务队列清空
+
+3、重复2...
+
+
+
+#### Object的方法
+
+##### Object.keys()
+
+**for...in** 循环和**Object.keys**方法都是获取对象可枚举属性
+
+区别：前者包括对象继承自原型对象的属性，而后者只包括对象本身的属性。如果需要获取对象自身的所有属性，不管enumerable的值，可以使用**Object.getOwnPropertyNames**方法。
+
+##### Object.assign()
+
+**Object.assign()** 方法用于将所有可枚举属性的值从一个或多个源对象分配到目标对象。它将返回目标对象。
+
+```js
+Object.assign(target, source1, source2, ...)
+```
+
+参数
+
+- target：目标对象
+- sources：源对象
+
+返回值
+
+- 目标对象
+
+如果目标对象中的属性具有相同的键，则属性将被源对象中的属性覆盖。后面的源对象的属性将类似地覆盖前面的源对象的属性。
+
+##### Object.setPrototype
+
+设置一个指定的对象的原型 到另一个对象或 null。
+
+```
+Object.setPrototypeOf(obj, prototype)
+```
+
+参数
+
+- obj ：指定对象
+- prototype：原型(一个对象 或 null)
+
+##### Object.freeze()
+
+**冻结**一个对象。一个被冻结的对象再也不能被修改；冻结了一个对象则不能向这个对象添加新的属性，不能删除已有属性，不能修改该对象已有属性的可枚举性、可配置性、可写性，以及不能修改已有属性的值。此外，冻结一个对象后该对象的原型也不能被修改。`freeze()` 返回和传入的参数相同的对象。
+
+```js
+Object.freeze(obj)
+```
+
+参数
+
+- obj：要被冻结的对象
+
+返回值
+
+- 被冻结的对象（即返回原先的对象，但是被冻结了）
+
+##### Object.defineProperty(obj,prop,desc)
+
+- obj：需要定义属性的当前对象
+
+- prop：当前需要定义的属性名
+- desc：属性描述符
+
+desc属性描述符以对象形式属性
+
+- value：设置属性的值，默认为undefined
+- writable：值是否可以重写，默认为false
+- enumerable：属性是否可以被枚举，默认为false
+- configurable：属性是否可以被删除或是否可以被再次修改特性（再次使用Object.defineProperty修改配置属性描述符），默认为false
+- set：作为该属性的 是 setter 函数，默认为undefined
+- get：作为该属性的 getter 函数，默认为undefined
+
+> 定义对象时就存在的属性，或者通过 **对象.属性** 这种形式的增加的属性，writable、enumerable、configurable默认都是true。
+
+> 属性描述符： value、writable
+>
+> 存取描述符：set、get
+>
+> 属性描述符和存取描述符不能同时使用
+
+> get：当访问该属性时，会调用此函数。执行时不传入任何参数，但是会传入 this 对象（由于继承关系，这里的this并不一定是定义该属性的对象）。继承关系是指，我们有可能get的是原型对象或父类的属性。get属性（函数）的返回值会被用作属性的值，但并不是属性的value值。
+
 #### 术语
 
 ##### polyfill
@@ -1705,8 +2334,6 @@ polyfill或polyfiller是一段代码（或插件），用于抹平浏览器之�
 ###### 动态polyfill
 
 具体的使用方法非常简单，只需要外链一个 js：
-
-
 
 ```xml
 <script src="https://cdn.polyfill.io/v2/polyfill.min.js"></script>
