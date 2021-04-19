@@ -8,6 +8,20 @@
 
 var不支持块级作用域。
 
+##### let
+
+通过 `let` 声明的变量直到它们的定义被执行时才初始化。在初始化之前，该变量处在一个自块顶部到初始化处理的“暂存死区”中（temporal dead zone，简称 TDZ）。
+
+不能在同一作用域下用 let 重复声明变量。
+
+> let会不会变量提升，官方是没有明确说明的，也许底层机制上是提升了，但是形式是没有提升。无需纠结。
+
+##### const
+
+const和let唯一不同的是，const声明的时候必须进行初始化赋值，而且只能赋值一次。
+
+若存储的值不需要变化则建议用const，因为const常量是不变的，不需要引擎实时监控，效率更高。
+
 #### 变量提升和函数提升
 
 ES6新增了块级作用域。块级作用域由 { } 包括，if 语句和 for 语句里面的{ }也属于块作用域。
@@ -167,7 +181,7 @@ console.log(fn) // 1
 
 4、类的constructor的this指向实例对象，类的方法的this指向这个方法的调用者。
 
-5、闭包内部函数和外层函数的this，决定于代码执行时，它们的函数体被引用在哪个作用域（函数体的地址被哪个作用域的变量所引用），即this会指向该方法运行时所在的环境，普通函数和方法被调用时亦如此。
+5、闭包内部函数和外层函数的this，决定于代码执行时，它们的函数体被引用在哪个作用域（函数体的地址被哪个作用域的变量所引用），即this会指向该函数运行时所在的环境，普通函数和方法被调用时亦如此。
 
 **eg1**
 
@@ -331,11 +345,13 @@ new function foo(){console.log("Hello World!")}()//使用new，正常执行
 
 ES6标准新增了一种新的函数：Arrow Function（箭头函数）
 
-箭头函数没有自己的`this`，`arguments`，`super`或`new.target`。
+箭头函数没有`this`，`arguments`，`super`、`new.target`、`prototype`。
 
 > **super**关键字用于访问和调用一个对象的父对象上的函数。
 >
 > **new.target**属性允许你检测函数或构造方法是否是通过[new](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Operators/new)运算符被调用的。即箭头函数不能用作构造器，和 new一起用会抛出错误。
+>
+> 箭头函数不能用作函数生成器Generator 。
 
 ```js
 x => x * x
@@ -416,6 +432,22 @@ x => ({ foo: x })
 2. 可作为参数传递
 3. 可作为结果return
 4. 可包含在数据结构里
+
+##### Array对象的高阶函数
+
+- forEach 只遍历数组，不返回新数组
+- map  对每项元素做改变后，返回新数组，遍历需return
+- reduce  对每项元素做叠加，返回叠加后的值，遍历需return
+- some  判断数组中某些项是否符合条件（内部return true跳出循环），返回布尔值。遍历的是空数组，直接返回false。
+- every  判断数组中每一项是否符合条件（内部return false跳出循环），返回布尔值。遍历的是空数组，直接返回true。
+- filter  筛选出符合条件的元素，返回新数组，遍历需return布尔值
+- find 返回数组中满足条件的第一个元素的值，否则返回undefined，遍历需return布尔值
+- findIndex  返回数组中满足条件的第一个元素的索引，否则返回-1，遍历需return布尔值
+- includes  判断一个数组是否包含一个指定的值，返回布尔值
+
+> forEach、map、reduce无法break跳出循环，不能通过return操作退出循环
+
+[15个必须知道的数组方法](https://mp.weixin.qq.com/s?__biz=MzIyMDkwODczNw==&mid=2247489785&idx=2&sn=081bfa65dde2a7afd456446ab584962c&chksm=97c58557a0b20c41a10a5e9f8f703b234587c446ff3fe2ba1f4e9b00d69218725033590c06fd&mpshare=1&scene=1&srcid=0909JGL7noZ12WJ23eDNQntq&sharer_sharetime=1600417803716&sharer_shareid=27dcefb05bb42e9bc0099d713541b753&key=289ce58814d2cb9f99707c59176d8414168f707ab7787f2762e760713a7e8356a074aa25d68df39184a39832930509aa54cb71e933313904df1505cae8c02a663c3d9a86f320a5b68d22d5fc7d55fc9659b47eee3b65630d8ccd67f2074992908819170152fdcec863c4064e8b5a7374d99bce2936732de895d7afe01ecd3c64&ascene=1&uin=NjMxODk4NDM4&devicetype=Windows+7+x64&version=62090070&lang=zh_CN&exportkey=AZjpDr8XQeyG2MyOkDGStFw=&pass_ticket=ueinQ2L4MqKNmXVpmfiBK9MosLQpuVnoM3G8ruA/olLkhQM/VzO5XcmlT9P8O6a/&wx_header=0)
 
 #### 函数柯里化
 
@@ -1241,6 +1273,232 @@ document.getElementById('logo').addEventListener('click', function() {
   logoData.timesClicked++;
 }, false);
 ```
+
+#### Promise
+
+Promise 对象代表了未来将要发生的事件，用来传递异步操作的消息。
+
+Promise对象里的函数会立即执行
+
+```js
+new Promise((resolve, reject) => {
+  console.log(1)  // 立即执行
+  resolve()  // 立即执行
+}).then(res=>{})
+```
+
+当我们调用resolve()或reject()的时候，触发promise.then(...)实际上是一个异步操作，这个promise.then(...)并不是在resolve()或reject()的时候就立刻执行的，而也是要重新进入任务队列排队的，不过能直接在当前的事件循环新的执行栈中被取出执行（不用等下次事件循环）。
+
+##### Promise.resolve() 
+
+返回一个状态由给定value决定的Promise对象。
+
+```js
+Promise.resolve() 
+// 等价于
+new Promise(resolve =>{
+	resolve()
+})
+```
+
+##### Promise.reject()
+
+返回一个状态为失败的Promise对象，并将给定的失败信息传递给对应的处理方法—then或catch。
+
+```js
+Promise.reject() 
+// 等价于
+new Promise((resolve,reject) =>{
+	reject()
+})
+```
+
+##### Promise.prototype.then(onFulfilled [, onRejected])
+
+最多需要有两个参数：Promise 的成功和失败情况的回调函数。返回一个新的 promise。
+
+成功状态的回调函数接受前一个promise resolve的值作为参数。
+
+失败状态的回调函数接受前一个promise reject的值作为参数。
+
+##### Promise.prototype.catch(onRejected)
+
+catch内的回调函数接受前一个promise reject的值作为参数。返回一个新的 promise。
+
+##### Promise.all([ promise1,promise2, . . . ])
+
+接收一个Promise对象的集合，返回一个新的promise对象。该promise对象在数组里所有的promise对象都成功的时候才会触发成功，一旦有任何一个promise对象失败则立即触发该promise对象的失败。这个新的promise对象在触发成功状态以后，会把一个包含所有promise返回值的数组作为成功回调的返回值，顺序跟数组元素的顺序保持一致；如果这个新的promise对象触发了失败状态，它会把数组里第一个触发失败的promise对象的错误信息作为它的失败错误信息。Promise.all方法常被用于处理多个promise对象的状态集合。
+
+##### Promise.allSettked([ promise1,promise2, . . . ])
+
+接收一个Promise对象的集合，等到所有promises都已敲定（settled）（每个promise都已兑现（fulfilled）或已拒绝（rejected））。
+返回一个新promise对象，该promise在所有promise完成后完成。并带有一个对象数组（可以在then中获取），每个对象对应每个promise的结果。
+
+##### Promise.any([ promise1,promise2, . . . ])
+
+接收一个Promise对象的集合，当其中的一个 promise 成功，就返回那个成功的promise对象。
+
+##### Promise.race([ promise1,promise2, . . . ])
+
+接收一个Promise对象的集合。race就是赛跑的意思，意思就是说，Promise.race([p1, p2, p3])里面哪个结果获取得快，就返回那个结果，不管结果本身是成功状态还是失败状态。返回最快的那个promise对象。
+
+##### 使用例子
+
+```js
+let temp = 'aaa'
+new Promise((resolve, reject) => {
+  console.log(temp)
+  setTimeout(() => {
+    resolve(temp + '111')
+  }, 1000)
+}).then(data => {
+  console.log(data)
+  return new Promise(resolve => {
+    resolve(data + '222')
+  })
+    .then(data => {
+      console.log(data)
+      return Promise.resolve(data + '333') // new Promise((resolve) => {resolve()})的简写
+    })
+    .then(data => {
+      console.log(data)
+      return 'Promise' // 可以直接返回数据，实际上底层还是进行了new Promise
+    })
+    .then(data => {
+      console.log(data)
+      return Promise.reject('err')
+    })
+    .then(data => {
+      console.log('。。。') // 因为是reject，所以不会执行then的第一个回调函数
+      // 下面写了catch，这里就不写then的第二个回调函数了
+    })
+    .catch(err => {
+      console.log(err)
+      return Promise.resolve('Promise')
+    })
+    .then(data => {
+      console.log(data) // 'Promise'
+      console.log(qqq) // qqq未定义
+      // throw 'err' 将异常信息定义为err
+      console.log('-------') // 同一个作用域下，异常后面的代码不执行
+    })
+    .catch(err => {
+      console.log(err) // catch还能捕获then中第一个回调函数抛出的异常,防止阻塞
+      return 'Promise'
+    })
+    .then(data => {
+      console.log(data) // 'Promise'
+    })
+})
+
+// ----------------------------------------------
+
+let temp1 = 'aaa'
+new Promise((resolve, reject) => {
+  console.log(temp1)
+  setTimeout(() => {
+    resolve(temp1 + '111')
+  }, 1000)
+})
+  .then(res => {
+    console.log(res)
+    // 可以直接return data，等于 return Promise.resolve(结果)
+    return res + '888'
+  })
+  .then(res => {
+    console.log(res) // aaa111888
+    throw 'err'
+  })
+  .catch(err => {
+    console.log(err)
+    // 如果是 return 结果 或者return Promise.resolve(结果)，则可以被后面的then接受
+    return Promise.resolve('catch里面的resolve可以被之后的then接收')
+    // 如果是return Promise.reject，catch后面必须有一个catch，但不一定是紧跟
+    // return Promise.reject('catch里面的reject可以被之后的catch接收')
+  })
+  .then(res => {
+    console.log(res)
+  })
+  // finally是获取不到then和catch的return
+  .finally(res => {
+    console.log(res)
+  })
+
+```
+
+#### async/await
+
+`async`和`await`关键字让我们可以用一种更简洁的方式写出基于Promise的异步行为，而无需刻意地链式调用`promise`。
+
+1、await  只能被用在 async 函数中，await后面一般是async函数（返回promise对象的函数）或者后面接new Promise() 或者任何要等待的值。await就是把promise的resolve的数据拿出来直接使用。
+
+2、await会等待结果返回，再执行之后的代码
+
+> 如果await后面的promise没有resolve一个值，对await来说是失败了，后面的代码不会执行
+
+3、async 修饰的函数  隐式返回一个 promise（即使不写return）。箭头函数也能用async修饰。
+
+async函数内return  xxx ，底层内部实际上进行了new Promise (resolve => resolve(xxx))，跟Promise的用法一样。
+
+4、在 await 外层  包一层  try{} catch(e){} 使用 可以获取异常
+
+5、并发要使用await Promise.all([ promise1,promise2, . . . ])
+
+6、async函数外部如果要到用then(res=>{})，要在async函数内return res。async函数内部就是promise 和 then 的语法糖。
+
+7、async函数本身不是异步的，是它里面的代码可能是异步的，如果想要执行完async函数再执行其他操作（而这个操作不想写在async函数内，因为不想每次执行async都会执行这个操作），这时候要在async函数后使用then。
+
+> 实际上，async / await 在底层转换成了 promise 和 then 回调函数。是基于promises的语法糖。每次我们使用 await, 解释器都创建一个 promise 对象，然后把剩下的 async 函数中的操作放到 then 回调函数中。
+
+- await会阻塞后面的代码
+
+```js
+async function fn(){
+	await console.log('a')
+}
+fn()
+console.log('b')
+// a
+// b
+```
+
+- 如果await后面的promise没有resolve一个值，对await来说是失败了，后面的代码不会执行
+
+```js
+function fn(){
+  return new Promise(resolve=>{
+      console.log(1)
+  })
+}
+async function f1(){
+  await fn()
+  console.log(2)
+}
+f1()
+console.log(3)
+//1
+//3
+```
+
+```js
+function fn(){
+  return new Promise(resolve=>{
+    console.log(1)
+    resolve()
+  })
+}
+async function f1(){
+  await fn()
+  console.log(2)
+}
+f1()
+console.log(3)
+//1
+//3
+//2
+```
+
+
 
 #### Generator函数
 
@@ -2196,19 +2454,27 @@ result.value.then(function(data){
 
 ```js
 setTimeout(() => {
-    //执行后 回调一个宏事件
-    console.log('内层宏事件3')
+  console.log('内层宏事件3')
 }, 0)
-console.log('外层宏事件1');
+console.log('外层宏事件1')
 
-new Promise((resolve) => {
-    console.log('外层宏事件2');
-    resolve()
-}).then(() => {
-    console.log('微事件1');
-}).then(()=>{
-    console.log('微事件2')
+new Promise(resolve => {
+  console.log('外层宏事件2')
+  resolve()
 })
+  .then(() => {
+    setTimeout(() => {
+      console.log('then-setTimeout-1')
+    })
+    console.log('微事件1')
+  })
+  .then(() => {
+    setTimeout(() => {
+      console.log('then-setTimeout-2')
+    })
+    console.log('微事件2')
+  })
+
 ```
 
 我们看看打印结果
@@ -2219,9 +2485,11 @@ new Promise((resolve) => {
 微事件1
 微事件2
 内层宏事件3
+then-setTimeout-1
+then-setTimeout-2
 ```
 
-• 首先浏览器执行js进入第一个宏任务进入主线程, 遇到 setTimeout 分发到宏任务Event Queue中
+• 首先浏览器执行js进入第一个宏任务进入主线程, 遇到 setTimeout 分发到宏任务Event Queue中（setTimeout优先级比script低）
 
 • 遇到 console.log() 直接执行 输出 外层宏事件1
 
@@ -2229,9 +2497,11 @@ new Promise((resolve) => {
 
 • 执行then 被分发到微任务Event Queue中
 
-•第一轮宏任务执行结束，开始执行微任务 打印 '微事件1' '微事件2'
+• 第一轮宏任务执行结束，开始执行第一个微任务，遇到setTimeoutout，分发到宏任务Event Queue中，然后打印 '微事件1' 
 
-•第一轮微任务执行完毕，执行第二轮宏事件，打印setTimeout里面内容'内层宏事件3'
+• 开始执行第二个微任务，遇到setTimeoutout，分发到宏任务Event Queue中，然后打印 '微事件2' 
+
+• 第一轮微任务执行完毕，执行第二轮宏事件，在同一宏任务队列中按照顺序打印 '内层宏事件3'、'then-setTimeout-1'、'then-setTimeout-2'
 
 **NodeJS引擎中**：
 
@@ -2324,6 +2594,81 @@ desc属性描述符以对象形式属性
 > 属性描述符和存取描述符不能同时使用
 
 > get：当访问该属性时，会调用此函数。执行时不传入任何参数，但是会传入 this 对象（由于继承关系，这里的this并不一定是定义该属性的对象）。继承关系是指，我们有可能get的是原型对象或父类的属性。get属性（函数）的返回值会被用作属性的值，但并不是属性的value值。
+
+
+
+#### 解构赋值
+
+通过**解构赋值,** 可以将属性/值从对象/数组中取出,赋值给其他变量。
+
+对象解构时：将“=”右边的属性解构出来，让将属性值赋值给“=”的左边的变量，按照属性名配对赋值的，所以左边的变量名要等于右边的属性名，当然左边的变量名也可以取别名，例如name：Name，将name取别名为Name。（先在右边找相应的属性，然后再根据需要取别名）。
+
+对数组元素（数组是对象，数组元素是属性）进行解构赋值时，多个变量要用[...]括起来，对对象属性进行解构赋值时，多个变量要用{...}括起来。
+
+```js
+let { name:Name,age } = { name:'swr',age:28 }
+let [x, y, z] = ['hello', 'JavaScript', 'ES6']; 
+```
+
+注意嵌套层次和位置要保持一致：
+
+```js
+let person = {
+    name: '小明',
+    address: {
+        city: 'Beijing',
+        street: 'No.1 Road',
+        zipcode: '100001'
+    }
+};
+var {name, address: {city, zipcode:zip}} = person;
+console.log(city); // 'Beijing'
+console.log(zip); // '100001'
+```
+
+如果数组本身还有嵌套（多维数组），也可以通过下面的形式进行解构赋值，注意嵌套层次和位置要保持一致：
+
+```js
+let [x, [y, z]] = ['hello', ['JavaScript', 'ES6']];
+x; // 'hello'
+y; // 'JavaScript'
+z; // 'ES6'
+```
+
+解构赋值还可以忽略某些元素：
+
+```js
+let [, , z] = ['hello', 'JavaScript', 'ES6']; // 忽略前两个元素，只对z赋值第三个元素
+z; // 'ES6'
+```
+
+解构赋值还可以使用默认值：
+
+```js
+let { name,age=18 } = { name:'swr'}
+```
+
+有些时候，如果变量已经被声明了，再次赋值的时候，正确的写法也会报语法错误：
+
+```js
+// 声明变量
+var x, y;
+// 解构赋值
+{x, y} = { name: '小明', x: 100, y: 200};// 语法错误
+```
+
+这是因为JavaScript引擎把 { 开头的语句当作了块处理，解决方法是用小括号括起来：
+
+```js
+// 声明变量
+var x, y;
+({x, y} = { name: '小明', x: 100, y: 200});//相当于匿名对象解构赋值
+name; //小明
+x; //100
+y; //200
+```
+
+
 
 #### 术语
 
