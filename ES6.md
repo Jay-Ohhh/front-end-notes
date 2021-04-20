@@ -2668,7 +2668,274 @@ x; //100
 y; //200
 ```
 
+#### Proxy
 
+**Proxy** 对象用于创建一个对象的代理，从而实现基本操作的拦截和自定义（如属性查找、赋值、枚举、函数调用等）。
+
+```js
+const p = new Proxy(target, handler);
+```
+
+**参数**
+
+- target：需要使用`Proxy`包装的目标对象（可以是任何类型的对象，包括原生数组，函数，甚至另一个代理）
+- handler：处理器对象，包含各种行为的捕获器（属性），捕获器中的函数定义执行一个操作时代理的行为
+
+**返回值**
+
+返回目标对象的代理对象
+
+##### [handler对象的方法](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Proxy)
+
+https://segmentfault.com/a/1190000019675719?utm_source=tag-newest
+
+在TypeScript中定义了可被代理得基本操作，一共14个（Reflect对象也是具有这14个方法），如下：
+
+```ts
+interface ProxyHandler<T extends object> {
+    getPrototypeOf? (target: T): object | null;
+    setPrototypeOf? (target: T, v: any): boolean;
+    isExtensible? (target: T): boolean;
+    preventExtensions? (target: T): boolean;
+    getOwnPropertyDescriptor? (target: T, p: PropertyKey): PropertyDescriptor | undefined;
+    has? (target: T, p: PropertyKey): boolean;
+    get? (target: T, p: PropertyKey, receiver: any): any;
+    set? (target: T, p: PropertyKey, value: any, receiver: any): boolean;
+    deleteProperty? (target: T, p: PropertyKey): boolean;
+    defineProperty? (target: T, p: PropertyKey, attributes: PropertyDescriptor): boolean;
+    enumerate? (target: T): PropertyKey[]; //废弃
+    ownKeys? (target: T): PropertyKey[];
+    apply? (target: T, thisArg: any, argArray?: any): any;
+    construct? (target: T, argArray: any, newTarget?: any): object;
+}
+```
+
+需要注意的是，如果一个属性不可配置（configurable）且不可写（writable），则 Proxy 不能修改该属性。
+
+Proxy只代理对象外层属性。
+
+##### 递归代理对象内部对象
+
+```js
+let obj={a:1,b:{c:2}};
+let handler={
+  get:function(obj,prop){
+    const v = Reflect.get(obj,prop);
+    if(v !== null && typeof v === 'object'){
+      return new Proxy(v,handler);//代理内层
+    }else{
+      return v; // 返回obj[prop]
+    }
+  },
+  set(obj,prop,value){
+    obj[prop] = value
+    return true;
+    // 或 return Reflect.set(obj,prop,value) // 设置成功返回true
+  }
+};
+let p=new Proxy(obj,handler);
+
+console.log(p.a)//会触发get方法
+console.log(p.b.c)//会先触发get方法获取p.b，然后触发返回的新代理对象的.c的set。
+
+p.b.c = 3
+console.log(p.b.c)
+```
+
+##### Proxy对象和原始对象
+
+改变了proxy实例的属性的值，被代理的原对象的属性的值也会改变。
+
+```js
+let target = {};
+let p = new Proxy(target, {});
+
+p.a = 1;   // 操作转发到目标
+
+console.log(target.a);    // 1  操作已经被正确地转发
+
+target.a=2;
+console.log(p.a)//2
+
+console.log(target===p)//false
+```
+
+##### Reflect
+
+**Reflect**是一个内置的对象，它提供拦截 JavaScript 操作的方法。这些方法与[proxy handlers](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Proxy)的方法相同。Reflect不是一个函数对象，因此它是不可构造的。
+
+**eg**
+
+```js
+const duck = {
+  name: 'Maurice',
+  color: 'white',
+  greeting: function() {
+    console.log(`Quaaaack! My name is ${this.name}`);
+  }
+}
+
+Reflect.has(duck, 'color');
+// true
+Reflect.has(duck, 'haircut');
+// false
+```
+
+##### Proxy和Object.defineProperty
+
+1、Proxy使用上比Object.defineProperty方便的多。
+
+2、Proxy代理整个对象，Object.defineProperty只代理对象上的某个属性。
+
+3、对象上定义新属性时，Proxy可以监听到，Object.defineProperty监听不到。
+
+4、数组新增删除修改时，Proxy可以监听到，Object.defineProperty监听不到。
+
+5、Proxy不兼容IE，Object.defineProperty不兼容IE8及以下。
+
+#### 运算符 & 操作符
+
+##### [运算符优先级](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Operators/Operator_Precedence)
+
+##### void
+
+void 是一元运算符，它可以出现在任意类型的操作数（表达式）之前执行操作数（表达式），却忽略操作数的返回值，返回undefined。用法：
+
+```js
+var a = b = c = 2;  //定义并初始化变量的值
+var d = void (a -= (b *= (c += 5)));  // 执行void运算符，并把返回值赋予变量
+console.log(a);  //返回-12
+console.log(b);  //返回14
+console.log(c);  //返回7
+console.log(d);  //返回undefined
+```
+
+#### window
+
+##### window.requestAnimationFrame & window.cancelAnimationFrame
+
+**window.requestAnimationFrame()** 告诉浏览器——你希望执行一个动画，并且要求浏览器在下次重绘之前调用指定的回调函数更新动画。该方法需要传入一个回调函数作为参数，该回调函数会在浏览器下一次重绘之前执行。
+
+> 若你想在浏览器下次重绘之前继续更新下一帧动画，那么回调函数自身必须再次调用window.requestAnimationFrame()
+
+```js
+window.requestAnimationFrame(callback);
+```
+
+**参数**
+
+callback：下一次重绘之前更新动画帧所调用的函数
+
+**返回值**
+
+一个 `long` 整数，请求 ID，可以传这个值给 [`window.cancelAnimationFrame()`](https://developer.mozilla.org/zh-CN/docs/Web/API/Window/cancelAnimationFrame) 以取消回调函数。
+
+###### 优点
+
+（1）requestAnimationFrame会把每一帧中的所有DOM操作集中起来，在一次重绘或回流中就完成，并且重绘或回流的时间间隔紧紧跟随浏览器的刷新频率
+
+（2）在隐藏或不可见的元素中，requestAnimationFrame将不会进行重绘或回流，这当然就意味着更少的CPU、GPU和内存使用量
+
+（3）requestAnimationFrame是由浏览器专门为动画提供的API，在运行时浏览器会自动优化方法的调用，并且如果页面不是激活状态下的话，动画会自动暂停，有效节省了CPU开销。
+
+（4）回调的次数通常是每秒60次，但大多数浏览器通常匹配 W3C 所建议的刷新频率，避免刷新率过高，浪费性能：
+
+- 浏览器会努力确保每秒 60 帧（60fps）。然而，如果浏览器无法确保，那么自然会限制每秒的帧数。例如，某个设备可能只能处理每秒 30 帧，所以每秒只能得到 30 帧。使用 requestAnimationFrame 来节流是一种有用的技术，它可以防止在一秒中进行 60 帧以上的更新。如果一秒钟内完成 100 次更新，则会为浏览器带来额外的负担，而用却户无法感知到这些工作。
+
+- 采用系统时间间隔(大多浏览器刷新频率是 60Hz，相当于 1000ms/60≈16.6ms)，保持最佳绘制效率，不会因为间隔时间过短，造成过度绘制，增加开销；也不会因为间隔时间太长，使用动画卡顿不流畅，让各种网页动画效果能够有一个统一的刷新机制。
+
+###### requestAnimationFrame 和 setTimeout
+
+与setTimeout相比，requestAnimationFrame最大的优势是由系统来决定回调函数的执行时机。
+
+换句话来说，requestAnimationFrame的步伐跟着系统的刷新步伐走。它能保证回调函数在屏幕每一次的刷新间隔中只被执行一次，这样就不会引起丢帧现象，也不会导致动画出现卡顿的问题。 
+
+###### 兼容性封装
+
+```js
+function() {
+  let lastTime = 0
+  if (!window.requestAnimationFrame) {
+    window.requestAnimationFrame =
+      window.webkitRequestAnimationFrame ||
+      window.msRequestAnimationFrame ||
+      window.mozRequestAnimationFrame ||
+      window.oRequestAnimationFrame ||
+      function (callback) {
+        let currentTime = new Date().getTime()
+        // 16.7ms是1000/60,每一帧需要的毫秒数  
+        // x = (currentTime - lastTime) 是当前时间 - 上次时间，意味着已经过了 x ms
+        // 16.7 - x 是想让setTimeout的回调函数callback在16.7ms之后执行 
+        let timeToCall = Math.max(0, 16.7 - (currentTime - lastTime))
+        let timer = window.setTimeout(function () {
+          callback(currentTime + timeTocall)
+        }, timeToCall)
+        lastTime = currentTime + timeToCall
+        return timer
+      }
+  }
+  if (!window.cancelAnimationFrame) {
+    window.cancelAnimationFrame =
+      window.webkitCancelAnimationFrame ||
+      window.webkitCancelRequestAnimationFrame ||
+      window.mozCancelAnimationFrame ||
+      window.mozCancelRequestAnimationFrame ||
+      window.msCancelAnimationFrame ||
+      window.msCancelRequestAnimationFrame ||
+      window.oCancelAnimationFrame ||
+      window.oCancelRequestAnimationFrame ||
+      function (id) {
+        window.clearTimeout(id)
+      }
+  }
+} 
+```
+
+
+
+#### 作用域
+
+作用域即执行环境，每个执行环境都有一个与之关联的变量对象，环境中定义的所有变量和函数都保存在这个对象中。在 web 浏览器中，全局执行环境被认为是 window 对象。且每个函数都有自己的执行环境，在进入函数时入栈，在函数执行之后，栈将其环境弹出，把控制权返回给之前的执行环境。
+
+当代码在一个环境中执行时，会创建变量对象的一个作用域链，是保证对执行环境有权访问的所有变量和函数的有序访问。作用域链的前端，始终是当前执行的代码所在环境的变量对象，最后端，始终是全局执行环境的变量对象。
+
+JavaScript 代码运行时，会产生一个全局的上下文环境（context，又称运行环境），包含了当前所有的变量和对象。然后，执行函数（或块级代码）的时候，又会在当前上下文环境的上层，产生一个函数运行的上下文，变成当前（active）的上下文，由此形成一个上下文环境的堆栈（context stack）。
+
+这个堆栈是“后进先出”的数据结构，最后产生的上下文环境首先执行完成，退出堆栈，然后再执行完成它下层的上下文，直至所有代码执行完成，堆栈清空。
+
+但是Generator函数是例外的：
+
+Generator 函数不是这样，它执行产生的上下文环境，一旦遇到`yield`命令，就会暂时退出堆栈，但是并不消失，里面的所有变量和对象会冻结在当前状态。等到对它执行`next`命令时，这个上下文环境又会重新加入调用栈，冻结的变量和对象恢复执行。
+
+#### 垃圾回收机制
+
+JS 中最常用的跟踪方法是标记清除，当函数执行完后，就会给局部变量打上“离开环境”的标记（除了闭包），在下一次垃圾回收时间到来时就会清除这一块内存，手动将一个有值的变量赋值为 null，也是让这个值离开环境，也可以释放内存。
+
+还有一种跟踪方法是引用计数，这会引起循环引用的问题，但现在所有的浏览器都使用了标记清除式的垃圾回收机制，所以不用考虑这个问题了。
+
+#### console
+
+console.*方法是没有相关规定是同步还是异步的，因此，不同的浏览器和JavaScript 环境可以按照自己的意愿来实现。
+
+在webkit内核浏览器中：
+
+```js
+var a = {
+  index: 1
+};
+console.log( a ); //  输出 { index: 2 }
+a.index++;
+```
+
+在调试的过程中遇到对象在console.log(..) 语句之后被修改，可你却看到了意料之外的输出结果，要意识到这可能是这种 I/O 的异步化造成的。
+
+如果遇到这种少见的情况，最好的选择是在JavaScript 调试器中使用断点，而不要依赖控制台输出。次优的方案是把对象序列化到一个字符串中，以强制执行一次“快照”，比如通过JSON.stringify()。
+
+一般对于基本类型number、string、boolean、null、undefined的输出是可信的。但对于Object等引用类型来说，则就会出现上述异常打印输出。
+
+ 
+
+在Node环境中，console.*方法是严格同步的，不会出现上述Object等引用类型异常打印输出的情况。
 
 #### 术语
 
@@ -2692,3 +2959,34 @@ polyfill或polyfiller是一段代码（或插件），用于抹平浏览器之�
 
 polyfill.io 的原理，它会根据你的浏览器 UA 头，判断你是否支持某些特性，从而返回给你一个合适的 polyfill。对于最新的 Chrome 浏览器来说，不需要任何 polyfill，所以返回的内容为空。对于 iOS Safari 来说，需要 URL 对象的 polyfill，所以返回了对应的资源。
 
+##### DOMString
+
+是一个UTF-16字符串。由于JavaScript已经使用了这样的字符串，所以DOMString 直接映射到 JavaScript String。
+
+##### 函数签名
+
+一个函数签名 (或类型签名，或方法签名) 定义了 函数 或 方法 的输入与输出。
+
+一个签名可以包括：
+
+- 参数 及参数的 类型
+
+- 一个返回值及其类型
+
+- 可能会抛出或传回的 异常
+
+- 有关 面向对象 程序中方法可用性的信息 (例如关键字 public、static 或 prototype)。
+
+##### falsy
+
+在 JavaScript 中只有 8 **个** **falsy** 值：
+
+| `false`                                                      | [false](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Lexical_grammar#Future_reserved_keywords_in_older_standards) 关键字 |      |
+| ------------------------------------------------------------ | ------------------------------------------------------------ | ---- |
+| 0                                                            | 数值 [zero](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type) |      |
+| -0                                                           | 数值 负 [zero](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type) |      |
+| 0n                                                           | 当 [BigInt](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/BigInt) 作为布尔值使用时, 遵从其作为数值的规则. `0n` 是 *falsy* 值. |      |
+| "", '', ``                                                   | 这是一个空字符串 (字符串的长度为零). JavaScript 中的字符串可用双引号 `**""**`, 单引号 `''`, 或 [模板字面量](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Template_literals) `` 定义。 |      |
+| [null](https://developer.mozilla.org/zh-CN/docs/Glossary/Null) | [null](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/null) - 缺少值 |      |
+| [undefined](https://developer.mozilla.org/zh-CN/docs/Glossary/undefined) | [undefined](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/undefined) - 原始值 |      |
+| [NaN](https://developer.mozilla.org/zh-CN/docs/Glossary/NaN) | [NaN ](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/NaN)- 非数值 |      |
