@@ -2913,6 +2913,243 @@ JS 中最常用的跟踪方法是标记清除，当函数执行完后，就会�
 
 还有一种跟踪方法是引用计数，这会引起循环引用的问题，但现在所有的浏览器都使用了标记清除式的垃圾回收机制，所以不用考虑这个问题了。
 
+
+
+#### 存储
+
+##### cookie
+
+###### cookie的来源
+
+**cookie 的本职工作并非本地存储，而是“维持状态”**。因为HTTP协议是**无状态的**，HTTP协议自身不对请求和响应之间的通信状态进行保存，通俗来说，服务器不知道用户上一次做了什么，这严重阻碍了交互式Web应用程序的实现。在典型的网上购物场景中，用户浏览了几个页面，买了一盒饼干和两瓶饮料。最后结帐时，由于HTTP的无状态性，不通过额外的手段，服务器并不知道用户到底买了什么，于是就诞生了cookie。它就是用来绕开HTTP的无状态性的“额外手段”之一。服务器可以设置或读取cookie中包含信息，借此维护用户跟服务器会话中的状态。
+
+在刚才的购物场景中，当用户选购了第一项商品，服务器在向用户发送网页的同时，还发送了一段cookie，记录着那项商品的信息。当用户访问另一个页面，浏览器会把cookie发送给服务器，于是服务器知道他之前选购了什么。用户继续选购饮料，服务器就在原来那段Cookie里追加新的商品信息。结帐时，服务器读取发送来的cookie就行了。
+
+###### 什么是cookie
+
+cookie指某些网站为了辨别用户身份而储存在用户本地终端上的数据(通常经过加密)。**cookie是服务端生成，客户端进行维护和存储（保存在浏览器）**，存储在内存或者磁盘中。通过cookie,可以让服务器知道请求是来源哪个客户端，就可以进行客户端状态的维护，比如登陆后刷新，请求头就会携带登陆时response header中的Set-Cookie,Web服务器接到请求时也能读出cookie的值，根据cookie值的内容就可以判断和恢复一些用户的信息状态。
+
+**cookie 遵循同源政策**
+
+###### 使用场景
+
+cookie 主要用于以下三个方面：
+
+- 会话状态管理（如用户登录状态、购物车、游戏分数或其它需要记录的信息）
+- 个性化设置（如用户自定义设置、主题等）
+- 浏览器行为跟踪（如跟踪分析用户行为等）
+
+###### cookie的原理
+
+![cookie](http://jay_ohhh.gitee.io/imagehosting/JS/cookie.webp)
+
+第一次访问网站的时候，浏览器发出请求，服务器端生成 cookie在响应中通过Set-Cookie头部告知客户端(允许多个Set-Cookie头部传递多个cookie)，客户端得到 cookie后,后续请求都会自动将 cookie头部携带至请求中发送给服务器（见下面例子），另外，cookie的过期时间、域、路径、有效期、适用站点都可以根据需要来指定。
+
+> 一个set-Cookie 字段只能设置一个cookie ，当你要想设置多个 cookie ，需要添加同样多的set-Cookie 字段
+>
+> 如果你想要使用 Set-Cookie 修改一个已经存在的 cookie 的值，那么要注意，你必须匹配原有的所有的属性值（如果存在的话），否则就会生成一个新的 cookie，而不是修改它的值
+
+```
+// 一个HTTP响应：
+HTTP/1.1 200 OK
+Content-type: text/html
+Set-Cookie: name=value
+Other-header: other-header-value
+```
+
+这个HTTP响应会设置一个名为"name"，值为"value"的cookie。名和值在发送时都会经过URL编码。浏览器会存储这些会话信息，并在之后的每个请求中都会通过HTTP头部cookie再将它们发回服务器，比如：
+
+```
+GET /index.jsl HTTP/1.1
+Cookie: name=value
+Other-header: other-header-value
+```
+
+###### cookie构成
+
+cookie在浏览器中是由以下参数构成的：
+
+- **name**：唯一标识cookie的名称。cookie名不区分大小写，因此myCookie和MyCookie是同一个名称。不过，实践中最好将cookie名当成区分大小写来对待，因为一些服务器软件可能这样对待它们。**cookie名必须经过URL编码**。
+- **value**：存储在cookie里的字符串值。**这个值必须经过URL编码**。
+- **Domain**：cookie有效的域。发送到这个域的所有请求都会包含对应的cookie。如果不指定，默认为文档来源（由协议、域名和端口共同定义），**不包含子域名**。如果指定了`Domain`，则一般包含子域名。因此，指定 `Domain` 比省略它的限制要少。但是，当子域需要共享有关用户的信息时，这可能会有所帮助。例如，如果设置 Domain=mozilla.org，则 Cookie 也包含在子域名中（如developer.mozilla.org）。
+- **Path**：请求URL中包含这个路径才会把cookie发送到服务器。
+
+```
+// 例如，设置 Path=/docs，则以下地址都会匹配：
+/docs
+/docs/Web/
+/docs/Web/HTTP
+```
+
+- **Expires/Max-Age**：设置cookie过期时间（Expires）或有效期（Max-Age）（即什么时间之后就不发送到服务器了）。**简单名/值对形式的cookie只在当前会话期间存在，用户关闭浏览器就会丢失**。如果想让cookie的生命周期超过单个浏览对话，那就指定Expires/Max-Age，**max-age优先级高于expires。**
+- **Secure**：设置之后，**只在使用SSL安全连接**的情况下才会把cookie发送到服务器。例如，请求`https://www.wrox.com`会发送cookie，而请求`http://www.wrox.com`则不会。
+- **HttpOnly**：设置了 HttpOnly 属性的 cookie 不能使用 JavaScript 经由  Document.cookie 属性、XMLHttpRequest 和  Request APIs 进行访问，以防范跨站脚本攻击（XSS）。
+
+```
+HTTP/1.1 200 OK
+Content-type: text/html
+Set-Cookie: name=value; domain=.wrox.com; path=/; secure
+Other-header: other-header-value
+```
+
+这里创建的cookie对所有wrox.com的子域及该域中的所有页面有效（通过path=/指定）。不过，这个cookie只能在SSL连接上发送，因为设置了secure标志。
+
+要知道，**域、路径、过期时间和secure标志用于告诉浏览器什么情况下应该在请求中包含cookie**。这些参数并不会随请求发送给服务器，**实际发送的只有cookie的名/值对**。
+
+###### JavaScript中的Cookie
+
+一般说来，cookie的生成方式主要有两种，一种是上文提到的在响应中通过Set-Cookie头部告知客户端；另外一种就是在JavaScript中可以通过document.cookie可以读写cookie，如下：
+
+```js
+//读取浏览器中的cookie
+console.log(document.cookie);
+//写入cookie
+document.cookie='myname=langlixingzhou;path=/;domain=.baidu.com';
+```
+
+在JavaScript中处理cookie比较麻烦，因为接口过于简单，只有BOM的document.cookie属性。在设置值时，可以通过document.cookie属性设置新的cookie字符串。这个字符串在被解析后会添加到原有cookie中。设置document.cookie不会覆盖之前存在的任何cookie，除非设置了已有的cookie。要为创建的cookie指定额外的信息，只要像Set-Cookie头部一样直接在后面追加相同格式的字符串即可：
+
+```js
+document.cookie = encodeURIComponent("name") + "=" +
+                  encodeURIComponent("Nicholas") + "; domain=.wrox.com; path=/";
+// 使用encodeURIComponent()对名称和值进行编码
+```
+
+###### cookie缺陷
+
+- cookie 不够大
+
+每个cookie的大小为4KB（**名字和值都包含在这4KB之内**），对于复杂的存储需求来说是不够用的。当 cookie 超过 4KB 时，它将面临被裁切的命运。这样看来，cookie 只能用来存取少量的信息。此外很多浏览器对一个站点的cookie个数也是有限制的（一般来说不超过300个cookie）。
+
+- 过多的 cookie 会带来巨大的性能浪费
+
+cookie是与特定域绑定的。同一个域名下的所有请求，都会携带 cookie。大家试想，如果我们此刻仅仅是请求一张图片或者一个 CSS 文件，我们也要携带一个 cookie 跑来跑去（关键是 cookie 里存储的信息并不需要），这是一件多么劳民伤财的事情。cookie 虽然小，但随着请求的叠加，这样的不必要的 cookie 带来的开销将是无法想象的。
+
+cookie是用来维护用户信息的，而域名(domain)下所有请求都会携带cookie，但对于静态文件的请求，携带cookie信息根本没有用，此时可以通过CDN（存储静态文件的）的域名和主站的域名分开来解决。
+
+- 由于在HTTP请求中的cookie是明文传递的，所以安全性成问题，除非用HTTPS。
+
+###### cookie与安全
+
+| 属性      | 作用                                                         |
+| --------- | ------------------------------------------------------------ |
+| value     | 如果用于保存用户登录态，应该将该值加密，不能使用明文的用户标识 |
+| http-only | 不能通过JS访问cookie，减速 XSS 攻击                          |
+| secure    | 只能在协议为 HTTPS 的请求中携带                              |
+| same-site | 规定浏览器不能在跨域请求中携带 Cookie，减速 CSRF 攻击        |
+
+有两种方法可以确保 cookie 被安全发送，并且不会被意外的参与者或脚本访问：`Secure` 属性和`HttpOnly` 属性。
+
+标记为 `Secure` 的 cookie 只应通过被 HTTPS 协议加密过的请求发送给服务端，因此可以预防中间人攻击。但即便设置了 `Secure` 标记，**敏感信息也不应该通过 cookie 传输**，因为 cookie 有其固有的不安全性，`Secure` 标记也无法提供确实的安全保障, 例如，可以访问客户端硬盘的人可以读取它。
+
+从 Chrome 52 和 Firefox 52 开始，不安全的站点（`http:`）无法使用cookie的 `Secure` 标记。
+
+JavaScript Document.cookie API 无法访问带有 `HttpOnly` 属性的cookie；此类 cookie 仅作用于服务器。例如，持久化服务器端会话的 cookie 不需要对 JavaScript 可用，而应具有 `HttpOnly` 属性。此预防措施有助于缓解跨站点脚本（XSS）攻击。
+
+```
+Set-Cookie: id=a3fWa; Expires=Wed, 21 Oct 2019 07:28:00 GMT; Secure; HttpOnly
+```
+
+对cookie的限制及其特性决定了cookie并不是存储大量数据的理想方式，让“专业的人做专业的事情”，Web Storage 出现了。
+
+HTML5中新增了本地存储的解决方案----Web Storage，这样有了Web Storage后，cookie能只做它应该做的事情了—— 作为客户端与服务器交互的通道，保持客户端状态。
+
+##### session
+
+除了使用Cookie，Web应用程序中还经常使用Session来记录客户端状态。**Session是服务器端使用的一种记录客户端状态的机制**，使用上比Cookie简单一些，相应的也**增加了服务器的存储压力**。
+
+##### [cookie 和 session](https://www.cnblogs.com/l199616j/p/11195667.html)
+
+为了弥补HTTP协议无状态的不足，常用的会话跟踪技术是Cookie与Session。
+
+**Cookie通过在客户端记录信息确定用户身份**，**Session通过在服务器端记录信息确定用户身份**。
+
+cookie 和 session均由服务器生成。
+
+如果说**Cookie机制是通过检查客户身上的“通行证”来确定客户身份的话，那么Session机制就是通过检查服务器上的“客户明细表”来确认客户身份。Session相当于程序在服务器上建立的一份客户档案，客户来访的时候只需要查询客户档案表就可以了。**
+
+##### Web Storage
+
+Web Storage的目的是解决通过客户端存储不需要频繁发送回服务器的数据时使用cookie的问题。Web Storage API包含了两个对象：localStorage和sessionStorage，**本质上是映射字符串键和值的对象化**。localStorage是永久存储机制，sessionStorage是跨会话的存储机制。这两种浏览器存储API提供了在浏览器中不受页面刷新影响而存储数据的两种方式。
+
+###### Storage 对象
+
+Window 对象的localStorage 和 sessionStorage 属性引用的是 Storage对象。Storage对象用于保存名/值对数据，直至存储空间上限（由浏览器决定）。一般来说，客户端数据的大小限制是按照每个源（协议、域和端口）来设置的，因此每个源有固定大小的数据存储空间。不同浏览器给localStorage和sessionStorage设置了不同的空间限制，但大多数会限制为每个源5MB。
+
+**localStorage 和 sessionStorage遵循同源策略**
+
+Storage对象定义了如下方法：
+
+- clear()：删除所有值；不在Firefox中实现。
+- getItem(name)：取得给定name的值。（get的值如果不是字符串类型，需要通过 JSON.parse 解析）
+- key(index)：取得给定数值位置的名称。
+- removeItem(name)：删除给定name的名/值对。
+- setItem(name, value)：设置给定name的值。（存储的值本身不是字符串类型，需要通过 JSON.stringfy 转化为 json 对象）
+
+**Storage 对象中的键值对总是以字符串的形式存储**，这意味着数值类型会自动转化为字符串类型。
+
+###### sessionStorage
+
+sessionStorage对象只存储会话数据，这意味着数据只会存储到浏览器关闭。这跟浏览器关闭时会消失的会话cookie类似。存储在sessionStorage中的数据不受页面刷新影响，可以在浏览器崩溃并重启后恢复（取决于浏览器，Firefox和WebKit支持，IE不支持）。
+
+sessionStorage 特别应该注意一点就是，**即便是相同域名下的两个页面，只要它们不在同一个浏览器窗口中打开，那么它们的 sessionStorage 数据便无法共享。**
+
+###### localStorage
+
+localStorage 与 sessionStorage 在 API 方面无异。
+
+###### localStorage 和 SessionStorage的区别
+
+- localStorage生命周期是永久，除非手动删除 
+
+- sessionStorage生命周期为当前窗口或标签页，当页面被关闭时，存储在 sessionStorage 的数据会被清除 
+
+- 不同浏览器无法共享localStorage或sessionStorage中的信息。相同浏览器的不同页面间可以共享相同的 localStorage（页面属于相同域名和端口），但是不同页面或标签页间无法共享sessionStorage的信息。
+
+##### Web Storage 和 Cookie 和 IndexDB 的区别
+
+| 特性         | cookie                                     | localStorage             | sessionStorage | indexDB                  |
+| ------------ | ------------------------------------------ | ------------------------ | -------------- | ------------------------ |
+| 数据生命周期 | 一般由服务器生成，可以设置过期时间         | 除非被清理，否则一直存在 | 页面关闭就清理 | 除非被清理，否则一直存在 |
+| 数据存储大小 | 4K                                         | 5M                       | 5M             | 无限                     |
+| 与服务端通信 | 每次都会携带在 header 中，对于请求性能影响 | 不参与                   | 不参与         | 不参与                   |
+
+- 均遵循同源政策。
+- Cookie 的本职工作并非本地存储，而是“维持状态”。
+- Web Storage定义了两个对象用于存储数据：sessionStorage和localStorage。前者用于严格保存浏览器一次会话期间的数据，因为数据会在浏览器关闭时被删除。后者用于会话之外持久保存数据。
+- IndexedDB是类似于SQL数据库的结构化数据存储机制。不同的是，IndexedDB存储的是对象，而不是数据表。
+
+##### Cache Storage
+
+`Cache Storage` 是用来存储 `Response` 对象 ，也就是对 HTTP 响应进行缓存。 `Cache Storage` 是多个 `cache` 的集合，每个 `cache` 可以存储多个响应对象。它基于 Promise。
+
+##### Application Cache
+
+它是 HTML5 中新引入的应用程序换粗技术，它的出现意味着 web 应用可以通过缓存，在没有网络的环境下运行，构建离线应用。
+
+优点:
+
+- 离线浏览
+- 提升页面的载入速度
+- 降低服务器的压力
+
+一般来说 `Application Cache` 只用来存储一些静态资源，它的使用方式主要需要两个步骤：
+
+1.服务端维护一个 `manifest`清单
+
+2.浏览器端进行一个设置。
+
+```html
+<html manifest="demo">
+```
+
+> 一般的，我们必须给 manifest 文件设置正确的 MIME-type 为 "text/cache-manifest"，它需要在服务器端进行配置。
+
+在 Progressive Web Application 中， Application Cache 配合 Service Worker 承担着主要的任务。
+
+
+
+
 #### console
 
 console.*方法是没有相关规定是同步还是异步的，因此，不同的浏览器和JavaScript 环境可以按照自己的意愿来实现。
