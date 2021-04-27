@@ -2497,7 +2497,7 @@ then-setTimeout-2
 
 • 执行then 被分发到微任务Event Queue中
 
-• 第一轮宏任务执行结束，开始执行第一个微任务，遇到setTimeoutout，分发到宏任务Event Queue中，然后打印 '微事件1' 
+• 第一轮宏任务执行结束，开始执行第一个微任务，遇到setTimeoutout，分发到宏任务Event Queue中，然后打印 '微事件1' ，生成第二个微任务（第二个then）
 
 • 开始执行第二个微任务，遇到setTimeoutout，分发到宏任务Event Queue中，然后打印 '微事件2' 
 

@@ -2835,7 +2835,7 @@ useRouteMatch 尝试以与 <Route> 相同的方式匹配当前URL。它主要用
 路由链接（携带参数）：
 
 ```jsx
-< Link to='/demo/tes/tom/18'}>详情</Link>
+< Link to='/demo/test/tom/18'}>详情</Link>
 ```
 
 注册路由（声明接收）：
@@ -2957,7 +2957,7 @@ interface Iprops extends RouteComponentProps{}
 
 const App:React.FC<Iprops> = props => {
     console.log(props.pathname) // 有提示,并且props有他的类型规定
-    return <div></div>
+    return (<div></div>)
 }
 
 export default withRouter(App)
