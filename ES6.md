@@ -2595,7 +2595,29 @@ desc属性描述符以对象形式属性
 
 > get：当访问该属性时，会调用此函数。执行时不传入任何参数，但是会传入 this 对象（由于继承关系，这里的this并不一定是定义该属性的对象）。继承关系是指，我们有可能get的是原型对象或父类的属性。get属性（函数）的返回值会被用作属性的值，但并不是属性的value值。
 
+##### Reflect
 
+**Reflect** 是一个内置的对象，它提供拦截 JavaScript 操作的方法。这些方法与**proxy handlers**的方法相同。`Reflect`不是一个函数对象，因此它是不可构造的。
+
+#### Array的方法
+
+##### Array.from()
+
+从一个类似数组或可迭代对象创建一个新的，浅拷贝的数组实例。
+
+```js
+Array.from(arrayLike[, mapFn[, thisArg]])
+```
+
+参数
+
+- arrayLike：伪数组对象或可迭代对象
+- mapFn（可选）：如果指定了该参数，新数组中的每个元素会执行该回调函数
+- thisArg（可选）：可选参数，执行回调函数 `mapFn` 时 `this` 对象
+
+返回值
+
+- 新数组
 
 #### 解构赋值
 
@@ -3398,3 +3420,13 @@ polyfill.io 的原理，它会根据你的浏览器 UA 头，判断你是否支�
 | [null](https://developer.mozilla.org/zh-CN/docs/Glossary/Null) | [null](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/null) - 缺少值 |      |
 | [undefined](https://developer.mozilla.org/zh-CN/docs/Glossary/undefined) | [undefined](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/undefined) - 原始值 |      |
 | [NaN](https://developer.mozilla.org/zh-CN/docs/Glossary/NaN) | [NaN ](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/NaN)- 非数值 |      |
+
+##### 浅合并和深合并
+
+###### 浅合并
+
+将一个对象的第一层合并到另一个对象的第一层，若属性相同，则替换掉。
+
+###### 深合并
+
+将一个对象的所有层级的属性递归合并到另一个对象，若属性相同，则替换掉。

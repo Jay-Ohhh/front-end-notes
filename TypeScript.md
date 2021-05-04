@@ -3744,7 +3744,7 @@ foo.classMethod()
 // TypeError: foo.classMethod is not a function
 ```
 
-注意，如果静态方法包含`this`关键字，这个`this`指的是类，而不是实例。
+注意，如果静态方法包含`this`关键字，这个`this`指的是Foo.prototype，而不是实例。
 
 ```javascript
 class Foo {
@@ -3984,7 +3984,7 @@ class Square extends Rectangle {
 var obj = new Square(3,4); // 输出 false
 ```
 
- 上面代码中，`new.target`会返回子类。 
+ 上面代码中，`new.target`会返回子类 Square 。 
 
 利用这个特点，可以写出不能独立使用、必须继承后才能使用的类。
 
