@@ -1327,20 +1327,20 @@ catch内的回调函数接受前一个promise reject的值作为参数。返回�
 
 ##### Promise.all([ promise1,promise2, . . . ])
 
-接收一个Promise对象的集合，返回一个新的promise对象。该promise对象在数组里所有的promise对象都成功的时候才会触发成功，一旦有任何一个promise对象失败则立即触发该promise对象的失败。这个新的promise对象在触发成功状态以后，会把一个包含所有promise返回值的数组作为成功回调的返回值，顺序跟数组元素的顺序保持一致；如果这个新的promise对象触发了失败状态，它会把数组里第一个触发失败的promise对象的错误信息作为它的失败错误信息。Promise.all方法常被用于处理多个promise对象的状态集合。
+接收一个包含Promise对象的可迭代对象为参数，返回一个新的promise对象。该promise对象在数组里所有的promise对象都成功的时候才会触发成功，一旦有任何一个promise对象失败则立即触发该promise对象的失败。这个新的promise对象在触发成功状态以后，会把一个包含所有promise返回值的数组作为成功回调的返回值，顺序跟参数数组的顺序保持一致；如果这个新的promise对象触发了失败状态，它会把数组里第一个触发失败的promise对象的错误信息作为它的失败错误信息。Promise.all方法常被用于处理多个promise对象的状态集合。
 
-##### Promise.allSettked([ promise1,promise2, . . . ])
+##### Promise.allSettled([ promise1,promise2, . . . ])
 
-接收一个Promise对象的集合，等到所有promises都已敲定（settled）（每个promise都已兑现（fulfilled）或已拒绝（rejected））。
+接收一个包含Promise对象的可迭代对象为参数，等到所有promises都已敲定（settled）（每个promise都已兑现（fulfilled）或已拒绝（rejected））。
 返回一个新promise对象，该promise在所有promise完成后完成。并带有一个对象数组（可以在then中获取），每个对象对应每个promise的结果。
 
 ##### Promise.any([ promise1,promise2, . . . ])
 
-接收一个Promise对象的集合，当其中的一个 promise 成功，就返回那个成功的promise对象。
+接收一个包含Promise对象的可迭代对象为参数，当其中的一个 promise 成功，就返回那个成功的promise对象。
 
 ##### Promise.race([ promise1,promise2, . . . ])
 
-接收一个Promise对象的集合。race就是赛跑的意思，意思就是说，Promise.race([p1, p2, p3])里面哪个结果获取得快，就返回那个结果，不管结果本身是成功状态还是失败状态。返回最快的那个promise对象。
+接收一个包含Promise对象的可迭代对象为参数。race就是赛跑的意思，意思就是说，Promise.race([p1, p2, p3])里面哪个结果获取得快，就返回那个结果，不管结果本身是成功状态还是失败状态。返回最快的那个promise对象。
 
 ##### 使用例子
 

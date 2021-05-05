@@ -900,7 +900,7 @@ $ yarn create react-app my-app --typescript
 
 你的项目可以使用在你的环境中声明的变量，就好像它们是在 JS 文件中本地声明的变量一样。默认情况下，你将定义以 `REACT_APP_` 开头的任何其他环境变量。
 
-除了一些内置变量（ `NODE_ENV` 、`GENERATE_SOURCEMAP`和 `PUBLIC_URL`）之外，变量名必须以 `REACT_APP_` 开头才能工作。
+除了一些内置变量（ `NODE_ENV` 、`PORT`、 `GENERATE_SOURCEMAP`和 `PUBLIC_URL`）之外，变量名必须以 `REACT_APP_` 开头才能工作。
 
 **环境变量在构建期间嵌入**。由于 Create React App 生成静态的 HTML / CSS / JS 包，因此无法在 runtime(运行时) 读取它们。要在运行时读取它们，你需要将HTML 加载到服务器上的内存中，并在运行时替换占位符，就像 [此处所述](http://www.html.cn/create-react-app/docs/title-and-meta-tags#injecting-data-from-the-server-into-the-page) 。或者，你可以随时在服务器上重建应用程序。
 
@@ -914,7 +914,7 @@ $ yarn create react-app my-app --typescript
 <title>%REACT_APP_WEBSITE_NAME%</title>
 ```
 
-- 除了一些内置变量（ `NODE_ENV` 、`GENERATE_SOURCEMAP`和 `PUBLIC_URL`）之外，变量名必须以 `REACT_APP_` 开头才能工作。
+- 除了一些内置变量（ `NODE_ENV` 、`PORT`、`GENERATE_SOURCEMAP`和 `PUBLIC_URL`）之外，变量名必须以 `REACT_APP_` 开头才能工作。
 - 环境变量在构建时注入。 如果需要在运行时注入它们，[请改为使用此方法](http://www.html.cn/create-react-app/docs/title-and-meta-tags#generating-dynamic-meta-tags-on-the-server) 
 
  **process.env.NODE_ENV** 

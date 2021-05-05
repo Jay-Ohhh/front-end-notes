@@ -269,7 +269,7 @@ const App = () => (
 );
 ```
 
-
+> 通常需要搭配错误边界使用，当加载失败使用降级后的UI
 
 - **import() — 推荐使用**
 
@@ -632,6 +632,50 @@ Hash history 不支持 `location.key` or `location.state`，但它的兼容性�
 
 单个被渲染的子元素。
 
+
+
+##### MemoryRouter
+
+它将您的“URL”的历史记录保存在内存中（不读取、不写入地址栏）。在测试和非浏览器环境（如React Native）中非常有用。
+
+```jsx
+<MemoryRouter
+  initialEntries={optionalArray}
+  initialIndex={optionalNumber}
+  getUserConfirmation={optionalFunc}
+  keyLength={optionalNumber}
+>
+  <App />
+</MemoryRouter>
+```
+
+###### initialEntries：array
+
+元素是history stack中location的数组。这些元素可能是具有{pathname，search，hash，state}对象或者是字符串url。
+
+```jsx
+<MemoryRouter
+  initialEntries={["/one", "/two", { pathname: "/three" }]}
+  initialIndex={1}
+>
+  <App />
+</MemoryRouter>
+```
+
+###### initialIndex：number
+
+initialEntries数组中初始位置的索引。
+
+###### keyLength：number
+
+loaction.key 的长度，默认为6。
+
+###### children：node
+
+渲染的子元素。若 React 版本小于16：渲染多个子元素时必须用一个根元素包裹。
+
+
+
 ##### Link
 
 在应用程序周围提供声明性的、可访问的导航。`<Link>` 以适当的 href 去渲染一个可访问的锚标签。
@@ -685,19 +729,7 @@ loaction 作为参数，应当返回以字符串形式或对象形式代表的 l
 <Link to="/" component={myComponent} />
 ```
 
-###### query
-
-已经转化成字符串的键值对的对象。
-
-###### hash
-
-URL 的 hash 值，如 `#a-hash`。一般用 to：object。
-
 **注意：React Router 目前还不能管理滚动条的位置，并且不会自动滚动到 hash 对应的元素上。如果需要管理滚动条位置，可以使用 [scroll-behavior](https://github.com/rackt/scroll-behavior) 这个库。**
-
-###### state
-
-保存在 `location` 中的 state。一般用 to：object。
 
 ###### activeClassName
 
@@ -797,8 +829,8 @@ location 对象包含有关当前 URL 的信息。形式大概就像这样：
 你使用以下几种方式来获取 location 对象：
 
 - 在 [Route component]() 中，以 `this.props.location` 的方式获取，
-- 在 [Route render]() 中，以 `({ location }) => ()` 的方式获取，
-- 在 [Route children]() 中，以 `({ location }) => ()` 的方式获取，
+- 在 [Route render]() 属性中，以 `({ location }) => ()` 的方式获取，
+- 在 [Route children]() 属性中，以 `({ location }) => ()` 的方式获取，
 - 在 [withRouter]() 中，以 `this.props.location` 的方式获取。
 
 ###### aria-current：string（了解）
@@ -844,46 +876,6 @@ aria-current属性应用在处于激活状态的链接，有效值为：
 ###### when：bool
 
 在when={true}或when={false}时以相应地阻止（true）或允许（false）导航。
-
-##### MemeryRouter
-
-它将您的“URL”的历史记录保存在内存中（不读取、不写入地址栏）。在测试和非浏览器环境（如React Native）中非常有用。
-
-```jsx
-<MemoryRouter
-  initialEntries={optionalArray}
-  initialIndex={optionalNumber}
-  getUserConfirmation={optionalFunc}
-  keyLength={optionalNumber}
->
-  <App />
-</MemoryRouter>
-```
-
-###### initialEntries：array
-
-元素是history stack中location的数组。这些元素可能是具有{pathname，search，hash，state}对象或者是字符串url。
-
-```jsx
-<MemoryRouter
-  initialEntries={["/one", "/two", { pathname: "/three" }]}
-  initialIndex={1}
->
-  <App />
-</MemoryRouter>
-```
-
-###### initialIndex：number
-
-initialEntries数组中初始位置的索引。
-
-###### keyLength：number
-
-loaction.key 的长度，默认为6。
-
-###### children：node
-
-渲染的子元素。若 React 版本小于16：渲染多个子元素时必须用一个根元素包裹。
 
 
 
@@ -1048,7 +1040,7 @@ class App extends React.Component {
 
 可以使用 `this.props.location`等获取路由参数。
 
-当您使用组件（而不是下面的 render 或 children）时，路由器会使用React.createElement从给定的组件中创建一个新的React元素。 这意味着，如果您向组件prop提供内联函数，则将在每个渲染中创建一个新组件。 因为在每次渲染时，都会重新将一个新的函数赋值给组件，所以将导致现有组件的卸载和新组件的安装，而不仅仅是更新现有组件。 使用内联函数进行内联渲染时，请使用render或children（如下）。
+当您使用组件（而不是下面的 render 或 children）时，路由器会使用React.createElement从给定的组件中创建一个新的React元素。 这意味着，如果您向组件prop提供内联函数，则将在每个渲染中创建一个新组件。 因为在每次渲染时，都会重新将一个新的函数赋值给组件，所以将导致现有组件的卸载和新组件的安装，而不仅仅是更新现有组件。 使用内联函数进行内联渲染时，请使用render或children。
 
 ###### components
 
@@ -1108,6 +1100,8 @@ render函数可以传递路由参数routeProps：match、loaction、history。
 ```jsx
 <Route path="/home" render={(routeProps) => <div>Home</div>} />
 ```
+
+>  与location匹配才渲染。
 
 <Route component>优先于<Route render>，因此不要在同一个<Route>中同时使用这两个组件。
 
@@ -1196,8 +1190,8 @@ location 对象包含有关当前 URL 的信息。形式大概就像这样：
 你使用以下几种方式来获取 location 对象：
 
 - 在 [Route component]() 中，以 `this.props.location` 的方式获取，
-- 在 [Route render]() 中，以 `({ location }) => ()` 的方式获取，
-- 在 [Route children]() 中，以 `({ location }) => ()` 的方式获取，
+- 在 [Route render]() 属性中，以 `({ location }) => ()` 的方式获取，
+- 在 [Route children]() 属性中，以 `({ location }) => ()` 的方式获取，
 - 在 [withRouter]() 中，以 `this.props.location` 的方式获取。
 
 如果<Route>元素包裹在<Switch>中并与传递给<Switch>的location（或当前history location）匹配，则传递给<Route>的 location 将被<Switch>的 location 覆盖。
@@ -1350,7 +1344,7 @@ let routes = (
 
 如果<Switch>有一个location属性，它将覆盖匹配到的子元素上的location。
 
-##### genneratePath
+##### generatePath
 
 generatePath函数可用于生成路由的URL。
 
@@ -1426,8 +1420,8 @@ location 对象包含有关当前 URL 的信息。形式大概就像这样：
 你使用以下几种方式来获取 location 对象：
 
 - 在 [Route component]() 中，以 `this.props.history` 的方式获取，
-- 在 [Route render]() 中，以 `({ history }) => ()` 的方式获取，
-- 在 [Route children]() 中，以 `({ history }) => ()` 的方式获取，
+- 在 [Route render]() 属性中，以 `({ history }) => ()` 的方式获取，
+- 在 [Route children]() 属性中，以 `({ history }) => ()` 的方式获取，
 - 在 [withRouter]() 中，以 `this.props.history` 的方式获取。
 
 ###### push（path, [state]）
@@ -1493,8 +1487,8 @@ location 对象包含有关当前 URL 的信息。形式大概就像这样：
 你使用以下几种方式来获取 location 对象：
 
 - 在 [Route component]() 中，以 `this.props.location` 的方式获取，
-- 在 [Route render]() 中，以 `({ location }) => ()` 的方式获取，
-- 在 [Route children]() 中，以 `({ location }) => ()` 的方式获取，
+- 在 [Route render]() 属性中，以 `({ location }) => ()` 的方式获取，
+- 在 [Route children]() 属性中，以 `({ location }) => ()` 的方式获取，
 - 在 [withRouter]() 中，以 `this.props.location` 的方式获取。
 
 location 对象不会发生改变，因此你可以在生命周期的钩子函数中使用 location 对象来查看当前页面的位置是否发生改变，这种技巧在获取远程数据以及使用动画时非常有用。
@@ -1554,8 +1548,8 @@ match 对象包含以下属性：
 你可以在以下地方获取 match 对象：
 
 - [Route component](https://reactrouter.com/web/api/Route/component) ：`this.props.match`
-- [Route render](https://reactrouter.com/web/api/Route/render-func) ： `({ match }) => ()`
-- [Route children](https://reactrouter.com/web/api/Route/children-func) ：`({ match }) => ()`
+- [Route render](https://reactrouter.com/web/api/Route/render-func) 属性： `({ match }) => ()`
+- [Route children](https://reactrouter.com/web/api/Route/children-func) 属性：`({ match }) => ()`
 - [withRouter](https://reactrouter.com/web/api/withRouter) ： `this.props.match`
 - [matchPath](https://reactrouter.com/web/api/matchPath) ：the return value（函数返回值）
 - [useRouteMatch](https://reactrouter.com/web/api/hooks/useroutematch) ：the return value（函数返回值）
@@ -1615,7 +1609,7 @@ const match = matchPath("/users/123", {
 
 ###### props
 
-第二个参数是要用于与match匹配的对象，它们与Route接受的match属性相同。 其中path可以是字符串或字符串数组：
+第二个参数是要用于与match匹配的对象，它们与Route接受的属性相同。 其中path可以是字符串或字符串数组：
 
 ```js
 {
@@ -1996,26 +1990,26 @@ export interface IRouteViewProps {
 
 const RouteView = (props: IRouteViewProps) => {
   return (
-    <>
+    <Switch>
     	{redirect && <Redirect {...redirect} />}
       <Route
         path={props.path}
         render={routeProps => {
           return  (
             <props.component {...routeProps}>
-              {childrenRoutes && childrenRoutes.length > 0 ? (
+              {childrenRoutes && childrenRoutes.length > 0 && (
                 <Switch>
                   {childrenRoutes.map((route, index) => (
                     // 因为是RouteViewContainer，因此会自动传入isLogin
                     <RouteViewContainer {...route} key={index} />
                   ))}
                 </Switch>
-            	 ) : null}
+            	 )}
             </props.component>
           ) : null
       	}}
       ></Route>
-    </>
+    <Switch/>
   )
 }
 // 这里我们使用了redux给RouteView生成一个容器组件
@@ -2064,121 +2058,7 @@ import App from './App';
 ReactDOM.render(<App />, document.getElementById('root'));
 ```
 
-##### Route
-
-###### path
-
-URL 中的路径。
-
-它会组合父 route 的路径，除非它是从 `/` 开始的， 将它变成一个绝对路径。
-
-**注意**：在[动态路由](http://react-guide.github.io/react-router-cn/docs/docs/guides/advanced/DynamicRouting.md)中，绝对路径可能不适用于 route 配置中。
-
-如果它是 undefined，路由会去匹配子 route。
-
-###### component
-
-当匹配到 URL 时，单个组件会被渲染。它可以被父 route 组件的 `this.props.children` 渲染。
-
-```jsx
-const routes = (
-  <Route component={App}>
-    <Route path="groups" component={Groups}/>
-    <Route path="users" component={Users}/>
-  </Route>
-)
-
-class App extends React.Component {
-  render () {
-    return (
-      <div>
-        {/* 这会是 <Users> 或 <Groups> */}
-        {this.props.children}
-      </div>
-    )
-  }
-}
-```
-
-###### components
-
-Route 可以定义一个或多个已命名的组件，当路径匹配到 URL 时， 它们可以被 父 route 组件的 `this.props[name]` 渲染。
-
-```jsx
-// 想想路由外部的 context — 如果你可拔插
-// `render` 的部分，你可能需要这么做：
-// <App main={<Users />} sidebar={<UsersSidebar />} />
-
-const routes = (
-  <Route component={App}>
-    <Route path="groups" components={{main: Groups, sidebar: GroupsSidebar}}/>
-    <Route path="users" components={{main: Users, sidebar: UsersSidebar}}>
-      <Route path="users/:userId" component={Profile}/>
-    </Route>
-  </Route>
-)
-
-class App extends React.Component {
-  render () {
-    const { main, sidebar } = this.props // 当路径匹配到 URL 时，可以被父route组件的 `this.props[name]` 访问
-    return (
-      <div>
-        <div className="Main">
-          {main}
-        </div>
-        <div className="Sidebar">
-          {sidebar}
-        </div>
-      </div>
-    )
-  }
-}
-
-class Users extends React.Component {
-  render () {
-    return (
-      <div>
-        {/* 当路径是 "/users/123" 是 `children` 会是 <Profile> */}
-        {/* UsersSidebar 也可以获取作为 this.props.children 的 <Profile> ，
-            所以这有点奇怪，但你可以决定哪一个可以
-            继续这种嵌套 */}
-        {this.props.children}
-      </div>
-    )
-  }
-}
-```
-
-###### getComponent(location, callback)
-
-与`component` 相比，它是异步的，能够实现按需加载，对于 code-splitting（代码分割）很有用。
-
-- ###### callback 
-
-  cb(err, component)
-  
-  ```jsx
-  <Route path="courses/:courseId" getComponent={(location, cb) => {
-    // 做一些异步操作去查找组件
-    cb(null, Course)
-  }}/>
-  ```
-
-
-
-###### onEnter(nextState, replaceState, callback?)
-
-当 route 即将进入时调用。它有三个参数：下一个路由的 state，重定向到另一个路径的方法replaceState，回调函数。`this` 会触发钩子去创建 route 实例。
-
-`replaceState(state,replacePath)`有两个参数：第一个参数用于更新 state 的 state 对象，第二个参数是重定向的路径。
-
-当 `callback` 作为函数的第三个参数传入时，这个钩子将是异步执行的，并且跳转会阻塞直到 `callback` 被调用。
-
-###### onLeave()
-
-当 route 即将退出时调用。
-
-> 在路由跳转过程中，[`onLeave` hook](http://react-guide.github.io/react-router-cn/docs/guides/basics/docs/Glossary.md#leavehook) 会在所有将离开的路由中触发，从最下层的子路由开始直到最外层父路由结束。然后[`onEnter` hook](http://react-guide.github.io/react-router-cn/docs/guides/basics/docs/Glossary.md#enterhook)会从最外层的父路由开始直到最下层子路由结束。
+> 
 
 ##### 集中式路由配置（JS对象）
 
@@ -2194,8 +2074,7 @@ route 定义的一个普通的 JavaScript 对象。 `Router` 把 JSX 的 `<Route
 const routeConfig = [
   { path: '/', // path: stirng | string[]
     component: App,
-    indexRoute: { component: Dashboard }, // 默认组件
-   // indexRedirect:'/about', // 重定向路由
+    // indexRedirect:'/about', // 重定向路由。不过一般使用 redirect组件进行重定向
     childRoutes: [
       { path: 'about', component: About },
       { path: 'inbox',
@@ -2264,10 +2143,6 @@ let myRoute = {
   }
 }
 ```
-
-###### indexRoute
-
-这与在使用 JSX route 配置时指定一个 `<IndexRoute>` 子集一样。
 
 ###### getIndexRoute(location, callback)
 
@@ -2820,6 +2695,8 @@ function HomeButton() {
 
 useParams返回URL参数的键/值对的对象。
 
+> 上面三个一般都是通过props.history，props.location，props.match.params或props.location.search来获取
+
 ##### useRouteMatch
 
 useRouteMatch 尝试以与 <Route> 相同的方式匹配当前URL。它主要用于访问匹配数据，而无需实际渲染<Route>。
@@ -2867,7 +2744,7 @@ const {name,age}=this.props.match.params
 
 ##### Search参数
 
-urlencode编码：将{ name: 'Tom' , age : 18 } 转换为 'name=tom&age=18'
+将{ name: 'Tom' , age : 18 } 转换为 'name=tom&age=18'
 
 可以使用`qs.stringfy`转换：
 
@@ -2900,7 +2777,7 @@ qs.parse('name=tom&age=18')  // { name: 'Tom' , age : 18 }
 const {search}=this.props.location
 ```
 
-备注：获取到的 search是 urlencode编码字符串，需要借助 querystring 模块的qs.parse解析
+备注：获取到的 search是  `'name=tom&age=18'` 这样的字符串，需要借助 querystring 模块的qs.parse解析
 
 ##### State参数
 
@@ -2941,13 +2818,13 @@ const {state}=this.props.location
 2.  pub1ic/ index.html 中引入样式时不使用相对路径，使用绝对路径，即将 `./`改为 `%PUBLIC_URL%`，只适用于react脚手架， `%PUBLIC_URL%`是 public 文件夹的路径
 3. 使用 HashRouter
 
-#### 手动引入路由组件属性
+#### 手动引入路由组件属性类型
 
 ```js
 import { RouteComponentProps } from 'react-router-dom'
 ```
 
-当我们使用`Route`组件或者使用`withRouter`的时候,都会给组件绑定`history,location,match`三个属性,但是创建函数组件时，props默认是没有的，需要手动引入router对应的属性
+当我们使用`Route`组件或者使用`withRouter`的时候,都会给组件绑定`history,location,match`三个属性：
 
 ```ts
 import React from 'react'

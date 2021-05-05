@@ -3187,7 +3187,7 @@ var directions = [0 /* Up */, 1 /* Down */, 2 /* Left */, 3 /* Right */];
 
 下面我们先回顾一下 ES6 中类的用法，更详细的介绍可以参考 [ECMAScript 6 入门 - Class](http://es6.ruanyifeng.com/#docs/class)。
 
-**类的由来**
+###### 类的由来
 
 JavaScript 语言中，生成实例对象的传统方法是通过构造函数。下面是一个例子。
 
@@ -3362,7 +3362,7 @@ Object.getOwnPropertyNames(Point.prototype)
 
 上面代码采用 ES5 的写法，`toString()`方法就是可枚举的。
 
-**constructor 方法**
+###### constructor 方法
 
 `constructor()`方法是类的默认方法，通过`new`命令生成对象实例时，自动调用该方法。一个类必须有`constructor()`方法，如果没有显式定义，一个空的`constructor()`方法会被默认添加。
 
@@ -3408,7 +3408,7 @@ Foo()
 // TypeError: Class constructor Foo cannot be invoked without 'new'
 ```
 
-**类的实例**
+###### 类的实例
 
 生成类的实例的写法，与 ES5 完全一样，也是使用`new`命令。前面说过，如果忘记加上`new`，像函数那样调用`Class`，将会报错。
 
@@ -3424,7 +3424,7 @@ var point = Point(2, 3);
 var point = new Point(2, 3);
 ```
 
-与 ES5 一样，实例属性是定义在`this`指向的对象上，静态成员和方法都是定义在原型上（即定义在`class`上）。
+与 ES5 一样，实例属性是定义在`this`指向的对象上，静态成员和方法都是定义在原型上。
 
 ```javascript
 //定义类
@@ -3469,7 +3469,7 @@ p1.__proto__ === p2.__proto__
 
 > `__proto__` 并不是语言本身的特性，这是各大厂商具体实现时添加的私有属性，虽然目前很多现代浏览器的 JS 引擎中都提供了这个私有属性，但依旧不建议在生产中使用该属性，避免对环境产生依赖。生产环境中，我们可以使用 `Object.getPrototypeOf` 方法来获取实例对象的原型，然后再来为原型添加方法/属性。
 
-**取值函数（getter）和存值函数（setter）**
+###### 取值函数（getter）和存值函数（setter）
 
 与 ES5 一样，在“类”的内部可以使用`get`和`set`关键字，对某个属性设置存值函数和取值函数，拦截该属性的存取行为。
 
@@ -3499,7 +3499,7 @@ inst.prop
 
 其实存值函数和取值函数是设置在 `prop` 属性的 descriptor 属性描述符上，与ES5的Object.defineProperty()一致。
 
-**属性表达式**
+###### 属性表达式
 
 类的属性名，可以采用表达式。
 
@@ -3519,7 +3519,7 @@ class Square {
 
 上面代码中，`Square`类的方法名`getArea`，是从表达式得到的。
 
-**Class 表达式**
+###### Class 表达式
 
 与函数一样，类也可以使用表达式的形式定义。
 
@@ -3563,7 +3563,7 @@ let person = new class {
 person.sayName(); // "张三"
 ```
 
-**类的继承**
+###### 类的继承
 
 使用`extends`继承类，且只允许继承一个父类。
 
@@ -3587,6 +3587,8 @@ class Cat extends Animal {
 ES5的继承，实质是先创造子类的实例对象this，然后再将父类的方法/属性添加到this上面。
 
 ES6的继承， 实质是先创造父类的实例对象this，然后再将子类的方法/属性添加到this上面。必须先通过父类的构造函数完成塑造，然后再对其加工，加上子类自身的属性和方法。如果不调用super方法，子类就得不到this对象。
+
+###### 其他
 
 **1. 注意点**
 
@@ -4016,7 +4018,7 @@ var y = new Rectangle(3, 4);  // 正确
 
 TypeScript中类的属性必须要在构造函数外声明。
 
-**public private 和 protected**
+###### public private 和 protected
 
 TypeScript 可以使用三种访问修饰符（Access Modifiers），分别是 `public`、`private` 和 `protected`。
 
@@ -4150,7 +4152,7 @@ let a = new Animal('Jack');
 // index.ts(13,9): TS2674: Constructor of class 'Animal' is protected and only accessible within the class declaration.
 ```
 
-**参数属性**
+###### 参数属性
 
 修饰符和`readonly`还可以使用在构造函数参数中，等同于类中定义该属性同时给该属性赋值，使代码更简洁。
 
@@ -4163,7 +4165,7 @@ class Animal {
 }
 ```
 
-**readonly**
+###### readonly
 
 只读属性关键字，只允许出现在属性声明或索引签名或构造函数中。
 
@@ -4193,7 +4195,7 @@ class Animal {
 }
 ```
 
-**抽象类**
+###### 抽象类
 
 `abstract` 用于定义抽象类和其中的抽象方法。
 
@@ -4294,7 +4296,7 @@ var Cat = (function (_super) {
 var cat = new Cat('Tom');
 ```
 
-**类的类型**
+###### 类的类型
 
 在没有加上类型之前，属性、方法、参数的类型都默认为`any`， 但可以从用法中通过类型推论推断出更好的类型。 
 
