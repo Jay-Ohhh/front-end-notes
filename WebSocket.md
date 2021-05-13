@@ -24,9 +24,13 @@
 
 1. 浏览器、服务器建立TCP连接，三次握手。这是通信的基础，传输控制层，若失败后续都不执行。
 2. TCP连接成功后，浏览器通过HTTP协议向服务器传送WebSocket握手数据。（开始前的HTTP握手）
-3. 服务器收到客户端的握手请求后，同样采用HTTP协议返回同意握手数据。
-4. 当收到了连接成功的消息后，通过TCP通道进行传输通信。（TCP协议，非HTTP协议）
+3. 服务器收到客户端的握手请求后，确认升级到 WebSocket 协议，同样采用HTTP协议返回同意握手数据。
+4. 当收到了连接成功的消息后，通过TCP通道进行传输通信。（TCP协议）
 5. 断开连接，TCP四次挥手。
+
+
+
+WebSocket 协议属于应用层协议，它依赖于传输层的 TCP 协议。WebSocket 通过 HTTP/1.1 协议的 **101** 状态码（切换协议）进行握手。为了创建 WebSocket 连接，需要通过浏览器发出请求，之后服务器进行回应，这个过程通常称为 “握手”（Handshaking）。
 
 
 
@@ -161,6 +165,137 @@ for (var i = 0; i < img.data.length; i++) {
 }
 ws.send(binary.buffer);
 ```
+
+#### WebSocket 客户端 单例模式
+
+需要注意处理连接、发送不成功的情况：
+
+- 如果连接不成功，重新连接
+- 重试的次数越多，重新连接的时间越大，避免浪费资源，因为服务器可能关机了
+- 如果发送不成功，重新发送
+  重试的次数越多，重新发送的时间越大，避免浪费资源，因为服务器可能关机了
+
+```js
+class SocketService {
+  // 单例设计模式
+  static instance = null;
+  static get Instance() {
+    if (!this.instance) {
+      this.instance = new SocketService();
+    }
+    return this.instance;
+  }
+  // 和服务器连接的socket对象
+  ws = null;
+  // 存储回调函数
+  callBackMapping = {};
+  // 连接状态标识
+  connected = false;
+  // 重新发送次数
+  sendRecord = 0;
+  // 重新连接次数
+  connectRecord = 0;
+  // 定时器
+  sendTimer = null;
+  connectTimer = null;
+
+  // 连接服务器的方法
+  connect() {
+    if (!window.WebSocket) {
+      return console.log("您的浏览器不支持WebSocket");
+    }
+    this.ws = new WebSocket("ws://127.0.0.1:8080");
+    // 连接成功
+    this.ws.onopen = () => {
+      console.log("连接服务端成功");
+      this.connected = true;
+      this.connectRecord = 0;
+    };
+    // 连接失败
+    this.ws.onclose = () => {
+      console.log("连接服务端失败");
+      this.connected = false;
+      // 如果连接不成功，重新连接
+      // 重试的次数越多，重新连接的时间越大，避免浪费资源，因为服务器可能关机了
+      this.connectRecord++;
+      if (this.connectTimer) clearTimeout(this.connectTimer);
+      if (this.connectRecord * 500 >= Number.MAX_SAFE_INTEGER) {
+        this.connectRecord = 0;
+        return;
+      }
+      this.connectTimer = setTimeout(() => {
+        this.connect();
+      }, this.connectRecord * 500);
+    };
+    // 得到服务端传过来的数据
+    this.ws.onmessage = msg => {
+      console.log("从服务端获取到了数据");
+      // 真正从服务器发送过来的数据在msg中的data字段
+      // console.log(msg.data)
+      const receive = JSON.parse(msg.data);
+      const socketType = receive.socketType;
+      if (this.callBackMapping[socketType]) {
+        const action = receive.action;
+        if (action === "getData") {
+          const realData = JSON.parse(receive.data);
+          this.callBackMapping[socketType].call(this, realData);
+        } else if (action === "fullScreen") {
+          this.callBackMapping[socketType].call(this, receive);
+        } else if (action === "themeChange") {
+          this.callBackMapping[socketType].call(this);
+        }
+      }
+    };
+  }
+
+  // 注册回调函数
+  registerCallback(socketType, callback) {
+    this.callBackMapping[socketType] = callback;
+  }
+  // 注销回调函数
+  unRegisterCallback(socketType) {
+    this.callBackMapping[socketType] = null;
+  }
+  // 发送数据
+  send(data) {
+    if (this.connected) {
+      this.sendRecord = 0;
+      this.ws.send(JSON.stringify(data));
+    } else {
+      // 如果发送不成功，重新发送
+      // 重试的次数越多，重新发送的时间越大，避免浪费资源，因为服务器可能关机了
+      this.sendRecord++;
+      if (this.sendTimer) clearTimeout(this.sendTimer);
+      if (this.sendRecord * 500 >= Number.MAX_SAFE_INTEGER) {
+        this.sendRecord = 0;
+        return;
+      }
+      this.sendTimer = setTimeout(() => {
+        this.send(data);
+      }, this.sendRecord * 500);
+    }
+  }
+}
+export default SocketService;
+```
+
+#### WebSocket 服务器端
+
+```js
+const WebSocket = require('ws')
+const ws = new WebSocket.Server({port: 8080});
+// 对客户端的连接事件进行监听
+ws.on('connection', client => {
+  	// 对客户端的连接对象进行message事件监听
+    // msg是客户端发给服务器端的数据
+    client.on('message', message => {
+        console.log('received: %s', message);
+    });
+    client.send('something');
+});
+```
+
+
 
 ### [长连接和短连接](https://www.cnblogs.com/gotodsp/p/6366163.html)
 

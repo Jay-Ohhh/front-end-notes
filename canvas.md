@@ -33,7 +33,7 @@ function draw( ) {
 - 从上一笔的停止点绘制到`(x,y)`
 3. 选择画笔
 - `context.lineWidth = 5`  画笔粗细为`5px`
-- `context.strokeStyle = "#AA394C"`  画笔验收为#AA394C
+- `context.strokeStyle = "#AA394C"`  画笔颜色为 #AA394C
 
 #### 确定绘制
 确定绘制只有两种方法，`fill( )`和`stroke( )`，填充和描边
@@ -115,7 +115,7 @@ context.strokeStyle = "black";
 context.stroke();
 ```
 > 用`lineTo()`方法闭合最后一点，闭合点会出现缺口。这种情况是设置了`lineWidth`导致的。如果默认1笔触的话，是没有问题的。但是笔触越大，线条越宽，这种缺口就越明显。使用使用`closePath()`闭合图形来避免这种情况。
-![缺口]( https://upload-images.jianshu.io/upload_images/7016617-87aad4166b1e97be.png )
+![缺口](https://upload-images.jianshu.io/upload_images/7016617-87aad4166b1e97be.png )
 <p align="center">左上角有缺口</p>
 ```JavaScript
 context.beginPath();
@@ -150,7 +150,7 @@ function drawRect (context,x,y,width,height,color,lineWidth,borderColor,fillColo
     
     context.lineWidth = lineWidth
     context.strokeStyle = borderColor
-    context.fillStyle = borderColor
+    context.fillStyle = fillColor
     
     context.fill()
     context.stroke()
@@ -179,14 +179,14 @@ function drawRect (context,x,y,width,height,color,lineWidth,borderColor,fillColo
 -  `round`：端点是在线段边缘处以线宽为直径的半圆（超出边缘）。
 -  `square`：端点是在选段边缘处以线宽为长、以一半线宽为宽的矩形（超出边缘）。
 
-![lineCap]( https://upload-images.jianshu.io/upload_images/7016617-7f62cdae933a4070.png )
+![lineCap](https://upload-images.jianshu.io/upload_images/7016617-7f62cdae933a4070.png )
 
 2. 线条的连接点`lineJoin`，三个属性值
 - `miter`，默认值，直接连接，创建尖角。
 - `bevel`，连接处为斜角（切去尖角）。
 - `round`，连接处为圆角。
 
-![lineJoin]( https://upload-images.jianshu.io/upload_images/7016617-59186380227af538.png )
+![lineJoin](https://upload-images.jianshu.io/upload_images/7016617-59186380227af538.png )
 
 3. 尖角最大长度 `miterLimit`属性
    限制当两条线相交时交接处最大长度；所谓交接处长度（斜接长度）是指线条交接处内角顶点到外角顶点的长度`miterLength`。
@@ -241,8 +241,8 @@ grd.addColorStop(1,"white");
 context.fillStyle = grd;
 context.strokeStyle = grd;
 ```
- 	2.2 径向渐变
-     	2.2.1 添加渐变圆 
+​		2.2 径向渐变
+ 			2.2.1 添加渐变圆 
 
 ```JavaScript
 // x0,y0是开始圆圆心，r0是开始圆半径；x1,y1是结束圆圆心，r1是结束圆圆半径
@@ -282,7 +282,7 @@ ctx.fillStyle = "rgba(255,0,0,0.5)";
 `fillText(text, x, y [, maxWidth])`
  fillText() 方法在画布上绘制填色的文本。文本的默认颜色是黑色 ，绘制的最大文本宽度是可选的
 `strokeText(text, x, y [, maxWidth])`
- strokeText() 方法在画布上绘制文本（没有填色）。文本的默认颜色是黑色，绘制的最大文本宽度是可选的`font = value`： 当前我们用来绘制文本的样式. 这个字符串使用和`CSS font` 属性相同的语法（包括复合写法）. 默认的字体是 `10px sans-serif`。 
+ strokeText() 方法在画布上绘制文本（没有填色）。文本的默认颜色是黑色，绘制的最大文本宽度是可选的`font = value`： 当前我们用来绘制文本的样式。这个字符串使用和`CSS font` 属性相同的语法（包括复合写法），默认的字体是 `10px sans-serif`。 
 `textAlign = value`： 基线对齐。 可选的值包括：top, hanging, middle, alphabetic, ideographic, bottom。 
 `direction = value`： 文本方向。可能的值包括：ltr, rtl, inherit。 
 `measureText()`： 将返回一个 `TextMetrics`对象 （包含文本属性的对象）。
@@ -318,7 +318,7 @@ img.onload = function(){
 }
 ```
 
-> 这里使用了`Image`的`onload`事件，它的作用是对图片进行预加载处理，即在图片加载完成后才立即除非其后`function`的代码体。这个是必须的，如果不写的话，画布将会显示黑屏。因为没有等待图片加载完成就填充纹理，导致浏览器找不到图片。
+> 这里使用了`Image`的`onload`事件，它的作用是对图片进行预加载处理，即在图片加载完成后才执行其后`function`的代码体。这个是必须的，如果不写的话，画布将会显示黑屏。因为没有等待图片加载完成就填充纹理，导致浏览器找不到图片。
 
 
 
@@ -437,11 +437,11 @@ function drawArcTo(cxt, x0, y0, x1, y1, x2, y2, r){
 }
 ```
 
-![]( https://upload-images.jianshu.io/upload_images/7016617-2c30602c0f395ab7.png )
+![](https://upload-images.jianshu.io/upload_images/7016617-2c30602c0f395ab7.png )
 
 #### 二次贝塞尔曲线
 
-![示意图]( https://upload-images.jianshu.io/upload_images/7016617-162f77a1f200fae8.gif )
+![示意图](https://upload-images.jianshu.io/upload_images/7016617-162f77a1f200fae8.gif )
 
 ```javascript
 context.quadraticCurveTo(cpx,cpy,x,y);
@@ -591,7 +591,7 @@ demo
 </html>
 ```
 
-![云朵]( https://upload-images.jianshu.io/upload_images/7016617-96590b10993d7f78.png )
+![云朵](https://upload-images.jianshu.io/upload_images/7016617-96590b10993d7f78.png )
 
 <p align="center">其实每次都不一样</p>
 #### 指定点是否在路径区域内（包括路径）
@@ -699,7 +699,7 @@ demo
         context.fillRect(100,100,200,100);
 
         context.fillStyle = "red";
-        context.translate(100,100);
+        context.translate(100,100); // 原点发生变化
         // translate() 之后调用如 fillRect() 之类的方法时，原点的值会添加到 x 和 y 坐标值上
         context.fillRect(100,100,200,100);
 
@@ -709,9 +709,9 @@ demo
 </html>
 ```
 
-![]( https://upload-images.jianshu.io/upload_images/7016617-3dda65e68d671444.png )
+![](https://upload-images.jianshu.io/upload_images/7016617-3dda65e68d671444.png )
 
-![]( https://upload-images.jianshu.io/upload_images/7016617-0332f55319fcec6c.png )
+![](https://upload-images.jianshu.io/upload_images/7016617-0332f55319fcec6c.png )
 
 - ##### 注意使用状态保存
 
@@ -764,7 +764,7 @@ demo
 </html>
 ```
 
-![]( https://upload-images.jianshu.io/upload_images/7016617-d46af85246327366.png )
+![](https://upload-images.jianshu.io/upload_images/7016617-d46af85246327366.png )
 
 这里的绿色矩形并没有如我们所愿在（300，300）位置处，而是跑到了（400，400）这里。为什么呢？想必大家已经知道了答案——Canvas是基于状态的绘制。在我们第一次平移之后，坐标系已经在（100，100）处了，所以如果继续平移，这个再基于新坐标系继续平移坐标系。那么要怎么去解决呢？很简单，有两个方法。
 
@@ -824,7 +824,7 @@ demo
 </html>
 ```
 
-![]( https://upload-images.jianshu.io/upload_images/7016617-96ffce2617a04f67.png )
+![](https://upload-images.jianshu.io/upload_images/7016617-96ffce2617a04f67.png )
 
 ##### 2. 旋转变换rotate()
 
@@ -888,7 +888,7 @@ demo
 </html>
 ```
 
-![]( https://upload-images.jianshu.io/upload_images/7016617-ed334e5588b77f08.png )
+![](https://upload-images.jianshu.io/upload_images/7016617-ed334e5588b77f08.png )
 
 > 这里用for循环绘制了14对正方形，其中蓝色是旋转前的正方形，红色是旋转后的正方形。每次旋转都以正方形左上角顶点为原点进行旋转。每次绘制都被save()与restore()包裹起来，每次旋转前都移动了坐标系。
 
@@ -936,7 +936,7 @@ demo
 </html>
 ```
 
-![]( https://upload-images.jianshu.io/upload_images/7016617-217dc735fffa8ff2.png )
+![](https://upload-images.jianshu.io/upload_images/7016617-217dc735fffa8ff2.png )
 
 看了上面的例子，大家一定对产生的结果有点奇怪。一是左上角顶点的坐标变了，而是线条的粗细也变了。因此，对于缩放变换有两点问题需要注意：
 
@@ -1075,7 +1075,7 @@ function getMyVideo() {
 
 >  SVG图像必须在 <svg> 根指定元素的宽度和高度。 
 
-![]( https://pic1.zhimg.com/80/v2-50bab101932466cc1517d75eafd589a8_720w.jpg )
+![](https://pic1.zhimg.com/80/v2-50bab101932466cc1517d75eafd589a8_720w.jpg )
 
 ##### 3. 保存图片
 (1) `toDataURL()`
@@ -1093,6 +1093,7 @@ function getMyVideo() {
 canvas.toDataURL(type, encoderOptions);
 ```
 
+- 如果画布的高度或宽度是0，那么会返回字符串`data:,。`
 - `type`： 图片格式，默认为 `image/png` 
 -  encoderOptions ： 在指定图片格式为 `image/jpeg 或` `image/webp的情况下，可以从 0 到 1 的区间内选择图片的质量`。如果超出取值范围，将会使用默认值 `0.92`。其他参数会被忽略。 
 -  返回值：一个包含data URI的字符串。
@@ -1329,13 +1330,13 @@ ctx.addHitRegion({control: element});
 
 4.  使用多层画布去画一个复杂的场景 
 
-- 在您的应用程序中，您可能会发现某些对象需要经常移动或更改，而其他对象则保持相对静态。 在这种情况下，可能的优化是使用多个``元素对您的项目进行分层。
+- 在您的应用程序中，您可能会发现某些对象需要经常移动或更改，而其他对象则保持相对静态。 在这种情况下，可能的优化是使用多个`<canvas>`元素对您的项目进行分层。
 
-- 例如，假设您有一个游戏，其UI位于顶部（z-index:3），中间是游戏性动作（z-index:2），底部是静态背景（z-index:1）。 在这种情况下，您可以将游戏分成三个``层。 UI将仅在用户输入时发生变化，游戏层随每个新框架发生变化，并且背景通常保持不变。
+- 例如，假设您有一个游戏，其UI位于顶部（z-index:3），中间是游戏性动作（z-index:2），底部是静态背景（z-index:1）。 在这种情况下，您可以将游戏分成三个`<canvas>`层。 UI将仅在用户输入时发生变化，游戏层随每个新框架发生变化，并且背景通常保持不变。
 
 5.  用CSS设置大的背景图 
 
- 如果像大多数游戏那样，你有一张静态的背景图，用一个静态的[``](https://developer.mozilla.org/zh-CN/docs/Web/HTML/Element/div)元素，结合[`background`](https://developer.mozilla.org/zh-CN/docs/Web/CSS/background) 特性，以及将它置于画布元素之后。这么做可以避免在每一帧在画布上绘制大图。 
+ 如果像大多数游戏那样，你有一张静态的背景图，用一个静态的<div>元素，结合[`background`](https://developer.mozilla.org/zh-CN/docs/Web/CSS/background) 特性，以及将它置于画布元素之后。这么做可以避免在每一帧在画布上绘制大图。 
 
 6.  用`CSS transforms`特性缩放画布 
 
@@ -1362,7 +1363,7 @@ var ctx = canvas.getContext('2d', { alpha: false });
 
 #### 注意点
 
-1. `Canvas` 的默认大小为300像素×150像素（宽×高，像素的单位是px）。但是，可以使用HTML的高度和宽度属性来自定义Canvas 的尺寸。
+1. `Canvas` 的默认大小为300像素×150像素（宽×高，像素的单位是px）。但是，可以使用HTML的宽度和高度属性来自定义Canvas 的尺寸。
 
 2. 如果你绘制出来的图像是扭曲的, 尝试用width和height属性为`<canvas>`明确规定宽高，而不是使用CSS。
 
@@ -1370,4 +1371,3 @@ var ctx = canvas.getContext('2d', { alpha: false });
 
 4. 与`<img> `元素不同， `<canvas>`元素需要结束标签(`</canvas>`)。如果结束标签不存在，则文档的其余部分会被认为是替代内容，将不会显示出来。
 
-#### 云朵、旋转、缩放、太阳系demo

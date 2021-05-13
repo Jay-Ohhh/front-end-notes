@@ -334,10 +334,22 @@ Redux 提供`createStore`这个函数，用来生成 Store。 要创建它，只
 Store 有以下职责：
 
 - 维持应用的 state；
+
 - 提供 [`getState()`](https://www.reduxjs.cn/api/store#getState) 方法获取 state；
+
 - 提供 [`dispatch(action)`](https://www.reduxjs.cn/api/store#dispatch) 方法更新 state；
+
 - 通过 [`subscribe(listener)`](https://www.reduxjs.cn/api/store#subscribe) 注册监听器;
-- 通过 [`subscribe(listener)`](https://www.reduxjs.cn/api/store#subscribe) 返回的函数注销监听器
+
+- 通过 [`subscribe(listener)`](https://www.reduxjs.cn/api/store#subscribe) 返回的函数注销监听器；
+
+- 通过 [replaceReducer(nextReduer)]() 替换 store 当前用来计算 state 的 reducer。
+
+  > replaceReducer 是一个高级 API。只有在你需要实现代码分隔，而且需要立即加载一些 reducer 的时候才可能会用到它。在实现 Redux 热加载机制的时候也可能会用到。
+  >
+  > 在大型项目中将代码拆分为多个按需加载的js包，redux中也可以实现动态添加reducer到store
+  >
+  > https://www.jianshu.com/p/591829e61bdd
 
 #### API
 
@@ -355,7 +367,7 @@ import { createStore } from 'redux'
 **参数**
 
 1. `reducer` *(Function)*: 接收两个参数，分别是当前的 state 树和要处理的 [action](https://www.reduxjs.cn/glossary#action)，返回新的 [state 树](https://www.reduxjs.cn/glossary#state)。
-2. [`preloadedState`] *(any)*: 初始时的 state。 如果你使用 [`combineReducers`](https://www.reduxjs.cn/api/combinereducers) 创建 `reducer`，改参数必须是一个普通对象，且其keys与 [`combineReducers`](https://www.reduxjs.cn/api/combinereducers) 构造的state对象的keys保持一致。
+2. [`preloadedState`] *(any)*: 初始时的 state。 如果你使用 [`combineReducers`](https://www.reduxjs.cn/api/combinereducers) 创建 `reducer`，该参数必须是一个普通对象，且其keys与 [`combineReducers`](https://www.reduxjs.cn/api/combinereducers) 构造的state对象的keys保持一致。
 3. `enhancer` *(Function)*: Store enhancer 是一个组合 store creator 的高阶函数，返回一个新的强化过的 store creator。与React高阶组件的概念一致。这与 middleware 相似，它也允许你通过复合函数改变 store 接口。
 
  **返回值**
@@ -573,7 +585,7 @@ Action 是把数据传入 store 的惟一途径，所以任何数据，无论来
 
  **返回值**
 
-(*Function*): 一个可以解绑变化监听器的函数。
+(*Function*): 一个可以解绑变化监听器的函数。调用该函数即可解绑。
 
 把 View 的更新函数（对于 React 项目，就是组件的`render`方法或`setState`方法）放入`listen`，就会实现 View 的自动渲染。
 
@@ -588,6 +600,12 @@ Action 是把数据传入 store 的惟一途径，所以任何数据，无论来
 `nextReducer` (*Function*) store 会使用的下一个 reducer。
 
 没有返回值。
+
+> replaceReducer 是一个高级 API。只有在你需要实现代码分隔，而且需要立即加载一些 reducer 的时候才可能会用到它。在实现 Redux 热加载机制的时候也可能会用到。
+>
+> 在大型项目中将代码拆分为多个按需加载的js包，redux中也可以实现动态添加reducer到store
+>
+> https://www.jianshu.com/p/591829e61bdd
 
 #### 数据流
 

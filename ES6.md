@@ -163,7 +163,7 @@ console.log(fn) // 1
 
 2、同一个变量只会声明一次，其他的会被忽略掉。
 
-3、函数声明的优先级高于变量申明的优先级。
+3、函数声明的优先级高于变量声明的优先级。
 
 #### this指向
 
@@ -181,7 +181,7 @@ console.log(fn) // 1
 
 4、类的constructor的this指向实例对象，类的方法的this指向这个方法的调用者。
 
-5、闭包内部函数和外层函数的this，决定于代码执行时，它们的函数体被引用在哪个作用域（函数体的地址被哪个作用域的变量所引用），即this会指向该函数运行时所在的环境，普通函数和方法被调用时亦如此。
+5、闭包内层函数和外层函数的this，决定于代码执行时，它们的函数体被引用在哪个作用域，即this会指向该函数运行时所在的环境，普通函数和方法被调用时亦如此。
 
 **eg1**
 
@@ -222,7 +222,7 @@ obj.b()  // 打印1
 
 （1）如果嵌套函数作为方法调用，其this的值指向调用它的对象。
 
-（2）如果嵌套函数作为函数调用（只要不是方法调用，例如在方法内作为函数调用、在函数内作为函数调用），其this值不是全局对象（非严格模式下）就是undefined（严格模式下）。为什么指向全局对象或者undefined？因为this是指向函数所在的对象，this不能指向函数。
+（2）如果嵌套函数作为函数调用（只要不是方法调用，例如在方法内作为函数调用、在函数内作为函数调用），其this值不是全局对象（非严格模式下）就是undefined（严格模式下）。为什么指向全局对象或者undefined？因为this是指向函数所在的作用域对象，this不能指向函数。
 
 将嵌套函数作为方法调用：
 
@@ -249,6 +249,26 @@ o.m(); // true
 ```
 
 
+
+#### 原型对象 prototype
+
+prototype：构造函数的原型对象
+
+`__proto__`：对象原型。
+
+实例对象的对象原型指向构造函数的原型对象：
+
+```js
+new Star().__proto__ === Star.prototype
+```
+
+为节省内存和时间，一般情况下，公共属性定义到构造函数里面，公共方法定义到原型对象里面。
+
+访问一个对象的属性或方法时是通过原型链进行查找，原型链的尽头是null。
+
+任何对象（包括函数、构造函数、数组等等）都有`__proto__`属性，是个非标准属性，只是为查找机制提供一个方向，实际开发中不应该使用这个属性。
+
+![原型链](http://jay_ohhh.gitee.io/imagehosting/JS/原型链.png)
 
 #### 闭包
 
@@ -277,9 +297,11 @@ function foo(local){
 
 闭包可以用来封装一个需要持久保存的变量，也可以模拟命名空间，避免变量名的污染。
 
+> 闭包可以让你在一个内层函数中访问到其外层函数的作用域的状态
+
 ##### 为什么要函数套函数呢？（不是必须的）
 
-是因为需要局部变量，所以才把 local 放在一个函数里，如果不把 local 放在一个函数里，local 就是一个全局变量了，达不到使用闭包的目的——隐藏变量。
+是因为需要局部变量，所以才把 local 变量放在一个函数里，如果不把 local 变量放在一个函数里，local 就是一个全局变量了，达不到使用闭包的目的——隐藏变量。
 
 所以函数套函数只是为了造出一个局部变量，跟闭包无关。
 
@@ -501,6 +523,33 @@ var fn=function(a){
     console.log(a);   //firebug输出12345678，使用=运算符
 }(12345678)
 ```
+
+#### Symbol
+
+ES5 的对象属性名都是字符串，这容易造成属性名的冲突。比如，你使用了一个他人提供的对象，但又想为这个对象添加新的方法（mixin 模式），新方法的名字就有可能与现有方法产生冲突。如果有一种机制，保证每个属性的名字都是独一无二的就好了，这样就从根本上防止属性名的冲突。这就是 ES6 引入`Symbol`的原因。
+
+ES6 引入了一种新的原始数据类型`Symbol`，表示独一无二的值。Symbol 值通过`Symbol`函数生成。
+
+注意，`Symbol`函数前不能使用`new`命令，否则会报错。这是因为生成的 Symbol 是一个原始类型的值，不是对象。
+
+`Symbol`函数可以接受一个字符串作为参数，表示对 Symbol 实例的描述，主要是为了在控制台显示，或者转为字符串时，比较容易区分。
+
+```javascript
+let s1 = Symbol('foo');
+let s2 = Symbol('bar');
+
+s1 // Symbol(foo)
+s2 // Symbol(bar)
+
+s1.toString() // "Symbol(foo)"
+s2.toString() // "Symbol(bar)"
+```
+
+生成的Symbol值不是字符串，点运算符后面总是字符串，因此作为属性名时，不能用点运算符。
+
+Symbol 值作为属性名时，该属性是公有属性不是私有属性，可以在类的外部访问。
+
+但是不会出现在 for...in 、 for...of 的循环中，也不会被 Object.keys() 、 Object.getOwnPropertyNames() 返回。如果要读取到一个对象的 Symbol 属性，可以通过 Object.getOwnPropertySymbols() 和 Reflect.ownKeys() 取到。
 
 #### Set和Map数据结构
 
@@ -1278,6 +1327,8 @@ document.getElementById('logo').addEventListener('click', function() {
 
 Promise 对象代表了未来将要发生的事件，用来传递异步操作的消息。
 
+Promise 有三种状态，pending进行中，fulfilled已成功，rejected已失败
+
 Promise对象里的函数会立即执行
 
 ```js
@@ -1288,6 +1339,8 @@ new Promise((resolve, reject) => {
 ```
 
 当我们调用resolve()或reject()的时候，触发promise.then(...)实际上是一个异步操作，这个promise.then(...)并不是在resolve()或reject()的时候就立刻执行的，而也是要重新进入任务队列排队的，不过能直接在当前的事件循环新的执行栈中被取出执行（不用等下次事件循环）。
+
+> promise一旦执行，无法取消
 
 ##### Promise.resolve() 
 
@@ -1426,6 +1479,52 @@ new Promise((resolve, reject) => {
 
 ```
 
+##### 手写Promise
+
+```js
+function myPromise(constructor){ 
+  let self=this;
+  self.status="pending" //定义状态改变前的初始状态 
+  self.value=undefined;//定义状态为resolved的时候的状态 
+  self.reason=undefined;//定义状态为rejected的时候的状态 
+  function resolve(value){
+    //两个==="pending"，保证了了状态的改变是不不可逆的 
+    if(self.status==="pending"){
+      self.value=value;
+      self.status="resolved"; 
+    }
+  }
+  function reject(reason){
+     //两个==="pending"，保证了了状态的改变是不不可逆的
+     if(self.status==="pending"){
+        self.reason=reason;
+        self.status="rejected"; 
+      }
+  }
+  //捕获构造异常 
+  try{
+    constructor(resolve,reject);
+  }catch(e){
+    reject(e);
+  } 
+}
+myPromise.prototype.then=function(onFullfilled,onRejected){ 
+  let self=this;
+  switch(self.status){
+    case "resolved": onFullfilled(self.value); break;
+    case "rejected": onRejected(self.reason); break;
+    default: 
+  }
+}
+
+// 测试
+var p=new myPromise(function(resolve,reject){resolve(1)}); 
+p.then(function(x){console.log(x)})
+//输出1
+```
+
+
+
 #### async/await
 
 `async`和`await`关键字让我们可以用一种更简洁的方式写出基于Promise的异步行为，而无需刻意地链式调用`promise`。
@@ -1434,7 +1533,9 @@ new Promise((resolve, reject) => {
 
 2、await会等待结果返回，再执行之后的代码
 
-> 如果await后面的promise没有resolve一个值，对await来说是失败了，后面的代码不会执行
+> 如果await后面的promise没有resolve()，对await来说是失败了，后面的代码不会执行
+>
+> 如果await右边的代码是同步执行，await左边的等号进行赋值相当于在then中取出参数resolve的值，是微任务，await之后的代码相当于是在then内执行，是微任务
 
 3、async 修饰的函数  隐式返回一个 promise（即使不写return）。箭头函数也能用async修饰。
 
@@ -1455,32 +1556,14 @@ async函数内return  xxx ，底层内部实际上进行了new Promise (resolve 
 ```js
 async function fn(){
 	await console.log('a')
+  console.log('c')
 }
 fn()
 console.log('b')
 // a
 // b
-```
+// c
 
-- 如果await后面的promise没有resolve一个值，对await来说是失败了，后面的代码不会执行
-
-```js
-function fn(){
-  return new Promise(resolve=>{
-      console.log(1)
-  })
-}
-async function f1(){
-  await fn()
-  console.log(2)
-}
-f1()
-console.log(3)
-//1
-//3
-```
-
-```js
 function fn(){
   return new Promise(resolve=>{
     console.log(1)
@@ -1496,6 +1579,24 @@ console.log(3)
 //1
 //3
 //2
+```
+
+- 如果await后面的promise没有resolve()，对await来说是失败了，函数内await后面的代码不会执行
+
+```js
+function fn(){
+  return new Promise(resolve=>{
+      console.log(1)
+  })
+}
+async function f1(){
+  await fn()
+  console.log(2)
+}
+f1()
+console.log(3)
+//1
+//3
 ```
 
 
@@ -2393,7 +2494,7 @@ result.value.then(function(data){
 
 > 当我们调用resolve()或reject()的时候，触发promise.then(...)实际上是一个异步操作，这个promise.then(...)并不是在resolve()或reject()的时候就立刻执行的，而也是要重新进入任务队列排队的，不过能直接在当前的事件循环新的执行栈中被取出执行（不用等下次事件循环）。
 
-在JS引擎中，我们可以按性质把任务分为两类，**macrotask**（宏任务）和 **microtask**（微任务）。
+在JS引擎中，我们可以按性质把异步任务分为两类，**macrotask**（宏任务）和 **microtask**（微任务）。
 
 **macrotask queue**可以有多个，相同任务源的宏任务，只能放到同一个宏任务队列中。
 
@@ -2403,13 +2504,15 @@ result.value.then(function(data){
 
 **优先级**
 
-1、macrotask（按优先级顺序排列）：script(你的全部JS代码，“同步代码”）、 setTimeout、setInterval、setImmediate、 I/O、UI rendering
+1、macrotask（按优先级顺序排列）：script（同步代码）、 setTimeout、setInterval、setImmediate、 I/O、UI rendering、UI事件
 
-2、microtask（按优先级顺序排列）：process.nextTick、Promise（这里指浏览器原生实现的 Promise）, Object.observe、 MutationObserver
+2、microtask（按优先级顺序排列）：process.nextTick、Promise（这里指浏览器原生实现的 Promise）, Object.observe（已废弃）、 MutationObserver
 
 > microtask任务 也可以生成新的 microtask任务 并且插入到同样的队列中（插入当前microtask）并且在同一个 tick 里执行
 
 3、JS引擎首先从macrotask queue中取出第一个任务，执行完毕后，将microtask queue中的所有任务取出，按顺序全部执行；
+
+> 宏任务队列每次只会执行一个任务
 
 4、然后再从macrotask queue（宏任务队列）中取下一个，执行完毕后，再次将microtask queue（微任务队列）中的全部取出；
 
@@ -2423,11 +2526,13 @@ result.value.then(function(data){
 
 2、再取出 microtask 中的全部任务执行（先清空process.nextTick队列，再清空promise.then队列）
 
-3、下一个事件循环，再回到 macrotask 取其中的下一项任务
+3、是否有必要渲染页面
 
-4、再重复2
+4、下一个事件循环，再回到 macrotask 取其中的下一项任务
 
-5、反复执行事件循环…
+5、再重复2
+
+6、反复执行事件循环…
 
 
 
@@ -2439,6 +2544,7 @@ result.value.then(function(data){
 | setInterval           | √      | √    |
 | setImmediate          | x      | √    |
 | requestAnimationFrame | √      | x    |
+| I/O                   | √      | √    |
 
 **微任务**
 
@@ -2465,16 +2571,16 @@ new Promise(resolve => {
   .then(() => {
     setTimeout(() => {
       console.log('then-setTimeout-1')
-    })
+    },1000)
     console.log('微事件1')
   })
   .then(() => {
     setTimeout(() => {
       console.log('then-setTimeout-2')
-    })
+    },0)
     console.log('微事件2')
   })
-
+console.log('外层宏事件3')
 ```
 
 我们看看打印结果
@@ -2482,11 +2588,12 @@ new Promise(resolve => {
 ```
 外层宏事件1
 外层宏事件2
+外层宏事件3
 微事件1
 微事件2
 内层宏事件3
-then-setTimeout-1
 then-setTimeout-2
+then-setTimeout-1
 ```
 
 • 首先浏览器执行js进入第一个宏任务进入主线程, 遇到 setTimeout 分发到宏任务Event Queue中（setTimeout优先级比script低）
@@ -2497,11 +2604,13 @@ then-setTimeout-2
 
 • 执行then 被分发到微任务Event Queue中
 
+• 继续执行script，输出 外层宏事件3
+
 • 第一轮宏任务执行结束，开始执行第一个微任务，遇到setTimeoutout，分发到宏任务Event Queue中，然后打印 '微事件1' ，生成第二个微任务（第二个then）
 
 • 开始执行第二个微任务，遇到setTimeoutout，分发到宏任务Event Queue中，然后打印 '微事件2' 
 
-• 第一轮微任务执行完毕，执行第二轮宏事件，在同一宏任务队列中按照顺序打印 '内层宏事件3'、'then-setTimeout-1'、'then-setTimeout-2'
+• 第一轮微任务执行完毕，执行第二轮宏事件，在同一宏任务队列中按照顺序执行（注意定时器时间），打印 '内层宏事件3'、'then-setTimeout-2'、'then-setTimeout-1'
 
 **NodeJS引擎中**：
 
@@ -2521,9 +2630,47 @@ then-setTimeout-2
 
 区别：前者包括对象继承自原型对象的属性，而后者只包括对象本身的属性。如果需要获取对象自身的所有属性，不管enumerable的值，可以使用**Object.getOwnPropertyNames**方法。
 
+##### Object.create()
+
+创建一个新对象，使用现有的对象来提供新创建的对象的`__proto__`。 
+
+```
+Object.create(proto，[propertiesObject])
+```
+
+参数
+
+- proto：新创建对象的对象原型
+- propertiesObject：可选，该传入对象自身的可枚举属性将为新创建的对象添加指定的属性值和对应的属性描述符。
+
+返回值
+
+- 一个新对象，带着指定的原型对象和属性。
+
+**eg**
+
+```js
+o = Object.create(Object.prototype, {
+  // foo会成为所创建对象的数据属性
+  foo: {
+    writable:true,
+    configurable:true,
+    value: "hello"
+  },
+  // bar会成为所创建对象的访问器属性
+  bar: {
+    configurable: false,
+    get: function() { return 10 },
+    set: function(value) {
+      console.log("Setting `o.bar` to", value);
+    }
+  }
+});
+```
+
 ##### Object.assign()
 
-**Object.assign()** 方法用于将所有可枚举属性的值从一个或多个源对象分配到目标对象。它将返回目标对象。
+用于将所有可枚举属性的值从一个或多个源对象分配到目标对象。它将返回目标对象。
 
 ```js
 Object.assign(target, source1, source2, ...)
@@ -2758,9 +2905,8 @@ let handler={
 let p=new Proxy(obj,handler);
 
 console.log(p.a)//会触发get方法
-console.log(p.b.c)//会先触发get方法获取p.b，然后触发返回的新代理对象的.c的set。
 
-p.b.c = 3
+p.b.c = 3 //会先触发get方法获取p.b，然后触发返回的新代理对象.c的set。
 console.log(p.b.c)
 ```
 
@@ -2917,13 +3063,15 @@ function() {
 
 #### 作用域
 
-作用域即执行环境，每个执行环境都有一个与之关联的变量对象，环境中定义的所有变量和函数都保存在这个对象中。在 web 浏览器中，全局执行环境被认为是 window 对象。且每个函数都有自己的执行环境，在进入函数时入栈，在函数执行之后，栈将其环境弹出，把控制权返回给之前的执行环境。
+作用域即代码的执行环境，每个执行环境都有一个与之关联的变量对象，环境中定义的所有变量和函数都保存在这个对象中。在 web 浏览器中，全局执行环境被认为是 window 对象。且每个函数都有自己的执行环境，在进入函数时入栈，在函数执行之后，栈将其环境弹出，把控制权返回给之前的执行环境。
 
 当代码在一个环境中执行时，会创建变量对象的一个作用域链，是保证对执行环境有权访问的所有变量和函数的有序访问。作用域链的前端，始终是当前执行的代码所在环境的变量对象，最后端，始终是全局执行环境的变量对象。
 
-JavaScript 代码运行时，会产生一个全局的上下文环境（context，又称运行环境），包含了当前所有的变量和对象。然后，执行函数（或块级代码）的时候，又会在当前上下文环境的上层，产生一个函数运行的上下文，变成当前（active）的上下文，由此形成一个上下文环境的堆栈（context stack）。
+JavaScript 代码运行时，会产生一个全局的上下文环境（context，又称运行环境），包含了当前所有的变量和对象。然后，执行函数（或块级代码）的时候，又会在当前上下文环境的上层，产生一个函数运行的上下文，变成当前（active）的上下文，由此形成一个上下文环境的栈（context stack）。
 
-这个堆栈是“后进先出”的数据结构，最后产生的上下文环境首先执行完成，退出堆栈，然后再执行完成它下层的上下文，直至所有代码执行完成，堆栈清空。
+> 内部环境可以通过作用域链访问外部环境，但外部环境不能访问内部环境的任何变量和函数。
+
+这个栈是“后进先出”的数据结构，最后产生的上下文环境首先执行完成，退出栈，然后再执行完成它下层的上下文，直至所有代码执行完成，栈清空。
 
 但是Generator函数是例外的：
 
@@ -3118,6 +3266,8 @@ family = null;
 
 在刚才的购物场景中，当用户选购了第一项商品，服务器在向用户发送网页的同时，还发送了一段cookie，记录着那项商品的信息。当用户访问另一个页面，浏览器会把cookie发送给服务器，于是服务器知道他之前选购了什么。用户继续选购饮料，服务器就在原来那段Cookie里追加新的商品信息。结帐时，服务器读取发送来的cookie就行了。
 
+> Cookie 自动在同源http请求头中携带，cookies在浏览器和服务器间来回传递信息，而sessionstorage和localstorage不会自动把数据发给服务器，仅在本地保存
+
 ###### 什么是cookie
 
 cookie指某些网站为了辨别用户身份而储存在用户本地终端上的数据(通常经过加密)。**cookie是服务端生成，客户端进行维护和存储（保存在浏览器）**，存储在内存或者磁盘中。通过cookie,可以让服务器知道请求是来源哪个客户端，就可以进行客户端状态的维护，比如登陆后刷新，请求头就会携带登陆时response header中的Set-Cookie,Web服务器接到请求时也能读出cookie的值，根据cookie值的内容就可以判断和恢复一些用户的信息状态。
@@ -3297,20 +3447,33 @@ localStorage 与 sessionStorage 在 API 方面无异。
 
 - sessionStorage生命周期为当前窗口或标签页，当页面被关闭时，存储在 sessionStorage 的数据会被清除 
 
-- 不同浏览器无法共享localStorage或sessionStorage中的信息。相同浏览器的不同页面间可以共享相同的 localStorage（页面属于相同域名和端口），但是不同页面或标签页间无法共享sessionStorage的信息。
+- 不同浏览器无法共享localStorage或sessionStorage中的信息。相同协议、域名、端口的前提下，相同浏览器的不同页面间可以共享相同的 localStorage，但是不同页面或标签页间无法共享sessionStorage的信息。
 
 ##### Web Storage 和 Cookie 和 IndexDB 的区别
 
-| 特性         | cookie                                     | localStorage             | sessionStorage | indexDB                  |
-| ------------ | ------------------------------------------ | ------------------------ | -------------- | ------------------------ |
-| 数据生命周期 | 一般由服务器生成，可以设置过期时间         | 除非被清理，否则一直存在 | 页面关闭就清理 | 除非被清理，否则一直存在 |
-| 数据存储大小 | 4K                                         | 5M                       | 5M             | 无限                     |
-| 与服务端通信 | 每次都会携带在 header 中，对于请求性能影响 | 不参与                   | 不参与         | 不参与                   |
+| 特性         | cookie                                               | localStorage                                         | sessionStorage                     | indexDB                  |
+| ------------ | ---------------------------------------------------- | ---------------------------------------------------- | ---------------------------------- | ------------------------ |
+| 数据生命周期 | 一般由服务器生成，可以设置过期时间                   | 除非被清理，否则一直存在                             | 页面关闭就清理                     | 除非被清理，否则一直存在 |
+| 数据存储大小 | 4K                                                   | 5M                                                   | 5M                                 | 无限                     |
+| 与服务端通信 | 每次请求都会自动携带在 header 中，影响请求性能       | 不参与                                               | 不参与                             | 不参与                   |
+| 作用域       | 在所有的同源标签页（不同页面但域名端口相同）都是共享 | 在所有的同源标签页（不同页面但域名端口相同）都是共享 | 不同标签页面的sessionStorage不共享 | /                        |
 
 - 均遵循同源政策。
 - Cookie 的本职工作并非本地存储，而是“维持状态”。
 - Web Storage定义了两个对象用于存储数据：sessionStorage和localStorage。前者用于严格保存浏览器一次会话期间的数据，因为数据会在浏览器关闭时被删除。后者用于会话之外持久保存数据。
 - IndexedDB是类似于SQL数据库的结构化数据存储机制。不同的是，IndexedDB存储的是对象，而不是数据表。
+
+##### 不同域名之间共享 localStorage
+
+两个不同的域名的localStorage不能直接互相访问。那么如何在`aaa.com`中如何调用`bbb.com`的localStorage?
+
+**实现原理**
+
+1、在`aaa.com`的页面中，在页面中嵌入一个src为`bbb.com`的`iframe`，此时这个`iframe`里可以调用`bbb.com`的localStorage。
+2、用`postMessage`方法实现页面与`iframe`之间的通信。
+ 综合1、2便可以实现`aaa.com`中调用`bbb.com`的localStorage。
+
+https://www.jianshu.com/p/8c4cee29d532
 
 ##### Cache Storage
 
@@ -3340,8 +3503,41 @@ localStorage 与 sessionStorage 在 API 方面无异。
 
 在 Progressive Web Application 中， Application Cache 配合 Service Worker 承担着主要的任务。
 
+#### 常见跨域方式
 
+https://www.cnblogs.com/sdcs/p/8484905.html
 
+1. jsonp；
+
+2. document.domain + iframe，二级域名和顶级域名的资源共享，两个页面设置同样的document.domain属性可以实现跨域；
+
+3.  window.name + iframe，页面中打开页面后window.name任然存在且可以访问；
+
+4.  location.hash + iframe
+
+5. postMassage，html5新增接口，多窗口中的信息传递；
+
+6. 跨域资源共享CORS，服务器端Access-Control-Allow-Origin设置可以通过的源，前端页面如果需要接收服务器带回的Cookie信息，需要打开`xhr.withCredentials = true;`确定请求是否携带Cookie；
+
+   > 普通跨域请求：只服务端设置Access-Control-Allow-Origin即可，前端无须设置，若要带cookie请求：前后端都需要设置。
+
+7. nginx反向代理；
+
+8. nodejs中间件代理跨域；
+
+9. WebSocket协议跨域
+
+#### null和undefined区别
+
+`null`代表空值代表空对象指针，没有对象此处不应该有值，对象原型链的终点；`undefined`代表声明但未赋值的变量
+
+```javascript
+typeof undefined //  undefined
+typeof null // object
+null == undefined // true
+undefined + 6 // NaN
+null + 6 // 6
+```
 
 #### console
 
@@ -3363,9 +3559,173 @@ a.index++;
 
 一般对于基本类型number、string、boolean、null、undefined的输出是可信的。但对于Object等引用类型来说，则就会出现上述异常打印输出。
 
- 
-
 在Node环境中，console.*方法是严格同步的，不会出现上述Object等引用类型异常打印输出的情况。
+
+#### 防抖和节流
+
+##### 防抖 debounce
+
+规定时间内多次触发事件，只执行最后一次。
+
+适用场景：
+
+- 按钮提交场景：防止多次点击提交
+- 输入框：当输入最后一个字符才触发
+
+```js
+// 有时希望立刻执行函数，然后等到停止触发 n 秒后，才可以重新触发执行。
+// immediate是否立即执行
+function debounce(func, wait, immediate) {
+  let timeout;
+  return function () {
+    const context = this;
+    const args = arguments;
+    if (timeout) clearTimeout(timeout);
+    if (immediate) {
+      const callNow = !timeout;
+      timeout = setTimeout(function () {
+        timeout = null;
+      }, wait)
+      if (callNow) func.apply(context, args)
+    } else {
+      timeout = setTimeout(function () {
+        func.apply(context, args)
+      }, wait);
+    }
+  }
+}
+```
+
+##### 节流 throttle
+
+规定时间内多次触发事件，只执行一次。
+
+适用场景：
+
+- 拖拽场景
+- 缩放场景resize
+
+```js
+function throttle(func, wait) {
+  let timeout;
+  return function () {
+    const context = this;
+    const args = arguments;
+    if (!timeout) {
+      timeout = setTimeout(function () {
+        timeout = null;
+        func.apply(context, args)
+      }, wait)
+    }
+  }
+}
+```
+
+#### 手写发布订阅
+
+```js
+// 发布订阅中心, on-订阅, off取消订阅, emit发布, 内部需要一个单独事件中心caches进行存储;
+
+interface CacheProps {
+  [key: string]: Array<(data?: unknown) => void>
+}
+
+class Observer {
+  private caches: CacheProps = {} // 事件中心
+
+  on(eventName: string, fn: (data?: unknown) => void) {
+    // eventName事件名-独一无二, fn是订阅后执行的自定义行为
+    this.caches[eventName] = this.caches[eventName] || []
+    this.caches[eventName].push(fn)
+  }
+
+  emit(eventName: string, data?: unknown) {
+    // 发布 => 将订阅的事件进行统一执行
+    if (this.caches[eventName]) {
+      this.caches[eventName].forEach((fn: (data?: unknown) => void) => fn(data))
+    }
+  }
+
+  off(eventName: string, fn?: (data?: unknown) => void) {
+    // 取消订阅 => 若fn不传, 直接取消该事件所有订阅信息
+    if (this.caches[eventName]) {
+      const newCaches = fn ? this.caches[eventName].filter(e => e !== fn) : []
+      this.caches[eventName] = newCaches
+    }
+  }
+}
+
+```
+
+#### 模块化规范
+
+##### Node端
+
+###### CommonJS
+
+- 运行时同步加载
+
+  > 同步意味着阻塞加载，浏览器资源是异步加载的，因此有了AMD CMD解决方案
+
+- 输出值的拷贝，会缓存第一次运行的结果
+
+**基本语法**
+
+- 暴露模块：`module.exports.xxx = value`或`exports.xxx = value`
+
+  > exports = module.exports = { } // 不能改变 exports 的指向
+
+- 引入模块：`require(xxx)`,如果是第三方模块，xxx为模块名；如果是自定义模块，xxx为模块文件路径
+
+##### 浏览器端
+
+###### AMD
+
+- 在浏览器端中并行异步加载 
+
+- 依赖前置，换句话说，在解析和执行当前模块之前，模块作者必须指明当前模块所依赖的模块
+- 提前执行依赖
+
+实现：RequireJS
+
+###### CMD
+
+- 在浏览器端中异步加载
+
+- 按需加载
+
+- 依赖就近，依赖可以就近书写，可以把依赖写进你的代码中的任意一行
+- 延迟执行依赖
+
+实现：Sea.js
+
+##### 浏览器 和 Node 兼容端
+
+###### UMD
+
+统一AMD和CommonJS规范，解决跨平台问题
+
+UMD先判断是否支持Node.js的模块（exports）是否存在，存在则使用Node.js模块模式；在判断是否支持AMD（define是否存在），存在则使用AMD方式加载模块
+
+###### ES6 Module
+
+浏览器和服务器通用的模块解决方案
+
+ES6 模块设计思想：尽量的静态化、使得编译时就能确定模块的依赖关系，以及输入和输出的变量（CommonJS和AMD模块，都只能在运行时确定这些东西）。
+
+- 输出值的引用
+
+- 静态解析
+
+- 编译时引入，不会缓存值
+
+  > 当ES6遇到import时，不会像CommonJS一样去执行模块，而是生成一个动态的只读引用，当真正需要的时候再到模块里去取值，所以ES6模块是动态引用，并且不会缓存值。
+  >
+  > 
+  >
+  > 编译：类似翻译，就是将源代码翻译成机器能识别的代码。
+  >
+  > 运行：就是将代码跑起来，被装载到内存中去了。
 
 #### 术语
 

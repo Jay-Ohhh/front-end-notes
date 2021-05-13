@@ -4272,8 +4272,8 @@ export default withRouter(App)
 这里面我选择使用 `react-redux,redux-thunk,redux`
 
 ```ts
-import { DispatchProp } from 'react-redux' // 获取 react-redux 中dispatch函数的类型
-import { Dispatch } from 'redux' // 获取仅包含dispatch属性的对象的类型
+import { DispatchProp } from 'react-redux' // 获取仅包含dispatch属性的对象的类型
+import { Dispatch } from 'redux' // 获取 redux 中dispatch函数的类型 
 const a:React.FC<DispatchProp> = function({dispatch}){
   // ...
 }
@@ -8453,7 +8453,7 @@ Context 是跨组件传值的一种方案，但我们需要知道，我们无法
 
 相同的输入（参数），永远会得到相同的输出，并且在执行过程里面没有副作用 。
 
-数据获取，设置订阅以及手动更改 React 组件中的 DOM 都属于副作用。
+设置订阅以及手动更改 React 组件中的 DOM 等改变了外部环境的都属于副作用。
 
 ##### **[协调](https://react.docschina.org/docs/reconciliation.html)**
 

@@ -3159,7 +3159,7 @@ var directions = [0 /* Up */, 1 /* Down */, 2 /* Left */, 3 /* Right */];
 
  传统方法中，JavaScript 通过构造函数实现类的概念，通过原型链实现继承。而在 ES6 中，我们终于迎来了 `class`。 
 
-**相关概念**
+##### 相关概念
 
 - 类（Class）：定义了一件事物的抽象特点，包含它的属性和方法
 
@@ -3182,6 +3182,24 @@ var directions = [0 /* Up */, 1 /* Down */, 2 /* Left */, 3 /* Right */];
 - 抽象类（Abstract Class）：抽象类是供其他类继承的基类，抽象类不允许被实例化。抽象类中的抽象方法必须在子类中被实现
 
 - 接口（Interfaces）：不同类之间公有的属性或方法，可以抽象成一个接口。接口可以被类实现（implements）。一个类只能继承自另一个类，但是可以实现多个接口
+
+##### ES5实现继承
+
+```js
+function Parent(value) {
+  this.value = value
+}
+function Child(value) {
+  Parent.call(this, value)
+}
+Child.prototype = new Parent()
+Child.prototype.constructor = Child
+
+const c = new Child(1)
+console.log(c.value) // 1
+```
+
+
 
 ##### ES6中类的用法
 
@@ -3408,6 +3426,8 @@ Foo()
 // TypeError: Class constructor Foo cannot be invoked without 'new'
 ```
 
+constructor 不可被枚举。
+
 ###### 类的实例
 
 生成类的实例的写法，与 ES5 完全一样，也是使用`new`命令。前面说过，如果忘记加上`new`，像函数那样调用`Class`，将会报错。
@@ -3425,6 +3445,8 @@ var point = new Point(2, 3);
 ```
 
 与 ES5 一样，实例属性是定义在`this`指向的对象上，静态成员和方法都是定义在原型上。
+
+> ES5 构造函数的方法是手动定义到 prototype 上
 
 ```javascript
 //定义类
@@ -3584,9 +3606,9 @@ class Cat extends Animal {
 }
 ```
 
-ES5的继承，实质是先创造子类的实例对象this，然后再将父类的方法/属性添加到this上面。
+ES5的继承，实质是先创造子类的实例对象，然后再将父类属性添加到实例对上面。
 
-ES6的继承， 实质是先创造父类的实例对象this，然后再将子类的方法/属性添加到this上面。必须先通过父类的构造函数完成塑造，然后再对其加工，加上子类自身的属性和方法。如果不调用super方法，子类就得不到this对象。
+class的继承， 实质是先创造父类的实例对象，然后再将子类属性添加到实例对象上面。必须先通过父类的构造函数完成塑造，然后再对其加工，加上子类自身的属性。如果不调用super方法，子类就得不到父类的实例对象。
 
 ###### 其他
 
@@ -4606,9 +4628,11 @@ function s({ a }: E) {}
 
 #### 泛型
 
- 泛型（Generics）是指在定义函数、接口或类的时候，不预先指定具体的类型，而在使用的时候再指定类型。
+ 泛型（Generics）是指在定义函数签名、接口或类的时候，不预先指定具体的类型，而在使用的时候再指定类型。
 
 - 把类型当作参数传递
+
+泛型可跟在函数名、接口名、类名的后面，对象的前面。
 
 **简单的例子**
 
@@ -4793,10 +4817,10 @@ createArray = function<T>(length: number, value: T): Array<T> {
 createArray(3, 'x'); // ['x', 'x', 'x']
 ```
 
-注意，此时在使用泛型接口的时候，需要定义泛型的类型。
+
 
 ```ts
-// A extends E = {a:1} 先执行A extends Action 在执行赋值运算，因此{a:1}是默认值
+// A extends E = {a:1} 先执行A extends E 再执行赋值运算，因此{a:1}是默认值
 // 因此在使用DispatchProp时不需再传入类型。
 interface E {
   a: number
@@ -4980,13 +5004,13 @@ tsc --target ES5 --experimentalDecorators
 
 装饰器的写法：普通装饰器（无法传入被修饰对象以外的参数）、装饰器工厂（可以传入被修饰对象以外的参数）
 
-**类装饰器**
+##### 类装饰器
 
 类装饰器在类声明顶部声明，后面不能加 `;`。
 
 类装饰器在运行时会被调用，类装饰器应用于类的构造函数，可以监视、修改、替换类的定义，传入一个参数：类的构造函数。
 
-- **普通装饰器**
+###### 普通装饰器
 
 ```ts
 // 普通装饰器（无法传入被修饰对象以外的参数）
@@ -5007,7 +5031,7 @@ let hc:any = new HttpClient(); // 打印 [Function: HttpClient]
 console.log(hc.apiUrl); // 'xxx'
 ```
 
-- **装饰器工厂**
+###### 装饰器工厂
 
 ```ts
 // 装饰器工厂（可以传入被修饰对象以外的参数）
@@ -5035,49 +5059,52 @@ let hc:any = new HttpClient();
 // constructor
 ```
 
-- **类装饰器重载类**
+###### 类装饰器重载类
 
 类装饰器在运行时会被调用，如果类装饰器返回一个值（只能是函数或者class）。
 
 若是函数，则执行函数体，不再执行旧类的constructor，但依然可以通过new params()调用旧类的constructor生成旧类的实例对象。
 
-若是class，则先调用被修饰类的constructor，然后再执行新类的constructor，对于类的方法，要么合并，要么覆盖，不再执行旧类的constructor。
+若是class，则先调用被修饰类的constructor，然后再执行新类的constructor，对于类的方法，要么合并，要么新类覆盖旧类的方法。
 
 方式一：
 
 ```ts
-function logClass(params:any):any{
+function logClass(params: any): any {
   // 类的重载
   return class extends params {
-    apiUrl : number; 
-    id:number;
-    constructor(){
+    apiUrl: number
+    id: number
+    constructor() {
       super()
       this.apiUrl = 1
       this.id = 1
     }
-    getData():void{
-      console.log(this.apiUrl);
-      console.log(this.id);
+    getData(): void {
+      console.log(this.apiUrl)
+      console.log(this.id)
     }
   }
 }
 
 @logClass
-class HttpClient{
-  apiUrl : string;
-  constructor(){
+class HttpClient {
+  apiUrl: string
+  constructor() {
     this.apiUrl = '我是类构造函数中的apiUrl'
+    console.log('旧类')
   }
-  getData():void{
-    console.log(this.apiUrl);
+  getData(): void {
+    console.log(this.apiUrl)
   }
 }
 
-let hc:any = new HttpClient()
-hc.getData() 
+let hc: any = new HttpClient()
+hc.getData()
+// 旧类
 // 1
 // 1
+
 ```
 
 方式二：
@@ -5116,11 +5143,11 @@ hc.getData()
 // 1
 ```
 
-**属性装饰器**
+##### 属性装饰器
 
 属性装饰器在运行时会被调用，传入2个参数：
 
-1. 对于静态成员是类的构造函数，对于实例成员是类的构造函数的原型对象
+1. 对于静态成员：是类的构造函数，对于实例成员：是类的构造函数的原型对象
 2. 成员的名字
 
 属性装饰器在属性声明上面声明，后面不能加 `;`。
@@ -5153,7 +5180,7 @@ let hc = new HttpClient()
 // apiUrl
 ```
 
-**方法装饰器**
+##### 方法装饰器
 
 方法装饰器会被用到方法的属性描述符上，可以用来监视、修改或者替换方法定义。
 
@@ -5200,7 +5227,7 @@ let hc = new HttpClient()
 // }
 ```
 
-**方法装饰器重写方法**
+###### 方法装饰器重写方法
 
 ```ts
 // 装饰器工厂
@@ -5226,7 +5253,7 @@ hc.getData(1,true) // [ '1', 'true' ]
 
 ```
 
-**方法装饰器扩展方法**
+###### 方法装饰器扩展方法
 
 与上述的重写类似
 
@@ -5258,7 +5285,7 @@ hc.getData(1,true)
 // [ '1', 'true' ]
 ```
 
-**访问器装饰器**
+##### 访问器装饰器
 
 在`set`或`get`前声明。
 
@@ -5295,7 +5322,7 @@ class Point {
 }
 ```
 
-**参数装饰器**
+##### 参数装饰器
 
 在对应的单个参数前面声明。
 
