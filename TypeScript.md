@@ -785,11 +785,13 @@ interface ObjectInterface {
 }
 ```
 
-**类型别名与接口的区别**
+#### **type与interface的区别**
 
-1. 类型别名不能被 `extends`和 `implements` 
-
-2. 多态this类型
+1. type可以声明 基本类型，联合类型，交叉类型，元组 的别名，interface不行
+2. type 语句中可以使用 typeof 获取类型实例
+3. interface能够声明合并，type不能
+4. 类型别名不能被 `extends`和 `implements` 
+5. type不能用于多态this类型
 
 多态 this 类型仅适用于接口：
 ```ts
@@ -805,7 +807,7 @@ class StringBuilder implements AddsStrings {
 }
 ```
 
-3. 对于映射类型，我们需要使用类型别名：
+6. type 支持类型映射，interface不支持：
 
 ```ts
 interface Point {  
@@ -4632,7 +4634,7 @@ function s({ a }: E) {}
 
 - 把类型当作参数传递
 
-泛型可跟在函数名、接口名、类名的后面，对象的前面。
+泛型可跟在函数名、类名、接口名、类型别名 的后面，对象的前面。
 
 **简单的例子**
 

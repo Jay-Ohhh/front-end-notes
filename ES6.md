@@ -3077,6 +3077,128 @@ JavaScript 代码运行时，会产生一个全局的上下文环境（context�
 
 Generator 函数不是这样，它执行产生的上下文环境，一旦遇到`yield`命令，就会暂时退出堆栈，但是并不消失，里面的所有变量和对象会冻结在当前状态。等到对它执行`next`命令时，这个上下文环境又会重新加入调用栈，冻结的变量和对象恢复执行。
 
+#### FormData
+
+##### FormData对象的作用
+
+1. 用一些键值对模拟HTML表单（不需使用form标签），以便将数据通过`XMLHttpRequest.send()` 方法发送出去；
+2. 可以上传二进制文件
+
+##### 构造函数
+
+```js
+new FormData(form)
+```
+
+参数 
+
+- form：可选，HTML form元素，生成的实例对象将form中的表单值用键值对的方式加入自身
+
+返回值
+
+一个新的 FormData 实例对象
+
+##### 方法
+
+https://developer.mozilla.org/zh-CN/docs/Web/API/FormData
+
+**FormData.append()**
+
+向 `FormData` 中添加新的属性值，`FormData` 对应的属性值存在也不会覆盖原值，而是新增一个值，如果属性不存在则新增一项属性值。
+
+#### Blob
+
+Blob，Binary Large Object的缩写，代表二进制数据的大对象。在Web中，Blob类型的对象表示不可变的类似文件对象（File对象）的原始数据，通俗点说，就是Blob对象是表示二进制数据的类File对象，用于文件操作，因此可以像操作File对象一样操作Blob对象，实际上，File继承自Blob。
+
+##### 使用场景
+
+![](http://jay_ohhh.gitee.io/imagehosting/JS/Blob作用.jpg)
+
+##### 构造函数
+
+```js
+new Blob( array, options )
+```
+
+参数
+
+- array：数组中的每一项连接起来构成Blob对象的数据，数组中的每项元素可以是 ArrayBuffer(二进制数据缓冲区)、ArrayBufferView、Blob、DOMString。或其他类似对象的混合体。
+
+- options：可选项，字典格式类型，可以指定如下两个属性：
+
+  - type，默认值为`""`，它代表了将会被放入到blob中的数组内容的MIME类型。
+
+  - endings， 默认值为"transparent"，用于指定包含行结束符`\n`的字符串如何被写入。 它是以下两个值中的一个： "native"，表示行结束符会被更改为适合宿主操作系统文件系统的换行符； "transparent"，表示会保持blob中保存的结束符不变。
+
+##### 属性
+
+- size：number类型，Blob对象中所包含数据的大小（字节）。
+
+- type：string类型， Blob 对象所包含数据的 MIME 类型。如果类型未知，则该值为空字符串。
+
+##### 方法
+
+https://developer.mozilla.org/zh-CN/docs/Web/API/Blob
+
+**slice**
+
+```
+var blob = instanceOfBlob.slice([start [, end [, contentType]]])
+```
+
+参数
+
+- start： 可选，代表 `Blob` 里的下标，表示第一个会被会被拷贝进新的 `Blob` 的字节的起始位置。如果传入的是一个负数，那么这个偏移量将会从数据的末尾从后到前开始计算。默认值是0
+
+- end： 可选，代表的是 `Blob` 的一个下标，这个下标-1的对应的字节将会是被拷贝进新的`Blob` 的最后一个字节。如果你传入了一个负数，那么这个偏移量将会从数据的末尾从后到前开始计算。默认值是 instanceOfBlob.size
+
+- contentType： 可选，给新的 `Blob` 赋予一个新的文档类型。这将会把它的 type 属性设为被传入的值。它的默认值是一个空的字符串。
+
+返回值
+
+一个新的`Blob`对象
+
+#### File
+
+通常情况下， `File` 对象是来自用户在一个 `<input>` 元素上选择文件后返回的 [`FileList`](https://developer.mozilla.org/zh-CN/docs/Web/API/FileList) 对象,也可以是来自由拖放操作生成的 [`DataTransfer`](https://developer.mozilla.org/zh-CN/docs/Web/API/DataTransfer) 对象。
+
+File 继承 自Blob。
+
+##### 方法
+
+`File` 接口没有定义任何方法，但是它从 `Blob` 接口继承了以下方法：
+
+**slice([start [, end [, contentType]]])**
+
+#### AurrayBuffer
+
+**`ArrayBuffer`** 对象用来表示通用的、固定长度的原始二进制数据缓冲区。它是一个字节数组。
+
+你不能直接操作 `ArrayBuffer` 的内容，而是要通过[类型数组对象（TypedArray）](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/TypedArray)或 [`DataView`](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/DataView) 对象来操作，它们会将缓冲区中的数据表示为特定的格式，并通过这些格式来读写缓冲区的内容。
+
+##### 使用场景
+
+![](http://jay_ohhh.gitee.io/imagehosting/JS/ArrayBuffer作用.jpg)
+
+![](http://jay_ohhh.gitee.io/imagehosting/JS/ArrayBuffer与Array区别.jpg)
+
+##### 构造函数
+
+```js
+new ArrayBuffer(length)
+```
+
+参数
+
+- `length`
+
+  要创建的 `ArrayBuffer` 的大小，单位为字节。
+
+返回值
+
+一个指定大小的 `ArrayBuffer` 对象，其内容被初始化为 0。
+
+
 #### 垃圾回收机制
 
 ##### 可达性
@@ -3399,7 +3521,7 @@ HTML5中新增了本地存储的解决方案----Web Storage，这样有了Web St
 
 ##### session
 
-除了使用Cookie，Web应用程序中还经常使用Session来记录客户端状态。**Session是服务器端使用的一种记录客户端状态的机制**，使用上比Cookie简单一些，相应的也**增加了服务器的存储压力**。
+除了使用Cookie，Web应用程序中还经常使用Session来记录客户端状态。**Session是服务器端使用的一种记录客户端状态的机制**，使用上比Cookie简单一些，相应的也**增加了服务器的存储压力**。SessionId 会被存储到客户端的cookie 中，请求时会自动携带。
 
 ##### [cookie 和 session](https://www.cnblogs.com/l199616j/p/11195667.html)
 
@@ -3502,6 +3624,149 @@ https://www.jianshu.com/p/8c4cee29d532
 > 一般的，我们必须给 manifest 文件设置正确的 MIME-type 为 "text/cache-manifest"，它需要在服务器端进行配置。
 
 在 Progressive Web Application 中， Application Cache 配合 Service Worker 承担着主要的任务。
+
+#### Token
+
+##### Access Token
+
+是访问资源接口（API）时所需要的资源凭证
+
+**简单 token 的组成：** uid(用户唯一的身份标识)、time(当前时间的时间戳)、sign（签名，token 的前几位以哈希算法压缩成的一定长度的十六进制字符串）
+
+**特点：**
+
+- 服务端无状态化、可扩展性好
+- 支持移动端设备
+- 安全
+- 支持跨程序调用
+
+###### token身份验证流程
+
+![](http://jay_ohhh.gitee.io/imagehosting/后台和网络/access token流程.png)
+
+1. 客户端使用用户名跟密码请求登录
+2. 服务端收到请求，去验证用户名与密码
+3. 验证成功后，服务端会签发一个 token 并把这个 token 发送给客户端
+4. 客户端收到 token 以后，会把它存储起来，比如放在 cookie 里或者 localStorage 里
+5. 客户端每次向服务端请求资源的时候需要带着服务端签发的 token
+6. 服务端收到请求，然后去验证客户端请求里面带着的 token ，如果验证成功，就向客户端返回请求的数据
+
+- **每一次请求都需要携带 token，需要把 token 放到 HTTP 的 Header 里**
+- **基于 token 的用户认证是一种服务端无状态的认证方式，服务端不用存放 token 数据。用解析 token 的计算时间换取 session 的存储空间，从而减轻服务器的压力，减少频繁的查询数据库**
+- **token 完全由应用管理，所以它可以避开同源策略**
+
+##### Refresh Token
+
+refresh token 是专用于刷新 access token 的 token。如果没有 refresh token，也可以刷新 access token，但每次刷新都要用户输入登录用户名与密码，会很麻烦。有了 refresh token，可以减少这个麻烦，客户端直接用 refresh token 去更新 access token，无需用户进行额外的操作。
+
+###### Refresh Token 验证流程
+
+![](http://jay_ohhh.gitee.io/imagehosting/后台和网络/refresh token流程.png)
+
+##### Access Token 和 Refresh Token 的区别
+
+- Access Token 的有效期比较短，当 Acesss Token 由于过期而失效时，使用 Refresh Token 就可以获取到新的 Token，如果 Refresh Token 也失效了，用户就只能重新登录了。
+- Refresh Token 及过期时间是存储在服务器的数据库中，只有在申请新的 Acesss Token 时才会验证，不会对业务接口响应时间造成影响，也不需要向 Session 一样一直保持在内存中以应对大量的请求。
+
+##### JWT（JSON Web Token）
+
+JWT 的原理是，服务器认证以后，生成一个 JSON 对象，发回给用户。以后，用户与服务端通信的时候，都要发回这个 JSON 对象。服务器完全只靠这个对象认定用户身份。为了防止用户篡改数据，服务器在生成这个对象的时候，会加上签名（详见后文）。
+
+服务器就不保存任何 session 数据了，也就是说，**服务器变成无状态了**，从而比较容易实现扩展。
+
+###### JWT的格式
+
+```
+Header.Payload.Signature
+```
+
+**Header**
+
+Header 部分是一个 JSON 对象，描述 JWT 的元数据，通常是下面的样子。
+
+```json
+{
+  "alg": "HS256",
+  "typ": "JWT"
+}
+```
+
+上面代码中，`alg`属性表示签名的算法（algorithm），默认是 HMAC SHA256（写成 HS256）；`typ`属性表示这个令牌（token）的类型（type），JWT 令牌统一写为`JWT`。
+
+最后，将上面的 JSON 对象使用 Base64URL 算法（详见后文）转成字符串。
+
+**Payload**
+
+Payload 部分也是一个 JSON 对象，用来存放实际需要传递的数据。JWT 规定了7个官方字段，供选用。
+
+- iss (issuer)：签发人
+- exp (expiration time)：过期时间
+- sub (subject)：主题
+- aud (audience)：受众
+- nbf (Not Before)：生效时间
+- iat (Issued At)：签发时间
+- jti (JWT ID)：编号
+
+除了官方字段，你还可以在这个部分定义私有字段，下面就是一个例子。
+
+```json
+{
+  "sub": "1234567890",
+  "name": "John Doe",
+  "admin": true
+}
+```
+
+注意，JWT 默认是不加密的，任何人都可以读到，所以不要把秘密信息放在这个部分。
+
+这个 JSON 对象也要使用 Base64URL 算法转成字符串。
+
+**Signature**
+
+Signature 部分是对前两部分的签名，防止数据篡改。
+
+首先，需要指定一个密钥（secret）。这个密钥只有服务器才知道，不能泄露给用户。然后，使用 Header 里面指定的签名算法（默认是 HMAC SHA256），按照下面的公式产生签名。
+
+```
+HMACSHA256(
+  base64UrlEncode(header) + "." +
+  base64UrlEncode(payload),
+  secret)
+```
+
+算出签名以后，把 Header、Payload、Signature 三个部分拼成一个字符串，每个部分之间用"点"（`.`）分隔，就可以返回给用户。
+
+###### Base64URL
+
+前面提到，Header 和 Payload 串型化的算法是 Base64URL。这个算法跟 Base64 算法基本类似，但有一些小的不同。
+
+JWT 作为一个令牌（token），有些场合可能会放到 URL（比如`api.example.com/?token=xxx`）。Base64 有三个字符`+`、`/`和`=`，在 URL 里面有特殊含义，所以要被替换掉：`=`被省略、`+`替换成`-`，`/`替换成`_` 。这就是 Base64URL 算法。
+
+###### JWT的使用方式
+
+客户端收到服务器返回的 JWT，可以储存在 Cookie 里面，也可以储存在 localStorage。
+
+此后，客户端每次与服务器通信，都要带上这个 JWT。你可以把它放在 Cookie 里面自动发送，但是这样不能跨域，所以更好的做法是放在 HTTP 请求的头信息`Authorization`字段里面。
+
+```
+Authorization: Bearer <token>
+```
+
+另一种做法是，跨域的时候，JWT 就放在 POST 请求的数据体里面。
+
+###### JWT 的几个特点
+
+（1）JWT 默认是不加密，但也是可以加密的。生成原始 Token 以后，可以用密钥再加密一次。
+
+（2）JWT 不加密的情况下，不能将秘密数据写入 JWT。
+
+（3）JWT 不仅可以用于认证，也可以用于交换信息。有效使用 JWT，可以降低服务器查询数据库的次数。
+
+（4）JWT 的最大缺点是，由于服务器不保存 session 状态，因此无法在使用过程中废止某个 token，或者更改 token 的权限。也就是说，一旦 JWT 签发了，在到期之前就会始终有效，除非服务器部署额外的逻辑。
+
+（5）JWT 本身包含了认证信息，一旦泄露，任何人都可以获得该令牌的所有权限。为了减少盗用，JWT 的有效期应该设置得比较短。对于一些比较重要的权限，使用时应该再次对用户进行认证。
+
+（6）为了减少盗用，JWT 不应该使用 HTTP 协议明码传输，要使用 HTTPS 协议传输。
 
 #### 常见跨域方式
 

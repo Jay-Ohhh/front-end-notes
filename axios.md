@@ -327,7 +327,8 @@ function generateReqKey(config) {
 const pendingRequest = new Map();
 function addPendingRequest(config) {
   const requestKey = generateReqKey(config);
-  config.cancelToken = new axios.CancelToken((cancel) => {
+  // config.cancelToken = config.cancelToken 是指我们发送某一请求时自己在config加的cancelToken，用于我们自己手动取消请求
+  config.cancelToken = config.cancelToken || new axios.CancelToken((cancel) => {
     if (!pendingRequest.has(requestKey)) {
        pendingRequest.set(requestKey, cancel);
     }
@@ -481,3 +482,18 @@ module.exports = function(app) {
 ```
 
 > **注意：** 你无需在任何位置导入此文件。 它在启动开发服务器时会自动注册。
+
+#### 请求事件
+
+**request config**
+
+```js
+onUploadProgress: function (event) {
+  // Do whatever you want with the native progress event
+},
+  
+onDownloadProgress: function (event) {
+  // Do whatever you want with the native progress event
+},
+```
+

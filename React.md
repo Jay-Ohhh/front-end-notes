@@ -1980,7 +1980,13 @@ React 与 HTML 之间有很多属性存在差异：
 
 ###### dangerouslySetInnerHTML
 
-`dangerouslySetInnerHTML` 是 React 为浏览器 DOM 提供 `innerHTML` 的替换方案。通常来讲，使用代码直接设置 HTML 存在风险，因为很容易无意中使用户暴露于[跨站脚本（XSS）](https://en.wikipedia.org/wiki/Cross-site_scripting)的攻击。因此，你可以直接在 React 中设置 HTML。设置 `dangerouslySetInnerHTML` 时，需要向其传递包含 key 为 `__html` 的对象。例如：
+`dangerouslySetInnerHTML` 是 React 为浏览器 DOM 提供 `innerHTML` 的替换方案。通常来讲，使用代码直接设置 HTML 存在风险，因为很容易无意中使用户暴露于[跨站脚本（XSS）](https://en.wikipedia.org/wiki/Cross-site_scripting)的攻击。这就意味着在React中，如果你不得不设置HTML，你就需要用DangerouslySetInnerHTML来代替传统的innerHTML方法。
+
+设置 `dangerouslySetInnerHTML` 时，需要向其传递包含 key 为 `__html` 的对象。例如：
+
+`dangerouslySetInnerHTML`被设计用来警示开发者，赋值给__html属性的值必须得是经过处理的，你可以用第三方库dompurify来帮你处理数据。
+
+`dangerouslySetInnerHTML`命名是用来告诉用户设置HTML是存在风险的，需要开发者明确自己在做什么。
 
 ```jsx
 function createMarkup() {
