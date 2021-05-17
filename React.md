@@ -7835,8 +7835,6 @@ const memoizedCallback = useCallback(
 
 把内联回调函数及依赖项数组作为参数传入 `useCallback`，它将返回该回调函数的 memoized 版本，该回调函数仅在某个依赖项改变时才会返回新的函数。当你把回调函数传递给经过优化的并使用引用相等性去避免非必要渲染（例如 `shouldComponentUpdate`）的子组件时，它将非常有用。
 
-传入 `useCallback` 的函数会在渲染期间执行。请不要在这个函数内部执行与渲染无关的操作，诸如副作用这类的操作属于 `useEffect` 的适用范畴，而不是 `useCallback`。
-
 `useCallback(fn, deps)` 相当于 `useMemo(() => fn, deps)`。
 
 > 注意

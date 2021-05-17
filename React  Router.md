@@ -1616,6 +1616,7 @@ const match = matchPath("/users/123", {
   path, // like /users/:id; either a single string or an array of strings
   strict, // optional, defaults to false
   exact, // optional, defaults to false
+  sensitive, // optional, defaults to false
 }
 ```
 
@@ -2701,7 +2702,7 @@ useParams返回URL参数的键/值对的对象。
 
 useRouteMatch 尝试以与 <Route> 相同的方式匹配当前URL。它主要用于访问匹配数据，而无需实际渲染<Route>。
 
-1、不接受任何参数并返回当前<Route>
+1、不接受任何参数并返回与当前<Route>匹配的match对象
 
 2、接受一个参数，与matchPath的props参数相同。 它可以是字符串的路径名（绝对或相对路径），也可以是带有Route接受的匹配参数的对象。
 
@@ -2818,7 +2819,7 @@ const {state}=this.props.location
 2.  pub1ic/ index.html 中引入样式时不使用相对路径，使用绝对路径，即将 `./`改为 `%PUBLIC_URL%`，只适用于react脚手架， `%PUBLIC_URL%`是 public 文件夹的路径
 3. 使用 HashRouter
 
-#### 手动引入路由组件属性类型
+#### TS 手动引入路由组件属性类型
 
 ```js
 import { RouteComponentProps } from 'react-router-dom'

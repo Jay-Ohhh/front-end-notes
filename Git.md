@@ -707,10 +707,17 @@ git commit -m ‘描述’
 git pull origin yyy （拉取要合并的分支代码）
 ```
 
-与同事协商，解决冲突
+5、与同事协商，解决冲突
 
 ```sh
 git push -u origin wyn
+```
+
+6、请求合并
+
+```
+gitlab -> merge request
+github -> pull request
 ```
 
 

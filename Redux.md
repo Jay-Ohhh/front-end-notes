@@ -1001,7 +1001,7 @@ const fetchPosts = postTitle => (dispatch, getState) => {
 
 #### redux-thunk
 
-`redux-thunk`主要的功能就是可以让我们`dispatch`一个函数，而不只是普通的 action 对象。我们可以在这个函数中进行副作用的操作。
+`redux-thunk`主要的功能就是可以让我们`dispatch`一个函数，而不只是普通的 action 对象。我们可以在这个函数中进行副作用的操作，然后dispatch一个action。
 
 因此在使用`redux-thunk`的情况下，编写Action creator可以返回函数，该函数接受 dispatch 、getState 、extraArgument 作为参数。
 
