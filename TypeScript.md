@@ -22,7 +22,7 @@ TypeScript 是 JavaScript 的类型的超集，它可以编译成纯 JavaScript�
 
 ### 基础
 
-#### 数据类型
+#### JS 数据类型
 
  JavaScript 的类型分为两种：基本类型和引用数据类型。 
 
@@ -32,7 +32,9 @@ TypeScript 是 JavaScript 的类型的超集，它可以编译成纯 JavaScript�
 
 引用数据类型包括： 对象(Object)、数组(Array)、函数(Function) 。
 
+#### TS 数据类型
 
+boolean、number、string、void、null、undefined、never、unkonwn、any、数组、元组、枚举、object
 
 **布尔值**
 
@@ -247,7 +249,7 @@ type UnionType5 = unknown | any; // any
 ```
 **交叉类型中的 unkonwn**
 
-任何类型与 unknown 相交不会改变结果类型：
+任何类型都可以吸收 `unknown` 类型。任何类型与 unknown 相交不会改变结果类型：
 ```ts
 type IntersectionType1 = unknown & null; // null
 type IntersectionType2 = unknown & undefined; // undefined

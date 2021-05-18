@@ -357,7 +357,7 @@ function removePendingRequest(config) {
 ```js
 axios.interceptors.request.use(
   function (config) {
-    removePendingRequest(config); // 检查是否存在重复请求，若存在则取消已发的请求
+    removePendingRequest(config); // 在请求开始前，取消之前的相同请求
     addPendingRequest(config); // 把当前请求信息添加到pendingRequest对象中
     return config;
   },
