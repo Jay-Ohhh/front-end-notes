@@ -2131,6 +2131,49 @@ xmlLang xmlSpace y y1 y2 yChannelSelector z zoomAndPan
 
 你也可以使用自定义属性，但要注意属性名全都为小写。
 
+##### SVG
+
+SVG 有两种引入用法：
+
+**1、作为url**
+
+```css
+.Logo {
+  background-image: url(./logo.png);
+}
+```
+
+**2、作为React 组件**
+
+```js
+import { ReactComponent as Logo } from './logo.svg';
+const App = () => (
+  <div>
+    {/* Logo 是一个实际的 React 组件 */}
+    <Logo />
+  </div>
+);
+```
+
+如果你不想将 SVG 作为单独的文件加载，可以使用这种方法。不要忘记导入中的花括号！ `ReactComponent` 导入名称是特殊的，它告诉 Create React App 你想要一个渲染 SVG 的 React 组件，而不是它的文件名。
+
+如果使用这种方式且用TS开发，需要在全局声明文件中：
+
+```ts
+/// <reference types="react" />
+/// <reference types="react-dom" />
+/// <reference types="react-scripts" />
+declare module '*.svg' {
+  import React from 'react'
+  export const ReactComponent: React.FC<
+    React.SVGProps<SVGSVGElement> & { title?: string }
+  >
+  export const src: string
+}
+```
+
+
+
 ##### 合成事件
 
 ###### **概览**
@@ -2615,7 +2658,7 @@ class List2 extends Component {
 
  [render props](https://react.docschina.org/docs/render-props.html) 、[高阶组件](https://react.docschina.org/docs/higher-order-components.html)、自定义 Hook
 
-##### 逻辑和UI分割、
+##### 逻辑和UI分割
 
 UI 组件负责 UI 的呈现，容器组件负责管理数据和逻辑。
 
@@ -2737,6 +2780,8 @@ class ErrorBoundary extends React.Component {
   }
 }
 ```
+
+> getDerivedStateFromError 不能执行副作用，componentDidCatch 可以执行副作用
 
 **命名导出（Named Exports）**
 

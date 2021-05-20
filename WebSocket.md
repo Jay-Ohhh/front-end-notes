@@ -99,7 +99,7 @@ ws.onclose = function(event) {
   // handle close event
 };
 ```
-- message  
+- message 
 用于指定收到服务器数据后的回调函数，WebSocket消息机制只支持字符串（String）和二进制(blob和ArrayBuffer)
 ```JavaScript
 ws.onmessage = function(event) {

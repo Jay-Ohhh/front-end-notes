@@ -221,9 +221,9 @@ module.exports = override(
 
 https://github.com/arackaf/customize-cra/blob/master/api.md#fixbabelimportslibraryname-options
 
-##### Craco
+##### craco
 
-与customize-cra相似，Craco是一个对 create-react-app 进行自定义配置的社区解决方案，但**Craco**并不依赖 **react-app-rewired**。更推荐使用**Craco**。**Craco**用法与**vue.config.js**更加相似。
+与customize-cra相似，craco是一个对 create-react-app 进行自定义配置的社区解决方案，但**craco**并不依赖 **react-app-rewired**。更推荐使用**craco**。**craco**用法与**vue.config.js**更加相似。
 
 使用：
 

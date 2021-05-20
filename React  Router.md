@@ -2059,7 +2059,7 @@ import App from './App';
 ReactDOM.render(<App />, document.getElementById('root'));
 ```
 
-> 
+
 
 ##### 集中式路由配置（JS对象）
 
