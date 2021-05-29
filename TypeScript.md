@@ -789,7 +789,7 @@ interface ObjectInterface {
 
 #### **type与interface的区别**
 
-1. type可以声明 基本类型，联合类型，交叉类型，元组 的别名，interface不行
+1. type可以声明 基本类型，联合类型，交叉类型的别名，interface不行
 2. type 语句中可以使用 typeof 获取类型实例
 3. interface能够声明合并，type不能
 4. 类型别名不能被 `extends`和 `implements` 
@@ -2554,6 +2554,7 @@ declare module 'moment' {
 ```ts
 // react-scripts会从模块中寻找
 /// <reference types="react-scripts" />
+
 // ./types/index.d.ts是自定义的全局变量声明文件
 /// <reference types="./types/index.d.ts" />
 ```

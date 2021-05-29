@@ -26,11 +26,11 @@ const和let唯一不同的是，const声明的时候必须进行初始化赋值�
 
 ES6新增了块级作用域。块级作用域由 { } 包括，if 语句和 for 语句里面的{ }也属于块作用域。
 
-变量提升是针对**var**而言。
+变量提升是针对**var**和 **function**而言。
 
 var不支持块级作用域。
 
-class中不能存在变量提升和函数提升。
+class中不存在变量提升和函数提升。
 
 ```js
 if(true){
@@ -103,7 +103,7 @@ console.log(a) // 10
 
 **eg3**
 
-var不支持块级作用域，所以在全局作用域重复声明了两次，第二次声明会被忽略，仅用于赋值。
+var不支持块级作用域，所以在全局作用域重复声明了两次，提升的第二次声明会被忽略，仅用于赋值。
 
 ```js
 // 全局作用域
@@ -111,6 +111,20 @@ var a = 1;
 if(true){
 	console.log(a); // 1
 	var a = 2;
+	console.log(a); // 2
+}
+console.log(a); // 2
+```
+
+等价于
+
+```js
+// 全局作用域
+var a = 1;
+var a; // 第二次声明会被忽略
+if(true){
+	console.log(a); // 1
+	a = 2;
 	console.log(a); // 2
 }
 console.log(a); // 2
@@ -226,7 +240,7 @@ obj.b()  // 打印1
 
 即使是在严格模式下，setTimeout()的function里面的this仍然默认指向window对象， 并不是undefined。
 
-7、箭头函数本身是没有this的，它的this是根据外层函数的this来决定的，它的外层函数可以这样找，向上找到( ){ }这样的函数体结构。
+7、箭头函数本身是没有this的，它的this是根据外层非箭头函数的this来决定的，它的外层函数可以这样找，向上找到( ){ }这样的函数体结构。
 
 8、嵌套函数的this指向，嵌套的函数不会从调用它的函数中继承this。
 
@@ -297,6 +311,59 @@ Child.prototype.constructor = Child
 const c = new Child(1)
 console.log(c.value) // 1
 ```
+
+#### 词法作用域
+
+JavaScript 采用词法作用域(lexical scoping)，也就是静态作用域。
+
+因为 JavaScript 采用的是词法作用域，函数的作用域在函数定义的时候就决定了。
+
+词法作用域和this指向是两回事。
+
+```js
+var value = 1;
+
+function foo() {
+    console.log(value);
+}
+
+function bar() {
+    var value = 2;
+    foo();
+}
+
+bar(); // 结果是 1
+```
+
+```js
+var scope = "global scope";
+function checkscope(){
+    var scope = "local scope";
+    function f(){
+        return scope;
+    }
+    return f();
+}
+checkscope(); // 'local scope'
+```
+
+```js
+var scope = "global scope";
+function checkscope(){
+    var scope = "local scope";
+    function f(){
+        return scope;
+    }
+    return f;
+}
+checkscope()(); // 'local scope'
+```
+
+原因也很简单，因为JavaScript采用的是词法作用域，函数的作用域基于函数创建的位置。
+
+而引用《JavaScript权威指南》的回答就是：
+
+JavaScript 函数的执行用到了作用域链，这个作用域链是在函数定义的时候创建的。嵌套的函数 f() 定义在这个作用域链里，其中的变量 scope 一定是局部变量，不管何时何地执行函数 f()，这种绑定在执行 f() 时依然有效。
 
 #### 闭包
 
@@ -453,7 +520,7 @@ x => { foo: x }
 x => ({ foo: x })
 ```
 
-##### **词法作用域**
+#### 词法作用域
 
 由书写代码时函数声明的位置来决定的。
 
@@ -503,7 +570,7 @@ x => ({ foo: x })
 
 柯里化，英语：Currying
 
-是把多个参数的函数变换成单一参数（最初函数的第一个参数）的函数，并且返回接受余下参数且返回结果的新函数。
+柯里化是一种将使用多个参数的一个函数转换成一系列使用一个参数的函数的技术
 
 ```js
 // 普通的add函数
@@ -1399,6 +1466,22 @@ new Promise((resolve, reject) => {
 
 > promise一旦执行，无法取消
 
+**Promise 原型方法**
+
+##### Promise.prototype.then(onFulfilled [, onRejected])
+
+最多需要有两个参数：Promise 的成功和失败情况的回调函数。返回一个新的 promise。
+
+成功状态的回调函数接受前一个promise resolve的值作为参数。
+
+失败状态的回调函数接受前一个promise reject的值作为参数。
+
+##### Promise.prototype.catch(onRejected)
+
+catch内的回调函数接受前一个promise reject的值作为参数。返回一个新的 promise。
+
+**Promise 静态方法**
+
 ##### Promise.resolve() 
 
 返回一个状态由给定value决定的Promise对象。
@@ -1422,18 +1505,6 @@ new Promise((resolve,reject) =>{
 	reject()
 })
 ```
-
-##### Promise.prototype.then(onFulfilled [, onRejected])
-
-最多需要有两个参数：Promise 的成功和失败情况的回调函数。返回一个新的 promise。
-
-成功状态的回调函数接受前一个promise resolve的值作为参数。
-
-失败状态的回调函数接受前一个promise reject的值作为参数。
-
-##### Promise.prototype.catch(onRejected)
-
-catch内的回调函数接受前一个promise reject的值作为参数。返回一个新的 promise。
 
 ##### Promise.all([ promise1,promise2, . . . ])
 
@@ -3049,15 +3120,13 @@ Reflect.has(duck, 'haircut');
 
 ##### Proxy和Object.defineProperty
 
-1、Proxy使用上比Object.defineProperty方便的多。
+1、Proxy代理整个对象，Object.defineProperty只代理对象上的某个属性。
 
-2、Proxy代理整个对象，Object.defineProperty只代理对象上的某个属性。
+2、对象上定义新属性时，Proxy可以监听到，Object.defineProperty监听不到。
 
-3、对象上定义新属性时，Proxy可以监听到，Object.defineProperty监听不到。
+3、数组新增删除修改时，Proxy可以监听到，Object.defineProperty监听不到。
 
-4、数组新增删除修改时，Proxy可以监听到，Object.defineProperty监听不到。
-
-5、Proxy不兼容IE，Object.defineProperty不兼容IE8及以下。
+4、Proxy不兼容IE，Object.defineProperty不兼容IE8及以下。
 
 #### 运算符 & 操作符
 
@@ -3165,7 +3234,7 @@ function() {
 
 当代码在一个环境中执行时，会创建变量对象的一个作用域链，是保证对执行环境有权访问的所有变量和函数的有序访问。作用域链的前端，始终是当前执行的代码所在环境的变量对象，最后端，始终是全局执行环境的变量对象。
 
-JavaScript 代码运行时，会产生一个全局的上下文环境（context，又称运行环境），包含了当前所有的变量和对象。然后，执行函数（或块级代码）的时候，又会在当前上下文环境的上层，产生一个函数运行的上下文，变成当前（active）的上下文，由此形成一个上下文环境的栈（context stack）。当该函数执行完毕后，对应的执行上下文从栈顶弹出，函数的作用域会随之销毁，其包含的所有变量也会统一释放并被自动回收。
+JavaScript 代码运行时，会产生一个全局的上下文环境（context，又称运行环境），包含了当前所有的变量和对象。然后，执行函数（或块级代码）的时候，又会在当前上下文环境的上层，产生一个函数运行的上下文，变成当前（active）的上下文，由此形成一个上作用域链。当该函数执行完毕后，对应的执行上下文从栈顶弹出，函数的作用域会随之销毁，其包含的所有变量也会统一释放并被自动回收。
 
 > 内部环境可以通过作用域链访问外部环境，但外部环境不能访问内部环境的任何变量和函数。
 
@@ -3307,7 +3376,7 @@ JavaScript 中内存管理的主要概念是可达性。
 
 **1. 有一组基本的固有可达值，由于显而易见的原因无法删除。例如:**
 
-- 当前正在执行的函数及其局部变量和参数。
+- 当前正在执行的函数及其局部变量和参数
 - 当前嵌套调用链上的其他函数及其局部变量和参数
 - 全局变量
 
@@ -3619,7 +3688,7 @@ HTML5中新增了本地存储的解决方案----Web Storage，这样有了Web St
 
 ##### session
 
-除了使用Cookie，Web应用程序中还经常使用Session来记录客户端状态。**Session是服务器端使用的一种记录客户端状态的机制**，使用上比Cookie简单一些，相应的也**增加了服务器的存储压力**。SessionId 会被存储到客户端的cookie 中，请求时会自动携带。
+除了使用Cookie，Web应用程序中还经常使用Session来记录客户端状态。**Session是服务器端使用的一种记录客户端状态的机制**，使用上比Cookie简单一些，相应的也**增加了服务器的存储压力**。Session Id 会被存储到客户端的cookie 中，请求时会自动携带。
 
 ##### [cookie 和 session](https://www.cnblogs.com/l199616j/p/11195667.html)
 

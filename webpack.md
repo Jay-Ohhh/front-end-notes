@@ -134,6 +134,10 @@ module.exports = {
 
 - `webpack-parallel-uglify-plugin`: 多进程执行代码压缩，提升构建速度
 
+- ```javascript
+  new webpack.optimize.CommonsChunkPlugin(options); // 抽取公共代码
+  ```
+
 - `mini-css-extract-plugin`：将 CSS 提取到单独的文件中，为每个包含 CSS 的 JS 文件创建一个 CSS 文件，并且支持 CSS 和 SourceMaps 的按需加载。
 
   > 抽离 css 样式,防止将样式打包在 js 中文件过大和因为文件大网络请求超时的情况
@@ -141,6 +145,8 @@ module.exports = {
 - `optimize-css-assets-webpack-plugin` ：压缩css
 
 - `clean-webpack-plugin`: build之前，将打包目录清理
+
+- `compression-webpack-analyzer`：gzip压缩
 
 - `webpack-bundle-analyzer`: 可视化分析包大小 (业务组件、依赖第三方模块)
 

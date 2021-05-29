@@ -17,7 +17,7 @@
 3. 使用虚拟DOM+优秀的 Diffing算法,尽量減少与真实DOM的交互。
 
 #### JSX
-JSX是一个 JavaScript 的语法扩展。
+JSX（JavaScript XML）是一个 JavaScript 的语法扩展。
 
 document有createElement()方法，React也有createElement()方法，下面就来介绍React的createElement()方法。
 
@@ -2574,7 +2574,7 @@ onToggle
 
 通信方式：
 
-- 父组件向子组件通信：props
+- 父组件向子组件通信：props、forwardRef（将父组件接收的ref属性转发到后代组件）
 - 子组件向父组件通信：自定义事件 — 父组件将一个能够触发 setState 的回调函数传递给子组件，子组件通过事件监听调用该回调函数
 - 跨级组件（祖—>孙）：redux、context、层层传递props
 - 非嵌套组件：redux、events包（第三方）
@@ -7443,7 +7443,7 @@ function NormalComponent() {
 该组件会在 `setList(data.list)` 后触发组件的 Render 过程，然后在 `setInfo(data.info)` 后再次触发 Render 过程，造成性能损失。遇到该问题，开发者有两种实现批量更新的方式来解决该问题：
 
 1. 将多个 State 合并为单个 State。例如 `useState({ list: null, info: null })` 替代 list 和 info 两个 State。
-2. 使用 React 官方提供的 unstable_batchedUpdates 方法，将多次 setState 封装到 unstable_batchedUpdates 回调中。修改后代码如下。
+2. 使用 React 官方提供的 **unstable_batchedUpdates** 方法，将多次 setState 封装到 unstable_batchedUpdates 回调中。修改后代码如下。
 
 ```jsx
 function BatchedComponent() {
