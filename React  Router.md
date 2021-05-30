@@ -26,7 +26,7 @@ npm install react-router-dom
 
 如果一个路由使用了相对路径，那么完整的路径将由它的所有祖先节点的路径和自身指定的相对路径拼接而成。[使用绝对路径](http://react-guide.github.io/react-router-cn/docs/guides/basics/RouteConfiguration.html#decoupling-the-ui-from-the-url)可以使路由匹配行为忽略嵌套关系。
 
-#### history 模式
+#### 路由模式
 
 React Router 是建立在 [history](https://github.com/rackt/history) 之上的。 简而言之，一个 history 知道如何去监听浏览器地址栏的变化， 并解析这个 URL 转化为 `location` 对象， 然后 router 使用它匹配到路由，最后正确地渲染对应的组件。
 
@@ -171,6 +171,16 @@ render(
   document.getElementById('app')
 )
 ```
+
+#### hash和history模式
+
+https://blog.csdn.net/u013205165/article/details/93738974
+
+1 hash 模式下，仅 hash 符号之前的内容会被包含在请求中，如 http://www.abc.com，因此对于后端来说，即使没有做到对路由的全覆盖，也不会返回 404 错误。
+
+2 history 模式下，前端的 URL 必须和实际向后端发起请求的 URL 一致，如 http://www.abc.com/book/id。如果后端缺少对 /book/id 的路由处理，将返回 404 错误。Vue-Router 官网里如此描述：”不过这种模式要玩好，还需要后台配置支持……所以呢，你要在服务端增加一个覆盖所有情况的候选资源：如果 URL 匹配不到任何静态资源，则应该返回同一个 index.html 页面，这个页面就是你 app 依赖的页面。“
+
+3 结合自身例子，对于一般的 Vue + Vue-Router + Webpack + XXX 形式的 Web 开发场景，用 history 模式即可，只需在后端（Apache 或 Nginx）进行简单的路由配置，同时搭配前端路由的 404 页面支持。
 
 #### 动态路由（代码路由）
 
@@ -2766,7 +2776,7 @@ qs.parse('name=tom&age=18')  // { name: 'Tom' , age : 18 }
 < Link to='/demo/test?name=tom&age=18'}>详情</Link>
 ```
 
-注册路由（无需声明,正常注册即可）：
+注册路由（无需声明，正常注册即可）：
 
 ```jsx
 < Route path="/demo/test" component={Test} />
@@ -2790,7 +2800,7 @@ State参数在url中不可见
 < Link to={{pathname:'/demo/test', search: "?sort=name", state:{name:'tom',age:18}}>详情</Link>
 ```
 
-注册路由（无需声明,正常注册即可）：
+注册路由（无需声明，正常注册即可）：
 
 ```jsx
 < Route path="/demo/test" component={Test} />

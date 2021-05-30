@@ -2,6 +2,101 @@
 
 [axios官方中文文档](http://www.axios-js.com/docs/)
 
+#### 请求方法
+
+**axios.request(config)**
+
+**axios.get(url[, config])**
+
+**axios.delete(url[, config])**
+
+**axios.head(url[, config])**
+
+**axios.options(url[, config])**
+
+**axios.post(url[, data[, config]])**
+
+**axios.put(url[, data[, config]])**
+
+**axios.patch(url[, data[, config]])**
+
+#### get请求、delete请求
+
+**GET 请求不存在请求实体部分，键值对参数放置在 URL 尾部，**浏览器把form数据转换成一个字串（name1=value1&name2=value2...），然后把这个字串追加到url后面，用`?`分割，加载这个新的url。因此请求头不需要设置 Content-Type 字段。
+
+```js
+ // Add headers to the request
+    if ('setRequestHeader' in request) {
+      utils.forEach(requestHeaders, function setRequestHeader(val, key) {
+        if (typeof requestData === 'undefined' && key.toLowerCase() === 'content-type') {
+          // Remove Content-Type if data is undefined  如果没有data，则去掉content-type，意味着get请求会自动去掉content-type
+          delete requestHeaders[key];
+        } else {
+          // Otherwise add header to the request
+          request.setRequestHeader(key, val);
+        }
+      });
+    }
+```
+
+如果get请求需要添加Content-Type，可以
+
+```js
+var $http
+// 添加一个新的axios实例
+$http = axios.create({
+  baseURL: url,
+})
+// 添加请求拦截器
+$http.interceptors.request.use(function (config) {
+  if (config.method == 'get') {
+    config.data = true  // 绕过源码的if判断
+  }
+  config.headers['H-TOKEN'] = '111'
+  return config;
+}, function (error) {
+  // 对请求错误做些什么
+  return Promise.reject(error);
+});
+```
+
+#### post请求、put请求
+
+当 data 是对象时，自动会把 Content-Type设置为 application/json;charset=UTF-8
+
+#### 响应数据
+
+axios对响应的数据会做了一层封装，response.data才是后端发过来的整个响应数据体，例如：
+
+```js
+// response.data 
+{
+	data:{},
+	msg:"",
+	code:200
+}
+```
+
+axios封装的response数据结构：
+
+```js
+config: {url: "/banner", method: "get", headers: {…}, baseURL: "http://localhost:3000", transformRequest: Array(1), …}
+
+data: {banners: Array(10), code: 200}  // 这个是后端发来的响应数据
+
+headers: {cache-control: "max-age=120", content-length: "5943", content-type: "application/json; charset=utf-8"}
+
+request: XMLHttpRequest {readyState: 4, timeout: 5000, withCredentials: true, upload: XMLHttpRequestUpload, onreadystatechange: *ƒ*, …}
+
+status: 200
+
+statusText: "OK"
+
+__proto__: Object
+```
+
+
+
 #### 二次封装
 
 ```js
@@ -497,3 +592,4 @@ onDownloadProgress: function (event) {
 },
 ```
 
+#### 跨域请求携带凭证 withCredentials：true
