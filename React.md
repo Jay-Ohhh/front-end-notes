@@ -4189,7 +4189,7 @@ function ListOfTenThings() {
 npx create-react-app ts-demo --typescript
 ```
 
-或将 [TypeScript](https://www.typescriptlang.org/) 添加到 Create React App 项目，请先安装它：
+将 [TypeScript](https://www.typescriptlang.org/) 添加到 Create React App 项目，请先安装它：
 
 ```bash
 $ npm install --save typescript @types/node @types/react @types/react-dom @types/jest
@@ -4298,6 +4298,63 @@ const Child:React.FC<Iprops> = () => {
 }
 
 export default Child
+```
+
+######  React.FC 声明函数组件和**普通声明**以及 **PropsWithChildren** 的区别是：
+
+- React.FC 显式地定义了返回类型，其他方式是隐式推导的
+
+- React.FC 对静态属性：displayName、propTypes、defaultProps 提供了类型检查和自动补全
+- React.FC 为 children 提供了隐式的类型（ReactElement | null），但是目前，提供的类型存在**一些 issue**[6]（问题）
+
+比如以下用法 React.FC 会报类型错误:
+
+```tsx
+const App: React.FC = props => props.children
+const App: React.FC = () => [1, 2, 3]
+const App: React.FC = () => 'hello'
+```
+
+解决方法:
+
+```tsx
+const App: React.FC<{}> = props => props.children as any
+const App: React.FC<{}> = () => [1, 2, 3] as any
+const App: React.FC<{}> = () => 'hello' as any
+// 或者
+const App: React.FC<{}> = props => (props.children as unknown) as JSX.Element
+const App: React.FC<{}> = () => ([1, 2, 3] as unknown) as JSX.Element
+const App: React.FC<{}> = () => ('hello' as unknown) as JSX.Element
+```
+
+在通常情况下，使用 **React.FC** 的方式声明最简单有效，推荐使用；如果出现类型不兼容问题，建议使用**以下两种方式：**
+
+第二种：使用 **PropsWithChildren**，这种方式可以为你省去频繁定义 children 的类型，自动设置 children 类型为 ReactNode:
+
+```tsx
+type AppProps = React.PropsWithChildren<{ message: string }>
+const App = ({ message, children }: AppProps) => (
+  <div>
+    {message}
+    {children}
+  </div>
+)
+```
+
+第三种：直接声明:
+
+```tsx
+type AppProps = {
+  message: string
+  children?: React.ReactNode
+}
+
+const App = ({ message, children }: AppProps) => (
+  <div>
+    {message}
+    {children}
+  </div>
+)
 ```
 
 ###### 在TS中使用react-router

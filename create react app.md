@@ -20,6 +20,22 @@ npm start
 
 然后打开 http://localhost:3000/ 查看你的应用。
 
+使用 [TypeScript](https://www.typescriptlang.org/) 创建新的 Create React App 项目，你可以运行：
+
+```bash
+$ npx create-react-app my-app --typescript
+$ # 或者
+$ yarn create react-app my-app --typescript
+```
+
+将 [TypeScript](https://www.typescriptlang.org/) 添加到 Create React App 项目：
+
+```bash
+$ npm install --save typescript @types/node @types/react @types/react-dom @types/jest
+$ # 或者
+$ yarn add typescript @types/node @types/react @types/react-dom @types/jest
+```
+
 ##### 文件架构
 
 ```
@@ -65,7 +81,7 @@ serviceWorker.js 用于移动端web开发，可以使你的react项目变成一�
 
 **react-app-env.d.ts**
 
-如果是使用 TypeScript 创建新的 Create React App 项目，则会在src文件夹下生成 react-app-env.d.ts 文件
+如果是使用 TypeScript 创建新的 Create React App 项目，运行 npm start 之后会在src文件夹下生成 react-app-env.d.ts 文件
 
 react-app-env.d.ts是全局变量的声明文件，常用于react、react-dom的一些API类型声明，图片、样式模块类型声明等等。
 
@@ -330,17 +346,17 @@ npm i webpack-bundle-analyzer --save -dev
 
 ```jsx
 const { BundleAnalyzerPlugin } = require("webpack-bundle-analyzer");
-const webpackPlugins = []
-if (process.env.NODE_ENV === 'production') {
-  // 打包分析
-  const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer')
-  // npm run build的时候浏览器会自动打开9090端口的一个页面显示当前依赖包的各种大小拼图
-  webpackPlugins.push(new BundleAnalyzerPlugin({ analyzerPort: 9090 }))
-}
+
 module.exports = {
-    webpack: {
-        plugins: webpackPlugins,
-    }
+  webpack: {
+    plugins: [
+      ...whenProd(() => [
+        new BundleAnalyzerPlugin({
+          analyzerPort: 9090
+        })
+      ])
+    ],
+  }
 };
 ```
 
@@ -872,20 +888,20 @@ const $ = window.$;
 
 ##### 添加 Typescript
 
+使用 [TypeScript](https://www.typescriptlang.org/) 启动新的 Create React App 项目，你可以运行：
+
+```bash
+$ npx create-react-app my-app --typescript
+$ # 或者
+$ yarn create react-app my-app --typescript
+```
+
 将 [TypeScript](https://www.typescriptlang.org/) 添加到 Create React App 项目，请先安装它：
 
 ```bash
 $ npm install --save typescript @types/node @types/react @types/react-dom @types/jest
 $ # 或者
 $ yarn add typescript @types/node @types/react @types/react-dom @types/jest
-```
-
-使用 [TypeScript](https://www.typescriptlang.org/) 创建新的 Create React App 项目，你可以运行：
-
-```bash
-$ npx create-react-app my-app --typescript
-$ # 或者
-$ yarn create react-app my-app --typescript
 ```
 
 接下来，将任何文件重命名为 TypeScript 文件（例如 `src/index.js` 重命名为 `src/index.tsx` ）并 **重新启动开发服务器**！

@@ -573,11 +573,20 @@ Action 是把数据传入 store 的惟一途径，所以任何数据，无论来
 
 (Object): 要 dispatch 的 action。
 
+**如何调用**
 
+- 在组件外：store.dispatch
+
+- 通过Provider组件传递store，`Provider`内的任何一个组件，如果需要使用store的方法，则必须是「被 connect 过的」组件——使用`connect`方法对「你编写的组件（被包装组件）」进行包装后的容器组件，然后由容器组件传递到被包装组件的props。
+
+  例如 Login组件中要使用 props.disptach ，则 Login组件必须被connect生成容器组件，并在 Provider 组件树下。
+
+  - 函数组件通过 props.dispatch 调用
+  - 类组件通过 this.props.dispatch 调用
 
 ###### subscribe(listener)
 
-添加一个变化监听器。Store 允许使用`store.subscribe`方法设置监听函数，一旦 State 发生变化，就自动执行这个函数。你可以在监听函数里调用 [`getState()`](https://www.reduxjs.cn/api/store#getState) 来拿到当前 state。
+添加一个变化监听器。Store 允许使用`store.subscribe`方法设置监听函数，一旦 State 发生变化，就自动执行这个函数。你可以在监听函数里调用 [`store.getState()`](https://www.reduxjs.cn/api/store#getState) 来拿到当前 state。
 
  **参数**
 
@@ -710,7 +719,7 @@ const VisibleTodoList = connect(
 
 - state：redux中的state（执行时会自动传入）
 
-- ownProps：容器组件的props对象（执行时会自动传入）
+- ownProps：容器组件的props对象，最终会传入到UI组件
 
 返回值：
 
@@ -769,7 +778,7 @@ const mapStateToProps = (state, ownProps) => {
 如果`mapDispatchToProps`是一个函数，会得到两个参数：
 
 - `dispatch`：store.dispatch（执行时会自动传入）
-- `ownProps`：容器组件的`props`对象（执行时会自动传入）
+- `ownProps`：容器组件的`props`对象，最终会传入到UI组件
 
 返回值：
 
@@ -929,7 +938,9 @@ render(<Root store={store} />, document.getElementById('root'))
 
 #### 异步action
 
-异步 action 是一个发给 dispatching 函数的值，但是这个值还不能被 reducer 消费。在发往真实的`store.dispatch`之前，middleware 会把异步 action 转换成一个或一组 action。异步 action 可以有多种数据类型，这取决于你所使用的 middleware。它
+Redux store 仅支持同步数据流。使用 `thunk` 等中间件可以帮助在 Redux 应用中实现异步性。
+
+异步 action 是一个发给 dispatch 函数的值，但是这个值还不能被 reducer 消费。在发往真实的`store.dispatch`之前，middleware 会把异步 action 转换成一个或一组 action。异步 action 可以有多种数据类型，这取决于你所使用的 middleware。它
 
 同步操作只要发出一种 Action 即可，异步操作的差别是它要发出三种 Action。
 
@@ -1000,6 +1011,8 @@ const fetchPosts = postTitle => (dispatch, getState) => {
 因此，异步操作的第一种解决方案就是，写出一个返回函数的 Action Creator，然后使用`redux-thunk`中间件改造`store.dispatch`。
 
 #### redux-thunk
+
+Redux store 仅支持同步数据流。使用 `thunk` 等中间件可以帮助在 Redux 应用中实现异步性。
 
 `redux-thunk`主要的功能就是可以让我们`dispatch`一个函数，而不只是普通的 action 对象。我们可以在这个函数中进行副作用的操作，然后dispatch一个action。
 

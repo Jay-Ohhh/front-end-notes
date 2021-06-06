@@ -790,9 +790,15 @@ interface ObjectInterface {
 #### **type与interface的区别**
 
 1. type可以声明 基本类型，联合类型，交叉类型的别名，interface不行
+
 2. type 语句中可以使用 typeof 获取类型实例
+
 3. interface能够声明合并，type不能
+
 4. 类型别名不能被 `extends`和 `implements` 
+
+   因此，公共或基础类型应该用 interface 声明，方便被extends。不过也可以用 type 声明，用交叉类型来扩展。
+
 5. type不能用于多态this类型
 
 多态 this 类型仅适用于接口：
@@ -1791,7 +1797,11 @@ jQuery('#foo');
 
 这里只演示了全局变量这种模式的声明文件，假如是通过模块导入的方式使用第三方库的话，那么引入声明文件又是另一种方式了（通过模块导入的方式将变量引到其它文件，不再是全局变量），将会在后面详细介绍。
 
+##### .d.ts和ts文件
 
+在**.d.ts**文件声明的变量相当于在全局中声明。
+
+在**.d.ts**文件声明的变量都能在**.ts**中使用。
 
 ##### 第三方声明文件
 
@@ -2558,6 +2568,8 @@ declare module 'moment' {
 // ./types/index.d.ts是自定义的全局变量声明文件
 /// <reference types="./types/index.d.ts" />
 ```
+
+三斜线指令中有两种`types` 和 `path` 两种不同的属性，它们的区别是：`types` 用于声明对另一个库的依赖，而 `path` 用于声明对另一个文件的依赖。
 
 ##### 书写一个全局变量的声明文件
 
@@ -5661,6 +5673,50 @@ type ReturnType<T> = T extends (
 有时候我们定义的泛型不想过于灵活或者说想继承某些类等，可以通过 extends 关键字添加泛型约束。
 
 ```ts
+type A = 'name' | 'age'
+type B = 'name' | 'age' | 'test'
+type C = A extends B ? A : never
+// C:'name'|'age'
+```
+
+```ts
+type A = 'name' | 'age' | 'test' | 'a'
+type B = 'name' | 'age' | 'test'
+type C = A extends B ? A : never 
+// C:never
+```
+
+```ts
+interface A {
+  name: string
+  age: number
+  a: string
+}
+interface B {
+  name: string
+  age: number
+}
+type C = A extends B ? A : never
+// C:A
+```
+
+```ts
+interface A {
+  name: string
+  age: number
+}
+interface B {
+  name: string
+  age: number
+  b: string
+}
+type C = A extends B ? A : never
+// C:never
+```
+
+
+
+```ts
 interface ILengthwise {
   length: number;
 }
@@ -6073,7 +6129,7 @@ tsc index.ts --allowJs
     "strictFunctionTypes": true, /* strictFunctionTypes的值为true或false，用于指定是否使用函数参数双向协变检查 */
     "strictBindCallApply": true, /* 设为true后会对bind、call和apply绑定的方法的参数的检测是严格检测的 */
     "strictPropertyInitialization": true,  /* 设为true后会检查类的非undefined属性是否已经在构造函数里初始化，如果要开启这项，需要同时开启strictNullChecks，默认为false */
-   "noImplicitThis": true, /* 当this表达式的值为any类型的时候，生成一个错误 */
+    "noImplicitThis": true, /* 当this表达式的值为any类型的时候，生成一个错误 */
     "alwaysStrict": true,  /* alwaysStrict的值为true或false，指定始终以严格模式检查每个模块，并且在编译之后的js文件中加入"use strict"字符串，用来告诉浏览器该js为严格模式 */
 
     /* Additional Checks */

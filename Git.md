@@ -728,7 +728,8 @@ git clone 项目的地址
 > git branch -a 查看所有分支，分支命名规范，远程主机名
 > git log 查看commit规范
 > git checkout -b wyn
-> git push -u origin wyn
+> git push -u origin wyn  
+> // or git push --set-upstream origin feat-wyn
 > git pull origin develop
 > git add .
 > git commit -m ‘描述’
@@ -867,6 +868,30 @@ https://www.liaoxuefeng.com/wiki/896043488029600/900004111093344
 
 至此，整个 pull request 的过程就结束了。
 
+https://zhuanlan.zhihu.com/p/87603185
+
+**pull request 步骤**
+
+- fork 到自己的仓库
+
+- git clone 到本地
+
+- 上游建立连接
+  `git remote add upstream 开源项目地址`
+
+- 创建开发分支 (非必须)
+  `git checkout -b test`
+
+- 推送到远程仓库
+
+  `git push -u origin test`
+
+- 修改提交代码
+  `git status` `git add .` `git commit -m`  `git pull upstream dev ` `git push`
+
+- 提交pr
+  去自己github仓库对应fork的项目下new pull request
+
 #### git远程操作
 
 https://www.ruanyifeng.com/blog/2014/06/git_remote.html
@@ -916,6 +941,8 @@ https://www.cnblogs.com/busigulang/articles/11224401.html
 | 管理员           | 创建 Issue、评论、Clone 和 Pull 仓库、打包下载代码、创建 Pull Request、 创建分支、推送分支、删除分支、创建标签（里程碑）、创建 Wiki、 添加仓库成员、强制推送分支、编辑仓库属性、可上传附件，可删除自己或他人上传的附件、 不能转移/清空/删除仓库 |
 
 #### git使用不同的邮箱配置不同的SSH
+
+https://blog.csdn.net/wangcongcsdn/article/details/106661793
 
 https://www.pianshen.com/article/302848775/
 

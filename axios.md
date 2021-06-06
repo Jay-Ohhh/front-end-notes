@@ -29,7 +29,7 @@
     if ('setRequestHeader' in request) {
       utils.forEach(requestHeaders, function setRequestHeader(val, key) {
         if (typeof requestData === 'undefined' && key.toLowerCase() === 'content-type') {
-          // Remove Content-Type if data is undefined  如果没有data，则去掉content-type，意味着get请求会自动去掉content-type
+          // Remove Content-Type if data is undefined  如果没有data，则去掉content-type，意味着get或delete请求会自动去掉content-type
           delete requestHeaders[key];
         } else {
           // Otherwise add header to the request
