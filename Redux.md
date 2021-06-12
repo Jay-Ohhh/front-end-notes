@@ -1663,6 +1663,10 @@ const App = () => {
 
 
 
+#### Redux-DevTools 使用
+
+https://www.cnblogs.com/anin/p/13582345.html
+
 #### 术语表
 
 ##### 副作用（side effect）

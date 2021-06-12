@@ -648,7 +648,7 @@ class WarningBanner extends React.Component {
 
  在组件的 `render` 方法中返回 `null` 并不会影响组件的生命周期。 
 
-#### 列表 &Key
+#### 列表 & Key
 
 **渲染多个组件**
 
@@ -2859,7 +2859,8 @@ class App extends React.Component {
 }
 
 // 中间的组件再也不必指明往下传递 theme 了。
-function Toolbar() {  return (
+function Toolbar() {  
+  return (
     <div>
       <ThemedButton />
     </div>
@@ -3088,7 +3089,8 @@ class App extends React.Component {
       <ThemeContext.Provider value={'dark'}>
         <UserContext.Provider value={'Jay'}>
         </UserContext.Provider>
-      </ThemeContext.Provider>    );
+      </ThemeContext.Provider>
+    );
   }
 }
 
@@ -6920,7 +6922,7 @@ function Example() {
 
 **为什么在组件内部调用 `useEffect`？** 将 `useEffect` 放在组件内部让我们可以在 effect 中直接访问 `count` state 变量（或其他 props）。我们不需要特殊的 API 来读取它 —— 它已经保存在函数作用域中。Hook 使用了 JavaScript 的闭包机制，而不用在 JavaScript 已经提供了解决方案的情况下，还引入特定的 React API。
 
-**`useEffect` 会在每次渲染后都执行吗？** 是的，默认情况下，它在第一次渲染之后*和*每次更新之后都会执行。（我们稍后会谈到[如何控制它](https://react.docschina.org/docs/hooks-effect.html#tip-optimizing-performance-by-skipping-effects)。）你可能会更容易接受 effect 发生在“渲染之后”这种概念，不用再去考虑“挂载”还是“更新”。React 保证了每次运行 effect 的同时，DOM 都已经更新完毕。
+**`useEffect` 会在每次渲染后都执行吗？** 是的，默认情况下，它在第一次渲染之后和每次更新之后都会执行。（我们稍后会谈到[如何控制它](https://react.docschina.org/docs/hooks-effect.html#tip-optimizing-performance-by-skipping-effects)。）你可能会更容易接受 effect 发生在“渲染之后”这种概念，不用再去考虑“挂载”还是“更新”。React 保证了每次运行 effect 的同时，DOM 都已经更新完毕。
 
 我们可以在 effect 中获取到最新的 `count` 值，因为他在函数的作用域内。当 React 渲染组件时，会保存已使用的 effect，并在更新完 DOM 后执行它。这个过程在每次渲染时都会发生，包括首次渲染。
 
@@ -7421,6 +7423,15 @@ npm install eslint-plugin-react-hooks --save-dev
 }
 ```
 
+useEffect的依赖项数组是空数组的情况下（仅在组件挂载和卸载时执行），不需检查 effect 的依赖，则可以添加 `// eslint-disable-next-line`，例如：
+
+```ts
+useEffect(() => {
+	// ...
+  // eslint-disable-next-line
+}, []);
+```
+
 ##### Hook API
 
 ###### useState
@@ -7446,7 +7457,7 @@ setValue(newValue);
 与 class 组件中的 `setState` 方法不同，Hook 的`setState` 不会自动合并更新对象。你可以用函数式的 `setState` 结合展开运算符来达到合并更新对象的效果。
 
 ```js
-setValue(preSValue => {
+setValue(preValue => {
   // 也可以使用 Object.assign
   return {...preValue, ...updatedValues};
 });

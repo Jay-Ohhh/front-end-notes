@@ -6095,7 +6095,7 @@ tsconfig.josn需要放在项目的根目录。
 tsc index.ts --allowJs
 ```
 
-**常用配置**
+**配置说明**
 
 ```json
 {
@@ -6121,7 +6121,7 @@ tsc index.ts --allowJs
     "importHelpers": true,  /* importHelpers的值为true或false，指定是否引入tslib里的辅助工具函数，默认为false */
     "downlevelIteration": true, /* 当target为'ES5' or 'ES3'时，为'for-of', spread, and destructuring'中的迭代器提供完全支持 */
     "isolatedModules": true,  /* isolatedModules的值为true或false，指定是否将每个文件作为单独的模块，默认为true，它不可以和declaration同时设定 */
-
+		"skipLibCheck":true,  /* 忽略所有的声明文件（ *.d.ts）的类型检查 */
     /* Strict Type-Checking Options */
     "strict": true /* strict的值为true或false，用于指定是否启动所有类型检查，如果设为true则会同时开启下面这几个严格类型检查，默认为false */,
     "noImplicitAny": true,   /* noImplicitAny的值为true或false，如果我们没有为一些值设置明确的类型，编译器会默认认为这个值为any，如果noImplicitAny的值为true的话。则没有明确的类型会报错。默认值为false */
@@ -6146,7 +6146,7 @@ tsc index.ts --allowJs
     "typeRoots": [],                       /* typeRoots用来指定声明文件或文件夹的路径列表，如果指定了此项，则只有在这里列出的声明文件才会被加载 */
     "types": [],                           /* types用来指定需要包含的模块，只有在这里列出的模块的声明文件才会被加载进来 */
     "allowSyntheticDefaultImports": true,  /* 用来指定允许从没有默认导出的模块中默认导入 */
-    "esModuleInterop": true /* 通过为导入内容创建命名空间，实现CommonJS和ES模块之间的互操作性 */,
+    "esModuleInterop": true, /* 通过为导入内容创建命名空间，实现CommonJS和ES模块之间的互操作性 */
     "preserveSymlinks": true,              /* 不把符号链接解析为其真实路径，具体可以了解下webpack和nodejs的symlink相关知识 */
 
     /* Source Map Options */
@@ -6167,6 +6167,42 @@ tsc index.ts --allowJs
   "references": [],  // 一个对象数组，指定要引用的项目
 }
 
+```
+
+**常用选项**
+
+```json
+{
+  "compilerOptions": {
+    "module": "esnext",
+    "target": "es5",
+    "allowSyntheticDefaultImports": true,
+    "jsx": "react",
+    "lib": ["dom", "dom.iterable", "esnext"],
+    "strict": true,
+    "moduleResolution": "node",
+    "experimentalDecorators": true,
+    "downlevelIteration": true,
+    "allowJs": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "isolatedModules": true,
+    "noEmit": true,
+    "noFallthroughCasesInSwitch": true,
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./src/*"],
+      "@pages/*": ["./src/pages/*"],
+      "@components/*": ["./src/components/*"],
+      "@img/*": ["./src/assets/img/*"],
+      "@css/*": ["./src/assets/css/*"],
+      "@utils/*": ["./src/utils/*"],
+      "@hooks/*": ["./src/hooks/*"]
+    }
+  },
+  "include": ["src"],
+  "exclude": ["node_modules", "build"]
+}
 ```
 
 **allowJs**

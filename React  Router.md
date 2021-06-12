@@ -2738,6 +2738,8 @@ useRouteMatch 尝试以与 <Route> 相同的方式匹配当前URL。它主要用
 const {name,age}=this.props.match.params
 ```
 
+> 刷新页面参数不消失，参数会在地址栏显示
+
 **需要服务器配合**
 
 例如，如果你使用带有 `/todos/42` 路由的 React 路由器，开发服务器将正确响应 `localhost:3000/todos/42` ，但是服务于上述生产构建的 Express 不会正确响应。
@@ -2790,6 +2792,8 @@ const {search}=this.props.location
 
 备注：获取到的 search是  `'name=tom&age=18'` 这样的字符串，需要借助 querystring 模块的qs.parse解析
 
+> 刷新页面参数不消失，参数会在地址栏显示
+
 ##### State参数
 
 State参数在url中不可见
@@ -2812,9 +2816,8 @@ State参数在url中不可见
 const {state}=this.props.location
 ```
 
-备注：刷新会保留参数
-
-
+>1、BrowserRouter(history)模式下，刷新页面参数**不消失**，参数不会在地址栏显示，因为state保存在history对象中
+>2、HashRouter(hash)模式下，刷新页面参数**消失**！！！参数不会在地址栏显示
 
 #### 404
 
