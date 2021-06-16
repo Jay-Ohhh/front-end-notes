@@ -1148,7 +1148,7 @@ npm install http-proxy-middleware --save
 yarn add http-proxy-middleware
 ```
 
-在 `src`文件夹 新建 `setupProxy.js`：
+**在 `src`文件夹** 新建 `setupProxy.js`：
 
 ```js
 const proxy = require('http-proxy-middleware');
@@ -1342,8 +1342,6 @@ yarn add gh-pages
     "start": "react-scripts start",
     "build": "react-scripts build",
 ```
-
-`predeploy` 脚本将在 `deploy` 运行之前自动运行。
 
 `predeploy` 脚本将在 `deploy` 运行之前自动运行。
 

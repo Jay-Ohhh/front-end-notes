@@ -785,9 +785,11 @@ loaction 作为参数，应当返回以字符串形式或对象形式代表的 l
 
 当元素处于活动状态时提供（增加）给该元素的样式对象（采用小驼峰命名属性的 JavaScript 对象）。
 
-###### excat：bool
+###### exact：bool
 
 如果为true，则仅当location完全匹配时才应用活动类/样式。
+
+如果路由还有子路由，则该路由的 exact 需要设置为false
 
 ```jsx
 <NavLink exact to="/profile">
@@ -956,9 +958,11 @@ aria-current属性应用在处于激活状态的链接，有效值为：
 <Redirect push to="/somewhere/else" />
 ```
 
-###### excat：bool
+###### exact：bool
 
 精确匹配路径。
+
+如果路由还有子路由，则该路由的 exact 需要设置为false
 
 当在<Switch>内部渲染<Redirect>时，只能与from结合使用以精确匹配location。
 
@@ -1158,9 +1162,11 @@ children函数可以传递路由参数routeProps：match、loaction、history。
 
 没有 path 属性的< Route > 或者 没有 from 属性的 < Redirect > 将总是匹配到当前的地址(location)，然后进行渲染。
 
-###### excat：bool
+###### exact：bool
 
 精确匹配路径。
+
+如果路由还有子路由，则该路由的 exact 需要设置为false
 
 |  path  | location.pathname |  exact  | matches? |
 | :----: | :---------------: | :-----: | :------: |

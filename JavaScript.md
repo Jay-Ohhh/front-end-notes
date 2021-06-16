@@ -3253,7 +3253,7 @@ Generator 函数不是这样，它执行产生的上下文环境，一旦遇到`
 ##### FormData对象的作用
 
 1. 用一些键值对模拟HTML表单（不需使用form标签），以便将数据通过`XMLHttpRequest.send()` 方法发送出去；
-2. 可以上传二进制文件
+2. 可以上传文件等二进制数据（binary）
 
 ##### 构造函数
 
@@ -3273,9 +3273,31 @@ new FormData(form)
 
 https://developer.mozilla.org/zh-CN/docs/Web/API/FormData
 
-**FormData.append()**
+**FormDataInstance.append(key, value [, filename])**
 
 向 `FormData` 中添加新的属性值，`FormData` 对应的属性值存在也不会覆盖原值，而是新增一个值，如果属性不存在则新增一项属性值。
+
+可以直接向FormData对象附加File或Blob类型的文件。
+
+##### multipart/form-data
+
+使用FormData时，请求头设置：
+
+```js
+headers: {
+	'Content-Type': 'multipart/form-data;charset=UTF-8'
+}
+```
+
+**multipart/form-data：**
+
+以消息的形式发送给服务器：会将表单的每个数据处理为一条消息，用分隔符分开。
+
+在表单中进行文件上传时，就需要使用该格式。
+
+既可以上传键值对，也可以上传文件。
+
+上传文件是以二进制（binary）的形式提交。
 
 #### Blob
 
@@ -3333,7 +3355,9 @@ var blob = instanceOfBlob.slice([start [, end [, contentType]]])
 
 通常情况下， `File` 对象是来自用户在一个 `<input>` 元素上选择文件后返回的 [`FileList`](https://developer.mozilla.org/zh-CN/docs/Web/API/FileList) 对象,也可以是来自由拖放操作生成的 [`DataTransfer`](https://developer.mozilla.org/zh-CN/docs/Web/API/DataTransfer) 对象。
 
-File 继承 自Blob。
+File 继承 自Blob。其他操作二进制数据的API（比如File对象），都是建立在Blob对象基础上的，继承了它的属性和方法。
+
+File 对象负责处理那些以文件形式存在的二进制数据。
 
 ##### 方法
 
