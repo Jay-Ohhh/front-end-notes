@@ -7553,6 +7553,8 @@ const [state, setState] = useState(() => fn()); // fn() 只会被调用一次
 
 需要注意的是，React 可能仍需要在跳过渲染前渲染该组件。不过由于 React 不会对组件树的“深层”节点进行不必要的渲染，所以大可不必担心。如果你在渲染期间执行了高开销的计算，则可以使用 `useMemo` 来进行优化。
 
+> useState不能设置set和map
+
 ###### useEffect
 
 ```js
