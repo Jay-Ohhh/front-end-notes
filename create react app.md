@@ -940,6 +940,8 @@ $ yarn add typescript @types/node @types/react @types/react-dom @types/jest
 ```js
 if (process.env.NODE_ENV === 'production') {
   // ...
+} else if (process.env.NODE_ENV === 'development'){
+  // ...
 }
 ```
 
