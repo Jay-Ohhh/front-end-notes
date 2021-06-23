@@ -294,10 +294,37 @@ module.exports = {
     webpack: {
         // 别名
         alias: {
-            "@": path.resolve(__dirname, "src"),
+            '@': path.resolve(__dirname, 'src'),
+          	'@pages': path.resolve(__dirname, 'src/pages'),
+      			'@components': path.resolve(__dirname, 'src/components'),
+      			'@img': path.resolve(__dirname, 'src/assets/img'),
         },
     }
 }       
+```
+
+如果项目使用TS的话，还需要**tsconfig.json**设置
+
+```json
+{
+	"extends": "./paths.json"
+}
+```
+
+**paths.json**
+
+```json
+{
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./src/*"],
+      "@pages/*": ["./src/pages/*"],
+      "@components/*": ["./src/components/*"],
+      "@img/*": ["./src/assets/img/*"]
+    }
+  }
+}
 ```
 
 **打包配置压缩文件**
@@ -380,7 +407,6 @@ module.exports = {
              new UglifyJsPlugin({
                 uglifyOptions: {
                     compress: {
-                        warnings: false,
                         drop_debugger: true,
                         drop_console: true,
                     },

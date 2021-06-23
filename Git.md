@@ -898,6 +898,28 @@ https://www.ruanyifeng.com/blog/2014/06/git_remote.html
 
 有时我们push完之后，发现代码写错了，于是回退，回退修改完代码后，在push时会报错（non-fast-forward），因为回退，我们本地库HEAD指向的版本比远程库的要旧，这时可以使用 git push -f 。
 
+##### 查看远程分支
+
+```sh
+git remote -v
+```
+
+##### 添加远程仓库地址
+
+```sh
+git remote add 远程仓库主机名 远程仓库地址
+```
+
+> 远程仓库主机名是自定义
+
+##### 删除远程仓库
+
+```sh
+git remote rm 远程仓库主机名
+```
+
+
+
 #### 配置公钥
 
 https://blog.csdn.net/lqlqlq007/article/details/78983879

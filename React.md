@@ -4212,7 +4212,7 @@ interface IState {
 	title:string
 }
 
-interface Iprops {
+interface IProps {
     count: number
   	// CSSProperties提供样式声明的类型信息
     // 用户传入style的时候就能够获得类型检查和代码补全
@@ -4222,7 +4222,7 @@ interface Iprops {
     // ...
 }
 
-class Child extends React.PureComponent<Iprops, IState> {
+class Child extends React.PureComponent<IProps, IState> {
   // ES7 写法
 	state = {
     	title: 'ts'
