@@ -1281,7 +1281,7 @@ Create React App 使用 `homepage` 字段确定构建的 HTML 文件中的根 UR
 
 > BrowserRouter的basenname属性：所有locations的基本URL。如果应用程序是从服务器上的子目录提供的，则需要将其设置为子目录。格式正确的基名称应该有一个前导斜杠，但不能有尾随斜杠。
 
-###### 不同的路径服务相同的构建（了解）
+###### 不同的路径服务相同的构建、hash模式部署
 
 如果你没有使用 HTML5 `pushState` history API 或根本不使用客户端路由，则无需指定应用程序的 URL 。相反，你可以把它放在你的 `package.json` 中：
 

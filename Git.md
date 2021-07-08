@@ -260,6 +260,19 @@ git branch -d 分支名 // 在其它分支才能删除该分支
 git push origin --delete 分支名
 ```
 
+##### branch 修改本地分支名
+
+```sh
+git branch -m oldName newName
+```
+
+##### branch 修改远程分支名
+
+```sh
+git push --delete origin 远程分支名 // 删除远程分支名
+git push -u origin 新分支名
+```
+
 ##### fetch 从远程获取代码库  
 
 ```shell
@@ -1056,3 +1069,5 @@ ssh-add ~/.ssh/id_rsa_gitlab(此处add后边是id_rsa_gitlab的绝对路径，~/
 #### 使用 Travis CI 自动更新
 
 https://cli.vuejs.org/zh/guide/deployment.html#github-pages
+
+#### husky

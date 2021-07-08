@@ -46,6 +46,8 @@ source map模式详细说明：https://blog.csdn.net/zwkkkk1/article/details/887
   >
   > 不暴露原始代码
 
+> 开发环境 最佳：eval-cheap-module-source-map生产环境 最佳：hidden-source-map
+
 ##### externals 选项（外部扩展）
 
 将不需要打包的静态资源从构建逻辑中剔除出去，而使用 `CDN` 的方式，去引用它们
