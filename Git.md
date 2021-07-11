@@ -1018,8 +1018,6 @@ https://www.cnblogs.com/feiquan/p/11538433.html
 
 - 重复以上步骤，生成id_rsa_github，id_rsa_github.pub
 
- 
-
 在.ssh文件下新建并配置config 文件：
 
 主要配置项说明：
@@ -1060,14 +1058,23 @@ ssh-agent 是用来控制保存公钥身份证所使用的私钥的程序，其�
 
 ```
 ssh-agent bash
-
-ssh-add ~/.ssh/id_rsa_gitlab(此处add后边是id_rsa_gitlab的绝对路径，~/ 代表前登录用户的用户目录)
+// 此处add后边是id_rsa_gitlab的绝对路径，~/ 代表前登录用户的用户目录
+// ~/.ssh/id_rsa_gitlab无效的话，可以直接跟绝对路径，例如：C:\\Users\\honor\\.ssh\\id_rsagitee
+ssh-add ~/.ssh/id_rsa_gitlab
 ```
 
-
+> 如果仓库是公司内网的话，需要通过公司提供的VPN连上内网，ssh-add 才能添加成功
 
 #### 使用 Travis CI 自动更新
 
 https://cli.vuejs.org/zh/guide/deployment.html#github-pages
 
 #### husky
+
+#### 常见问题
+
+##### refusing to merge unrelated histories
+
+出现这个问题的最主要原因还是在于本地仓库和远程仓库实际上是独立的两个仓库。
+
+解决：在git pull 或 git merge 命令后加上--allow-unrelated-histories
