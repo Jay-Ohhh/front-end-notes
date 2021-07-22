@@ -291,6 +291,14 @@ git pull = git fetch + git merge
 
 **git pull --rebase** = git fetch + git rebase
 
+常见问题
+
+- refusing to merge unrelated histories，通常出现于两个远程仓库拉pull到本地仓库的情况
+
+  出现这个问题的最主要原因还是在于本地仓库和远程仓库实际上是独立的两个仓库。
+
+  解决：在git pull 或 git merge 命令后加上--allow-unrelated-histories
+
 ##### 查看本地工作区、暂存区中文件的修改状态
 
 ```sh
@@ -1056,14 +1064,15 @@ ssh-agent 是用来控制保存公钥身份证所使用的私钥的程序，其�
 
  这个过程在终端输入: 
 
-```
+```sh
 ssh-agent bash
 // 此处add后边是id_rsa_gitlab的绝对路径，~/ 代表前登录用户的用户目录
 // ~/.ssh/id_rsa_gitlab无效的话，可以直接跟绝对路径，例如：C:\\Users\\honor\\.ssh\\id_rsagitee
 ssh-add ~/.ssh/id_rsa_gitlab
+ssh -T 地址 // 测试是否连上
 ```
 
-> 如果仓库是公司内网的话，需要通过公司提供的VPN连上内网，ssh-add 才能添加成功
+> 如果仓库是公司内网的话，需要通过公司提供的VPN连上内网，ssh-add和 ssh -T 才能添加成功
 
 #### 使用 Travis CI 自动更新
 
