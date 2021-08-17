@@ -696,6 +696,10 @@ const VisibleTodoList = connect()(TodoList);
 
 因此，`connect`方法的完整 API 如下：
 
+```js
+connect([mapStateToProps], [mapDispatchToProps], [mergeProps],[options])
+```
+
 ```javascript
 import { connect } from 'react-redux'
 
@@ -711,6 +715,14 @@ const VisibleTodoList = connect(
 
 当`connect`第二个参数为`null`时，即`connect(mapStateToProps,null)`，可以直接在UI组件的`this.props.dispatch`拿到`dispatch`方法。
 
+`connect` 的第三个参数`mergeProps`方法：
+
+不管是 mapStateToProps还是 mapDispatchToProps，都需要和 ownProps merge 之后才会被赋给组件。connect 的第三个参数就是用来做这件事。通常情况下，你可以不传这个参数，connect 就会使用 Object.assign 替代该方法。
+
+`connect` 的第四个参数`options`：
+
+如果指定这个参数，可以定制 connector 的行为，一般不用。
+
 ##### mapStateToProps()
 
 `mapStateToProps`是一个函数。它的作用就是像它的名字那样，建立一个从（外部的）`state`对象到（UI 组件的）`props`对象的映射关系，即将store中的数据作为props绑定到组件上。接受state的UI/容器组件需要实现该函数。
@@ -718,8 +730,9 @@ const VisibleTodoList = connect(
 参数：
 
 - state：redux中的state（执行时会自动传入）
+- ownProps：容器组件的props对象，最终会与UI组件的props合并传入到UI组件
 
-- ownProps：容器组件的props对象，最终会传入到UI组件
+> 当 state 变化，或者 ownProps 变化的时候，mapStateToProps 都会被调用
 
 返回值：
 
@@ -778,7 +791,7 @@ const mapStateToProps = (state, ownProps) => {
 如果`mapDispatchToProps`是一个函数，会得到两个参数：
 
 - `dispatch`：store.dispatch（执行时会自动传入）
-- `ownProps`：容器组件的`props`对象，最终会传入到UI组件
+- `ownProps`：容器组件的`props`对象，最终会与UI组件的props合并传入到UI组件
 
 返回值：
 

@@ -3827,6 +3827,33 @@ function enhance(WrappedComponent) {
 
 这个问题的解决方案是通过使用 `React.forwardRef` API（React 16.3 中引入）。
 
+##### import组件
+
+当export default 组件时，import时即引入对应的组件模块
+
+例如
+
+```js
+// MyComponent.jsx
+export default MyComponent 
+
+// other.jsx
+import MyComponent from 'MyComponent'  // MyComponent即为对应的模块，其实是模块中的default的值
+// or
+const MyComponentModule = await import ('./MyComponent')  // 动态引入MyComponent组件模块，其中MyComponentModule包含模块的default属性（export default 导出的 default）
+
+```
+
+##### 强制刷新组件
+
+- key属性值的改变
+
+> 适用于函数组件和类组件
+
+- ref + component.forceUpdate(callback)
+
+> 适用于类组件，类组件支持传入ref属性
+
 ##### 与第三方库协调同
 
 React 不会理会 React 自身之外的 DOM 操作。它根据内部虚拟 DOM 来决定是否需要更新，而且如果同一个 DOM 节点被另一个库操作了，React 会觉得困惑而且没有办法恢复。 

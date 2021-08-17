@@ -154,6 +154,8 @@ module.exports = {
 
   > vue cli 已经集成了该功能
 
+- webpackbar：导报进度条
+
 #### 优化打包体积
 
 ##### webpack-bundle-analyzer
