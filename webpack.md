@@ -156,6 +156,10 @@ module.exports = {
 
 - webpackbar：导报进度条
 
+- open-browser-webpack-plugin：自动打开浏览器
+
+- copy-webpack-plugin：将已存在的单个文件或整个目录复制到构建目录中
+
 #### 优化打包体积
 
 ##### webpack-bundle-analyzer

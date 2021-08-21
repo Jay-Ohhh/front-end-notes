@@ -270,8 +270,6 @@ unknown 类型的值不能用作大多数运算符的操作数。这是因为如
 
 如果要对类型为 unknown 的值使用任何其他运算符，则必须先指定类型（或使用类型断言强制编译器信任你）。
 
-
-
 #### 类型推论
 
  如果没有初始化（声明+赋值）时没有明确的指定类型，那么 TypeScript 会依照类型推论（Type Inference）的规则推断出一个类型。 
@@ -2823,6 +2821,19 @@ handleEvent(document.getElementById('world'), 'dblclick'); // 报错，event 不
 
 注意，**类型别名与字符串字面量类型都是使用 `type` 进行定义。**
 
+#### 模板字面量类型
+
+模板字面量类型和 JavaScript 中的模板字符串语法完全一致，只不过是用在类型定义里面：
+
+```ts
+type topBottom = "top" | "bottom"
+type leftRight = "left" | "right"
+
+type Position = `${topBottom }-${leftRight }`
+```
+
+当我们定义了一个具体的字面量类型时，TypeScript 会通过拼接内容的方式产生新的字符串字面量类型。
+
 #### 元组
 
 数组合并了相同类型的对象，而元组（Tuple）合并了不同类型的对象。
@@ -2880,6 +2891,32 @@ tom.push(true); // 报错
 
 // Argument of type 'true' is not assignable to parameter of type 'string | number'.
 ```
+
+#### 命名元组类型(Labeled tuple types)
+
+命名元组类型适需要 TypeScript 4.0及以上版本才能使用，它极大的改善了我们的开发体验及效率，先来看一个例子:
+
+```ts
+// 这是没有命名的元组，语义化较差
+type Address = [string, number]
+
+function setAddress(...args: Address) {
+  // some code here
+  console.log(args)
+}
+```
+
+```ts
+// 这是命名的元组，具备语义化
+type Address = [streetName: string, streetNumber: number]
+
+function setAddress(...args: Address) {
+  // some code here
+  console.log(args)
+}
+```
+
+这样，在调用函数时（鼠标指向函数参数Address时），我们的参数就获得了相应的语义，这使得代码更加容易维护。
 
 #### 枚举
 
@@ -4189,6 +4226,38 @@ class Cat extends Animal {
 let a = new Animal('Jack');
 
 // index.ts(13,9): TS2674: Constructor of class 'Animal' is protected and only accessible within the class declaration.
+```
+
+###### 私有类字段
+
+TypeScript 3.8 将支持 ECMAScript 私有字段，千万别和 TypeScript private 修饰符 混淆。
+
+这是在 TypeScript 中具有私有类字段的类：
+
+```ts
+class Animal {
+  #name: string;
+  constructor(theName: string) {
+    this.#name = theName;
+  }
+}
+```
+
+在`private`关键字之上使用私有类字段的区别在于前者有更好的运行时保证。用`private`关键字声明的 TypeScript 字段将在编译后的JavaScript代码中成为常规字段。另一方面，私有类字段在编译后的代码中仍然是私有的。
+
+试图在运行时访问私有类字段将导致语法错误。我们也使用浏览器开发工具也检查不了私有类字段。
+
+有了私有类字段，我们终于在JavaScript中得到了真正的私有。
+
+###### constructor的简洁写法
+
+```ts
+class Animal {
+  // public readonly name;
+  constructor(public readonly name) {
+    // this.name = name;
+  }
+}
 ```
 
 ###### 参数属性
