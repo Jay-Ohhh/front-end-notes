@@ -6579,15 +6579,17 @@ React 会自动添加 ”px” 后缀到内联样式为数字的属性后。如�
 
 但并非所有样式属性都转换为像素字符串。有些样式属性是没有单位的(例如 `zoom`，`order`，`flex`)。无单位属性的完整列表在[此处](https://github.com/facebook/react/blob/4131af3e4bf52f3a003537ec95a1655147c81270/src/renderers/dom/shared/CSSProperty.js#L15-L59)。
 
-**样式模块化**
+###### 样式模块化
 
-样式模块化可以防止样式类名冲突
+样式模块化可以防止样式类名冲突。
 
-在CSS文件名加入module，例如 index.css —> index.module.css
+通过create react app创建的项目，在CSS文件名加入module，例如 index.css —> index.module.css
 
 ```jsx
 import xxx from './index.module.css'
 // 使用
+<div className={xxx.active}>hello<div />
+// 或
 <div className="xxx.active">hello<div />
 ```
 

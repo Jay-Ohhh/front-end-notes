@@ -105,19 +105,25 @@ module.exports = {
 ###### 其余
 
 - [`style-loader`](https://webpack.docschina.org/loaders/style-loader) 将模块导出的内容作为样式并添加到 DOM 中
+
 - [`css-loader`](https://webpack.docschina.org/loaders/css-loader) 加载 CSS 文件并解析 import 的 CSS 文件，最终返回 CSS 代码
+
 - [`less-loader`](https://webpack.docschina.org/loaders/less-loader) 加载并编译 LESS 文件
+
 - [`sass-loader`](https://webpack.docschina.org/loaders/sass-loader) 加载并编译 SASS/SCSS 文件
+
 - [`postcss-loader`](https://webpack.docschina.org/loaders/postcss-loader) 使用 [PostCSS](http://postcss.org/) 加载并转换 CSS/SSS 文件
+
 - [`stylus-loader`](https://webpack.docschina.org/loaders/stylus-loader/) 加载并编译 Stylus 文件
 
-对于 Sass 等 CSS 预处理语言的 loader，在使用 Vue、React 的脚手架创建项目时根据你选择的CSS预处理语言已经配置好。
+  对于 Sass 等 CSS 预处理语言的 loader，在使用 Vue、React 的脚手架创建项目时根据你选择的CSS预处理语言已经配置好。
+
+- [cache-loader](https://github.com/webpack-contrib/cache-loader#getting-started) 在一些性能开销较大的 loader 之前添加此 loader，以将结果缓存到磁盘里。请注意，保存和读取这些缓存文件会有一些时间开销，所以请只对性能开销较大的 loader 使用此 loader。
 
 ##### 语法
 
 - [`babel-loader`](https://webpack.docschina.org/loaders/babel-loader) 使用 [Babel](https://babeljs.io/) 加载 ES2015+ 代码并将其转换为 ES5
 - [`ts-loader`](https://github.com/TypeStrong/ts-loader) 像加载 JavaScript 一样加载 [TypeScript](https://www.typescriptlang.org/) 2.0+
-
 - `eslint-loader`：通过 ESLint 检查 JavaScript 、TypeScript代码
 
 ##### 图片和字体
@@ -132,9 +138,11 @@ module.exports = {
 
 #### 常用插件
 
+- `html-webpack-plugin`：该插件将为你生成一个 HTML5 文件，页面入口等
+
 - `terser-webpack-plugin`: 支持压缩 ES6 (Webpack4)
 
-- `webpack-parallel-uglify-plugin`: 多进程执行代码压缩，提升构建速度
+- webpack-parallel-uglify-plugin: 多进程执行代码压缩，提升构建速度
 
 - ```javascript
   new webpack.optimize.CommonsChunkPlugin(options); // 抽取公共代码
@@ -154,11 +162,11 @@ module.exports = {
 
   > vue cli 已经集成了该功能
 
-- webpackbar：导报进度条
+- `webpackbar`：导报进度条
 
-- open-browser-webpack-plugin：自动打开浏览器
+- `open-browser-webpack-plugin`：自动打开浏览器
 
-- copy-webpack-plugin：将已存在的单个文件或整个目录复制到构建目录中
+- `copy-webpack-plugin`：将已存在的单个文件或整个目录复制到构建目录中
 
 #### 优化打包体积
 
