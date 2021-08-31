@@ -162,7 +162,7 @@ module.exports = {
 
   > vue cli 已经集成了该功能
 
-- `webpackbar`：导报进度条
+- `webpackbar`：打包进度条
 
 - `open-browser-webpack-plugin`：自动打开浏览器
 
