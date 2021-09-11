@@ -168,6 +168,8 @@ module.exports = {
 
 - `copy-webpack-plugin`：将已存在的单个文件或整个目录复制到构建目录中
 
+- `webpack.DefinePlugin`：这是一个简单的字符串替换插件，将我们所有经过 webpack 打包的 js 文件中代码对应的变量都替换为我们在这个插件中指定的其他值或表达式。DefinePlugin 允许创建一个在编译时可以配置的全局常量。
+
 #### 优化打包体积
 
 ##### webpack-bundle-analyzer

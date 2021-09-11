@@ -2804,6 +2804,8 @@ const {search}=this.props.location
 
 State参数在url中不可见
 
+通过`history.push(path, state)`的**state**仅在 browser history 和 memory history中有效。
+
 路由链接（携带参数）：
 
 ```jsx

@@ -63,6 +63,12 @@ SS Modules 允许使用`:global(.className)`的语法，声明一个全局规则
 }
 ```
 
+```css
+:global{
+	// 其它css样式
+}
+```
+
 `App.js`使用普通的`class`的写法，就会引用全局`class`。
 
 ```jsx

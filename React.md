@@ -4226,6 +4226,12 @@ $ # 或者
 $ yarn add typescript @types/node @types/react @types/react-dom @types/jest
 ```
 
+###### 组件类型
+
+```ts
+React.ComponentType<P = {}> = React.ComponentClass<P> | React.FunctionComponent<P>
+```
+
 ###### 编写一个类组件
 
 类组件可以接受props,并且每个类组件都有state数据,所以他需要有两个数据类型规范
@@ -6735,7 +6741,7 @@ customElements.define('x-search', XSearch);
 
 
 
-#### Hook
+#### Hooks
 
 ##### 简介
 
@@ -7414,7 +7420,7 @@ useState('Poppins')        // 🔴 2 （之前为 3）。读取变量名为 surn
 useEffect(updateTitle)     // 🔴 3 （之前为 4）。替换更新标题的 effect 失败
 ```
 
-**这就是为什么 Hook 需要在我们组件的最顶层调用。**如果我们想要有条件地执行一个 effect，可以将判断放到 Hook 的*内部*：
+这就是为什么 Hook 需要在我们组件的最顶层调用。如果我们想要有条件地执行一个 effect，可以将判断放到 Hook 的内部：
 
 ```jsx
   useEffect(function persistForm() {

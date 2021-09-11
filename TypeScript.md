@@ -2346,7 +2346,14 @@ declare enum Directions {
 ```js
 exports = module.exports = {};
 ```
+```ts
+// 兼容CommonJS和AMD的导出
+export = {something1, something2, ..., somethingN};
+export = something;
+```
+
 在 commonjs 规范中，我们用以下方式来导出一个模块：
+
 ```js
 // 整体导出
 module.exports = foo;
@@ -2376,9 +2383,10 @@ import * as foo from 'foo';
 import { bar } from 'foo';
 ```
 
-第三种方式是 `import ... require`，这也是 ts 官方推荐的方式：
+第三种方式是 `import ... require`（只能再ts中使用），这也是 ts 官方推荐的方式：
 
 ```ts
+// 兼容CommonJS和AMD的导入
 // 整体导入
 import foo = require('foo');
 // 单个导入
