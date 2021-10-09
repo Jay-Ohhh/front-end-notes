@@ -48,6 +48,28 @@ source map模式详细说明：https://blog.csdn.net/zwkkkk1/article/details/887
 
 > 开发环境 最佳：eval-cheap-module-source-map生产环境 最佳：hidden-source-map
 
+##### optimization
+
+###### splitChunks
+
+使用webpack打包项目时一方面我们要防止单个文件太大，另一方面要防止文件碎片化，即打包文件太多，导致网络请求过多。所以合理的配置应该是兼顾打包文件的数量以及打包文件的个数。
+
+###### runtimeChunk
+
+runtimeChunk：用来优化持久化缓存的, runtime 指的是 webpack 的运行环境(具体作用就是模块解析, 加载) 和 模块信息清单, 模块信息清单在每次有模块变更(hash 变更)时都会变更, 所以我们想把这部分代码单独打包出来, 配合后端缓存策略, 这样就不会因为某个模块的变更导致包含模块信息的模块(通常会被包含在最后一个 bundle 中)缓存失效. optimization.runtimeChunk 就是告诉 webpack 是否要把这部分单独打包出来。
+
+```js
+// 常用配置
+module.exports = {
+  //...
+  runtimeChunk: {
+    name: 'manifest',
+  }
+};
+```
+
+
+
 ##### externals 选项（外部扩展）
 
 将不需要打包的静态资源从构建逻辑中剔除出去，而使用 `CDN` 的方式，去引用它们
@@ -170,6 +192,8 @@ module.exports = {
 
 - `webpack.DefinePlugin`：这是一个简单的字符串替换插件，将我们所有经过 webpack 打包的 js 文件中代码对应的变量都替换为我们在这个插件中指定的其他值或表达式。DefinePlugin 允许创建一个在编译时可以配置的全局常量。
 
+- `terser-webpack-plugin`：该插件使用 [terser](https://github.com/terser-js/terser) 来压缩 JavaScript，另外可以去除注释、console、debugger
+
 #### 优化打包体积
 
 ##### webpack-bundle-analyzer
@@ -255,6 +279,36 @@ module: {
 }
 
 ```
+
+#### Modules
+
+##### ES6
+
+###### import() 动态引入
+
+https://webpack.docschina.org/api/module-methods/#import
+
+#### hash、chunkhash、contenthash
+
+##### hash
+
+每次构建的生成唯一的一个hash，且所有的文件hash串是一样的
+
+##### chunkhash
+
+chunk的修改才改变对应的hash值
+
+##### contenthash
+
+文件内容修改才会改变的hash值
+
+通常而言：
+
+`chunkHash`可以用于`js`打包`，contentHash`可以用到`css`文件打包。
+
+#### runtime和manifest
+
+https://webpack.docschina.org/concepts/manifest/#root
 
 #### webpack 和 gulp 区别
 

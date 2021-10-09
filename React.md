@@ -463,7 +463,8 @@ class Toggle extends React.Component {
     this.state = {isToggleOn: true};
 
     // 为了在回调中使用 `this`，这个绑定是必不可少的             
-    this.handleClick = this.handleClick.bind(this);  }
+    this.handleClick = this.handleClick.bind(this);
+  }
 
   handleClick() {    
     this.setState(state => ({      
@@ -1570,6 +1571,7 @@ componentDidUpdate(prevProps) {
   if (this.props.userID !== prevProps.userID) {
     this.fetchData(this.props.userID);
   }
+}
 ```
 
 你也可以在 `componentDidUpdate()` 中**直接调用 `setState()`**，但请注意**它必须被包裹在一个条件语句里**，正如上述的例子那样进行处理，否则会导致死循环。它还会导致额外的重新渲染，虽然用户不可见，但会影响组件性能。不要将 props “镜像”给 state，请考虑直接使用 props。 欲了解更多有关内容，请参阅[为什么 props 复制给 state 会产生 bug](https://react.docschina.org/blog/2018/06/07/you-probably-dont-need-derived-state.html)。

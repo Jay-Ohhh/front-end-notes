@@ -14,6 +14,7 @@ import style from './App.css';
 
 export default () => {
   return (
+    // style.title：局部类名
     <h1 className={style.title}>
       Hello World
     </h1>
@@ -51,7 +52,7 @@ export default () => {
 
 SS Modules 允许使用`:global(.className)`的语法，声明一个全局规则。凡是这样声明的`class`，都不会被编译成哈希字符串。
 
-`App.css`加入一个全局`class`。
+`App.css`加入一个全局`class`，即使没加`:global`，也是全局class，因为是`App.css`全局css文件。
 
 ```css
 .title {
@@ -179,11 +180,11 @@ module.exports = {
 
 ```jsx
 import React from 'react';
-import style from './App.css';
+import styles from './App.css';
 
 export default () => {
   return (
-    <h1 className={style.title}>
+    <h1 className={styles.title}>
       Hello World
     </h1>
   );

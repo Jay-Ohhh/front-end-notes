@@ -1039,9 +1039,9 @@ User　　用户名
 ```
 
 ```
-Host XXXX
+Host XXXX                    // 例如 git@saasdev.fastlion.cn
 
-HostName XXXX(github).com
+HostName XXXX(github).com    // 例如 git@saasdev.fastlion.cn
 
 PreferredAuthentications publickey
 
@@ -1069,7 +1069,7 @@ ssh-agent bash
 // 此处add后边是id_rsa_gitlab的绝对路径，~/ 代表前登录用户的用户目录
 // ~/.ssh/id_rsa_gitlab无效的话，可以直接跟绝对路径，例如：C:\\Users\\honor\\.ssh\\id_rsagitee
 ssh-add ~/.ssh/id_rsa_gitlab
-ssh -T 地址 // 测试是否连上
+ssh -T 地址 // 测试是否连上，例如：ssh -T git@saasdev.fastlion.cn
 ```
 
 > 如果仓库是公司内网的话，需要通过公司提供的VPN连上内网，ssh-add和 ssh -T 才能添加成功

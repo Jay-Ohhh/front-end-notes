@@ -64,7 +64,10 @@ trim_trailing_whitespace = true
 # 结尾插入新行
 insert_final_newline = true
 
-[*.{html,css,less,scss,json}]       # 对所有 html, less, css, json 文件生效
+[*.md]
+trim_trailing_whitespace = false
+
+[*.{html,css,less,scss,json}]       # 对所有 html,css,less,scss,json 文件生效
 quote_type = double                 # 字符串使用双引号
 ```
 
