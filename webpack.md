@@ -26,6 +26,22 @@ https://juejin.cn/post/6854573217336541192#heading-5
 
 #### 配置项
 
+##### ouput
+
+###### filename、chunkFilename
+
+filename是主入口的文件名，chunkFilename是非主入口的文件名。
+
+###### 占位符
+
+| **模板**    | **描述**                                    |
+| ----------- | ------------------------------------------- |
+| [hash]      | 模块标识符(module identifier)的 hash        |
+| [chunkhash] | chunk 内容的 hash                           |
+| [name]      | 模块名称                                    |
+| [id]        | 模块标识符(module identifier)               |
+| [query]     | 模块的 query，例如，文件名 `?` 后面的字符串 |
+
 ##### devtool
 
 此选项控制是否生成，以及如何生成 Source Map。
@@ -158,6 +174,19 @@ module.exports = {
 
   > create react app 已经设置了 导入小于 10,000 字节的图片将返回 [data URI](https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/Data_URIs) 而不是路径，svg除外。
 
+#### loader占位符
+
+一些loader常见的占位符，具体的请查看loader的文档。
+
+- `[name]` 源文件名称
+- `[folder]` 文件夹相对于 `compiler.context` 或者 `modules.localIdentContext` 配置项的相对路径。
+- `[path]` 源文件相对于 `compiler.context` 或者 `modules.localIdentContext` 配置项的相对路径。
+- `[file]` - 文件名和路径。
+- `[ext]` - 文件拓展名。
+- `[hash]` - 字符串的哈希值。基于 `localIdentHashSalt`、`localIdentHashFunction`、`localIdentHashDigest`、`localIdentHashDigestLength`、`localIdentContext`、`resourcePath` 和 `exportName` 生成。
+- `[<hashFunction>:hash:<hashDigest>:<hashDigestLength>]` - 带有哈希设置的哈希。
+- `[local]` - 原始类名。
+
 #### 常用插件
 
 - `html-webpack-plugin`：该插件将为你生成一个 HTML5 文件，页面入口等
@@ -192,7 +221,11 @@ module.exports = {
 
 - `webpack.DefinePlugin`：这是一个简单的字符串替换插件，将我们所有经过 webpack 打包的 js 文件中代码对应的变量都替换为我们在这个插件中指定的其他值或表达式。DefinePlugin 允许创建一个在编译时可以配置的全局常量。
 
-- `terser-webpack-plugin`：该插件使用 [terser](https://github.com/terser-js/terser) 来压缩 JavaScript，另外可以去除注释、console、debugger
+- `terser-webpack-plugin`：该插件使用 [terser](https://github.com/terser-js/terser) 来压缩 JavaScript，另外可以去除注释、console、debugger。
+
+  webpack v5 开箱即带有最新版本的 `terser-webpack-plugin`。如果你使用的是 webpack v5 或更高版本，同时希望自定义配置，那么仍需要安装 `terser-webpack-plugin`。如果使用 webpack v4，则必须安装 `terser-webpack-plugin` v4 的版本。
+
+- `webpack.BannerPlugin`：为每个 chunk 文件头部添加 banner。
 
 #### 优化打包体积
 
@@ -306,11 +339,15 @@ chunk的修改才改变对应的hash值
 
 `chunkHash`可以用于`js`打包`，contentHash`可以用到`css`文件打包。
 
+#### chunk和bundle
+
+https://juejin.cn/post/6844903889393680392
+
 #### runtime和manifest
 
 https://webpack.docschina.org/concepts/manifest/#root
 
-#### webpack 和 gulp 区别
+#### webpack和gulp
 
 gulp强调的是前端开发的工作流程，我们可以通过配置一系列的task，定义task处理的事务（例如文件压缩合并、雪碧图、启动server、版本控制等），然后定义执行顺序，来让gulp执行这些task，从而构建项目的整个前端开发流程。
 

@@ -226,3 +226,20 @@ export default () => {
 }
 ```
 
+#### 常见问题
+
+##### 父元素宽度由子元素宽度决定
+
+父元素
+
+```css
+display: inline-block; // or table
+white-space:nowrap; // 如果没有这一条，子元素会自动换行
+```
+
+子元素
+
+```css
+display: inline-block; // or table
+```
+

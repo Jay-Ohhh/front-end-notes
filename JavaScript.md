@@ -2825,6 +2825,18 @@ o = Object.create(Object.prototype, {
 });
 ```
 
+##### Object.values(obj)
+
+返回一个给定对象自身的所有可枚举属性值的数组，值的顺序与使用[`for...in`](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Statements/for...in)循环的顺序相同 ( 区别在于 for-in 循环枚举原型链中的属性 )。
+
+参数
+
+- obj：被返回可枚举属性值的对象。
+
+返回值
+
+- 一个包含对象自身的所有可枚举属性值的数组。
+
 ##### Object.entries()
 
 返回一个给定对象自身可枚举属性的键值对数组

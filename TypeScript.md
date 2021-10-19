@@ -6201,7 +6201,7 @@ tsc index.ts --allowJs
 		"skipLibCheck":true,  /* 忽略所有的声明文件（ *.d.ts）的类型检查 */
     /* Strict Type-Checking Options */
     "strict": true /* strict的值为true或false，用于指定是否启动所有类型检查，如果设为true则会同时开启下面这几个严格类型检查，默认为false */,
-    "noImplicitAny": true,   /* noImplicitAny的值为true或false，如果我们没有为一些值设置明确的类型，编译器会默认认为这个值为any，如果noImplicitAny的值为true的话。则没有明确的类型会报错。默认值为false */
+    "noImplicitAny": true,   /* noImplicitAny的值为false时，如果我们没有为一些值设置明确的类型，编译器会默认认为这个值为any，如果noImplicitAny的值为true的话。则没有明确的类型会报错。默认值为false */
     "strictNullChecks": true,   /* strictNullChecks为true时，null和undefined值不能赋给非这两种类型的值，别的类型也不能赋给他们，除了any类型。还有个例外就是undefined可以赋值给void类型 */
     "strictFunctionTypes": true, /* strictFunctionTypes的值为true或false，用于指定是否使用函数参数双向协变检查 */
     "strictBindCallApply": true, /* 设为true后会对bind、call和apply绑定的方法的参数的检测是严格检测的 */
