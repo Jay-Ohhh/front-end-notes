@@ -241,5 +241,98 @@ white-space:nowrap; // 如果没有这一条，子元素会自动换行
 
 ```css
 display: inline-block; // or table
+vertical-align: top; // 设置成顶部对齐，默认是底部对齐
 ```
+
+##### 修改input-placeholder样式
+
+```less
+@normalFontSize: 13px;
+
+.placeholder {
+	font-size: @normalFontSize;
+	color: #999;
+}
+
+.input-placeholder{
+  .input {
+  font-size: @normalFontSize;
+  color: #333;
+    &::-webkit-input-placeholder {
+      /* webkit */
+      .placeholder();
+    }
+    &::-moz-placeholder {
+      /* Mozilla Firefox 19+ */
+      .placeholder();
+    }
+    &:-moz-placeholder {
+      /* Mozilla Firefox 4 to 18 */
+      .placeholder();
+    }
+    &::-ms-input-placeholder {
+      /* Internet Explorer 10-11 */
+      .placeholder();
+    }
+	}
+}
+
+// 使用
+@import 'XXX'; // 引入.input-placeholder的less文件
+
+#app {
+  .input-placeholder();
+}
+```
+
+##### 修改滚动条
+
+```less
+.webkitScrollbar(@className) {
+	/*修改滚动条样式*/
+	.@{className}::-webkit-scrollbar {
+    // 宽高最好设置成一致，否则水平和垂直的滚动条粗细不一样
+		width: 5px;
+		height: 5px;
+	}
+	.@{className}::-webkit-scrollbar-track {
+		border-radius: 10px;
+		background-color: #fff;
+	}
+	.@{className}::-webkit-scrollbar-thumb {
+		background-color: rgba(144, 147, 153, 0.3);
+		border-radius: 10px;
+	}
+	.@{className}::-webkit-scrollbar-thumb:hover {
+		background-color: rgba(110, 110, 111, 0.3);
+	}
+	// @{className}::-webkit-scrollbar-corner {
+	// }
+}
+参数说明
+::-webkit-scrollbar 滚动条整体部分
+::-webkit-scrollbar-thumb  滚动条里面的小方块（三角形），能向上向下移动（或往左往右移动，取决于是垂直滚动条还是水平滚动条）
+::-webkit-scrollbar-track  滚动条的轨道（里面装有Thumb）
+::-webkit-scrollbar-button 滚动条的轨道的两端按钮，允许通过点击微调小方块的位置。
+::-webkit-scrollbar-track-piece 内层轨道，滚动条中间部分（除去）
+::-webkit-scrollbar-corner 边角，即两个滚动条的交汇处
+::-webkit-resizer 两个滚动条的交汇处上用于通过拖动调整元素大小的小控件
+
+// 使用
+@import 'XXX'; // 引入.webkitScrollbar的less文件
+
+#app{
+  .webkitScrollbar(类名) // 类名不要带点
+}
+```
+
+| 滚动条伪元素                    | 作用的位置                                              |
+| ------------------------------- | ------------------------------------------------------- |
+| ::-webkit-scrollbar             | 整个滚动条                                              |
+| ::-webkit-scrollbar-button      | 滚动条上的按钮 (上下箭头)                               |
+| ::-webkit-scrollbar-thumb       | 滚动条上的滚动滑块                                      |
+| ::-webkit-scrollbar-track       | 滚动条轨道                                              |
+| ::-webkit-scrollbar-track-piece | 滚动条没有滑块的轨道部分                                |
+| ::-webkit-scrollbar-corner      | 当同时有垂直滚动条和水平滚动条时交汇的部分              |
+| ::-webkit-resizer               | 某些元素的corner部分的部分样式(例:textarea的可拖动按钮) |
 

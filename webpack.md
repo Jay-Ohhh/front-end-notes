@@ -42,6 +42,24 @@ filename是主入口的文件名，chunkFilename是非主入口的文件名。
 | [id]        | 模块标识符(module identifier)               |
 | [query]     | 模块的 query，例如，文件名 `?` 后面的字符串 |
 
+##### output
+
+```javascript
+module.exports = {
+  //...
+  output: {
+    // One of the below
+    publicPath: 'auto', // It automatically determines the public path from either `import.meta.url`, `document.currentScript`, `<script />` or `self.location`.
+    publicPath: 'https://cdn.example.com/assets/', // CDN（总是 HTTPS 协议）
+    publicPath: '//cdn.example.com/assets/', // CDN（协议相同）
+    publicPath: '/assets/', // 相对于服务(server-relative)
+    publicPath: 'assets/', // 相对于 HTML 页面
+    publicPath: '../assets/', // 相对于 HTML 页面
+    publicPath: '', // 相对于 HTML 页面（目录相同）
+  },
+};
+```
+
 ##### devtool
 
 此选项控制是否生成，以及如何生成 Source Map。

@@ -176,7 +176,9 @@ render(
 
 https://blog.csdn.net/u013205165/article/details/93738974
 
-1 hash 模式下，仅 hash 符号之前的内容会被包含在请求中，如 http://www.abc.com，因此对于后端来说，即使没有做到对路由的全覆盖，也不会返回 404 错误。
+1 hash 模式下，仅 # 符号之前的内容会被包含在请求中，如 http://www.abc.com，因此对于后端来说，即使没有做到对路由的全覆盖，也不会返回 404 错误。
+
+**地址栏里 `#` 以及后面部分都是不会随请求发送到服务器。**
 
 2 history 模式下，前端的 URL 必须和实际向后端发起请求的 URL 一致，如 http://www.abc.com/book/id。如果后端缺少对 /book/id 的路由处理，将返回 404 错误。Vue-Router 官网里如此描述：”不过这种模式要玩好，还需要后台配置支持……所以呢，你要在服务端增加一个覆盖所有情况的候选资源：如果 URL 匹配不到任何静态资源，则应该返回同一个 index.html 页面，这个页面就是你 app 依赖的页面。“
 
@@ -539,6 +541,8 @@ ReactDOM.render(<Router history={customHistory} />, node);
 
 它使用浏览器中的 [History](https://developer.mozilla.org/en-US/docs/Web/API/History) API （HTML5 history 模式）用于处理 URL，创建一个像`example.com/some/path`这样真实的 URL 。
 
+`history API` 是 `H5` 提供的新特性，允许开发者**直接更改前端路由**，即更新浏览器 `URL` 地址而**不重新发起请求**。
+
 ```js
 // 引入BrowserRouter这个组件的类型（接口）
 import { BrowserRouterProps} from 'react-router-dom'
@@ -555,6 +559,23 @@ import {BrowserRouter as Router} from "react-router-dom";
   <App />
 </BrowserRouter>
 ```
+
+###### history的特点
+
+对于 `history` 来说，主要有以下特点：
+
+- 新的 `url` 可以是与当前 `url` 同源的任意 `url` ，也可以是与当前 `url` 一样的地址，但是这样会导致的一个问题是，会把**重复的这一次操作**记录到栈当中。
+- 通过 `history.state` ，添加任意类型的数据到记录中。
+- 可以额外设置 `title` 属性，以便后续使用。
+- 通过 `pushState` 、 `replaceState` 来实现无刷新跳转的功能。
+
+###### 存在问题
+
+对于 `history` 来说，确实解决了不少 `hash` 存在的问题，但是也带来了新的问题。**具体如下：**
+
+- 使用 `history` 模式时，在对当前的页面进行刷新时，此时浏览器会重新发起请求。如果 `nginx` 没有匹配得到当前的 `url` ，就会出现 `404` 的页面。
+- 而对于 `hash` 模式来说，  它虽然看着是改变了 `url` ，但不会被包括在 `http` 请求中。所以，它算是被用来指导浏览器的动作，并不影响服务器端。因此，改变 `hash` 并没有真正地改变 `url` ，所以页面路径还是之前的路径， `nginx` 也就不会拦截。
+- 因此，在使用 `history` 模式时，需要**通过服务端来允许地址可访问**，如果没有设置，就很容易导致出现 `404` 的局面。
 
 ###### basename：string
 
@@ -613,9 +634,18 @@ location.key的长度，默认为6。
 
 ##### HashRouter
 
+`hash` 永远不会提交到 `server` 端（可以理解为只在前端自生自灭）。
+
 Hash history 使用 URL 中的 hash（`#`）部分去创建形如 `example.com/#/some/path` 的路由。
 
 Hash history 不支持 `location.key` or `location.state`，但它的兼容性更好，不需要配置服务器，通常适用于老版本的浏览器。
+
+###### hash的特点
+
+- hash变化会触发网页跳转，即浏览器的前进和后退。
+- `hash` 可以改变 `url` ，但是不会触发页面重新加载（hash的改变是记录在 `window.history` 中），即不会刷新页面。也就是说，所有页面的跳转都是在客户端进行操作。因此，这并不算是一次 `http` 请求，所以这种模式不利于 `SEO` 优化。`hash` 只能修改 `#` 后面的部分，所以只能跳转到与当前 `url` 同文档的 `url` 。
+- `hash` 通过 `window.onhashchange` 的方式，来监听 `hash` 的改变，借此实现无刷新跳转的功能。
+- `hash` 永远不会提交到 `server` 端（可以理解为只在前端自生自灭）。
 
 ###### basename：string
 

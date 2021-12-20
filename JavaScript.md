@@ -1484,6 +1484,31 @@ new Promise((resolve, reject) => {
 
 catch内的回调函数接受前一个promise reject的值作为参数。返回一个新的 promise。
 
+**如果 Promise 状态已经变成resolved，再抛出错误是无效的。**
+
+```js
+const promise = new Promise(function(resolve, reject) {
+  resolve('ok');
+  console.log(111)
+  throw new Error('test');  //会被忽略，不会被捕获，等于没有抛出
+});
+promise
+  .then(res => { console.log(res) })
+  .catch(e => { console.log(e) });
+// 打印 111
+// 打印 ok ，但不会打印错误
+catch是从pending到reject的状态改变，但是一个promise一旦resolve以后，状态就凝固了，无法再发生变化，因此会被忽略。
+```
+
+**catch的捕获异常**
+
+不能捕获异步操作中产生的异常（`Promise.then`/`setTimeout`都是典型的异步操作）：
+
+- 在非async函数中的try-catch
+- Promise.catch`Promise`的`catch`会在`resolve`被调用之前的`throw`的`Error`对象，或者`reject`被调用后触发。
+
+`Promise`的`catch`只会捕获到自身链式中的错误，不能捕获then等内部的其他promise的错误。
+
 **Promise 静态方法**
 
 ##### Promise.resolve() 
@@ -2592,6 +2617,47 @@ result.value.then(function(data){
 上面代码中，首先执行 Generator 函数，获取遍历器对象，然后使用`next`方法（第二行），执行异步任务的第一阶段。由于`Fetch`模块返回的是一个 Promise 对象，因此要用`then`方法调用下一个`next`方法。
 
 可以看到，虽然 Generator 函数将异步操作表示得很简洁，但是流程管理却不方便（即何时执行第一阶段、何时执行第二阶段）。
+
+#### 原生js获取元素的各种位置
+
+##### 加给元素：
+
+- offsetLeft （距离**定位**父级的距离）
+- offsetTop （距离**定位**父级的距离）
+- offsetWidth （可视宽度）
+- offsetHeight （可视高度）
+- clientLeft （左边框宽度）
+- clientTop （上边框宽度）
+- clientWidth（width + padding）
+- clientHeight（height + padding）
+- scrollTop（纵向滚动距离）
+- scrollLeft（横向滚动距离）
+- scrollWidth（内容宽度）
+- scrollHeight（内容高度）
+
+##### 子元素相对父容器的高度（父元素无需定位）
+
+child.getBoundingClientRect().top - parent.getBoundingClientRect().top
+
+##### getBoundingClientRect ( ) 返回值：对象 有6个属性
+
+- left（元素左侧相对于可视区左上角的距离）
+- right（元素右侧相对于可视区左上角的距离）
+- top（元素上边相对于可视区左上角的距离）
+- bottom（元素下边相对于可视区左上角的距离）
+- width（可视宽度）
+- height（可视高度）
+
+##### 获取可视区宽高：
+
+- window.innerWidth
+- window.innerHeight
+- document.documentElement.clientWidth
+- document.documentElement.clientHeight
+
+##### 屏幕宽高：
+
+- window.screen.width
 
 #### try-catch-finally
 
@@ -4032,6 +4098,108 @@ a.index++;
 一般对于基本类型number、string、boolean、null、undefined的输出是可信的。但对于Object等引用类型来说，则就会出现上述异常打印输出。
 
 在Node环境中，console.*方法是严格同步的，不会出现上述Object等引用类型异常打印输出的情况。
+
+#### hash和history
+
+##### Hash模式
+
+###### 1、定义
+
+`hash` 模式是一种把前端路由的路径用井号 `#` 拼接在真实 `url` 后面的模式。当井号 `#` 后面的路径发生变化时，浏览器并不会重新发起请求，而是会触发 `onhashchange` 事件。
+
+###### 2、网页url组成部分
+
+（1）了解几个url的属性
+
+| 属性               | 含义     |
+| ------------------ | -------- |
+| location.protocal  | 协议     |
+| location.hostname  | 主机名   |
+| location.host      | 主机     |
+| location.port      | 端口号   |
+| location.patchname | 访问页面 |
+| location.search    | 搜索内容 |
+| location.hash      | 哈希值   |
+
+（2）演示
+
+**下面用一个网址来演示以上属性：**
+
+```js
+//http://127.0.0.1:8001/01-hash.html?a=100&b=20#/aaa/bbb
+location.protocal // 'http:'
+localtion.hostname // '127.0.0.1'
+location.host // '127.0.0.1:8001'
+location.port //8001
+location.pathname //'01-hash.html'
+location.serach // '?a=100&b=20'
+location.hash // '#/aaa/bbb'
+```
+
+###### 3、hash的特点
+
+- hash变化会触发网页跳转，即浏览器的前进和后退。
+- `hash` 可以改变 `url` ，但是不会触发页面重新加载（hash的改变是记录在 `window.history` 中），即不会刷新页面。也就是说，所有页面的跳转都是在客户端进行操作。因此，这并不算是一次 `http` 请求，所以这种模式不利于 `SEO` 优化。`hash` 只能修改 `#` 后面的部分，所以只能跳转到与当前 `url` 同文档的 `url` 。
+- `hash` 通过 `window.onhashchange` 的方式，来监听 `hash` 的改变，借此实现无刷新跳转的功能。
+- `hash` 永远不会提交到 `server` 端（可以理解为只在前端自生自灭）。
+
+##### History模式
+
+###### 1、定义
+
+`history API` 是 `H5` 提供的新特性，允许开发者**直接更改前端路由**，即更新浏览器 `URL` 地址而**不重新发起请求**。
+
+###### 2、与hash的区别
+
+我们用一个例子来演示， `hash` 与 `history` 在浏览器下刷新时的区别。**具体如下：**
+
+**正常页面浏览**
+
+```bash
+https://github.com/xxx 刷新页面
+
+https://github.com/xxx/yyy 刷新页面
+
+https://github.com/xxx/yyy/zzz 刷新页面
+```
+
+**改造H5 history模式**
+
+```bash
+https://github.com/xxx 刷新页面
+
+https://github.com/xxx/yyy 前端跳转，不刷新页面
+
+https://github.com/xxx/yyy/zzz 前端跳转，不刷新页面
+```
+
+###### 3、history的API
+
+下面阐述几种 `HTML5` 新增的 `history API` 。**具体如下表：**
+
+| API                                       | 定义                                                         |
+| ----------------------------------------- | ------------------------------------------------------------ |
+| history.pushState(data, title [, url])    | pushState主要用于**往历史记录堆栈顶部添加一条记录**。各参数解析如下：**①data**会在onpopstate事件触发时作为参数传递过去；**②title**为页面标题，当前所有浏览器都会忽略此参数；③**url**为页面地址，可选，缺少时表示为当前页地址 |
+| history.replaceState(data, title [, url]) | 更改当前的历史记录，参数同上； 上面的pushState是添加，这个更改 |
+| history.state                             | 用于存储以上方法的data数据，不同浏览器的读写权限不一样       |
+| window.onpopstate                         | 响应pushState或者replaceState的调用                          |
+
+###### 4、history的特点
+
+对于 `history` 来说，主要有以下特点：
+
+- 新的 `url` 可以是与当前 `url` 同源的任意 `url` ，也可以是与当前 `url` 一样的地址，但是这样会导致的一个问题是，会把**重复的这一次操作**记录到栈当中。
+- 通过 `history.state` ，添加任意类型的数据到记录中。
+- 可以额外设置 `title` 属性，以便后续使用。
+- 通过 `pushState` 、 `replaceState` 来实现无刷新跳转的功能。
+
+###### 5、存在问题
+
+对于 `history` 来说，确实解决了不少 `hash` 存在的问题，但是也带来了新的问题。**具体如下：**
+
+- 使用 `history` 模式时，在对当前的页面进行刷新时，此时浏览器会重新发起请求。如果 `nginx` 没有匹配得到当前的 `url` ，就会出现 `404` 的页面。
+- 而对于 `hash` 模式来说，  它虽然看着是改变了 `url` ，但不会被包括在 `http` 请求中。所以，它算是被用来指导浏览器的动作，并不影响服务器端。因此，改变 `hash` 并没有真正地改变 `url` ，所以页面路径还是之前的路径， `nginx` 也就不会拦截。
+- 因此，在使用 `history` 模式时，需要**通过服务端来允许地址可访问**，如果没有设置，就很容易导致出现 `404` 的局面。
 
 #### 防抖和节流
 

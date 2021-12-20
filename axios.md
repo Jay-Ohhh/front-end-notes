@@ -39,7 +39,7 @@
     }
 ```
 
-如果get请求需要添加Content-Type，可以
+##### get、delete请求添加Content-Type
 
 ```js
 var $http
@@ -59,6 +59,26 @@ $http.interceptors.request.use(function (config) {
   return Promise.reject(error);
 });
 ```
+
+##### get、delete请求添加body传参
+
+**axios 0.22.0 版本以下的**
+
+```js
+axios.delete("/xxx/xxx/delete", {data:ids})
+```
+
+**axios 0.22.0 版本以上的**
+
+```js
+axios.request({
+        url:"/xxx/xxx/delete",
+        method:"delete",
+        data:ids
+      })
+```
+
+**axios 0.22.0的版本在delete方法中，在config中配置data属性并不能上传payload数据，可采用axios.request()方法替代**
 
 #### post请求、put请求
 

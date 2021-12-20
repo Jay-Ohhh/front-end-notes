@@ -6265,7 +6265,7 @@ tsc index.ts --allowJs
     "forceConsistentCasingInFileNames": true,
     "isolatedModules": true,
     "noEmit": true,
-    "noFallthroughCasesInSwitch": true,
+    "noFallthroughCasesInSwitch": true, /* 用于检查switch中是否有case没有使用break跳出switch，默认为false */
     "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"],

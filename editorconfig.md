@@ -69,5 +69,9 @@ trim_trailing_whitespace = false
 
 [*.{html,css,less,scss,json}]       # 对所有 html,css,less,scss,json 文件生效
 quote_type = double                 # 字符串使用双引号
+
+# Makefile文件中要用tab缩进，这个确实是历史遗留问题，用空格缩进会出错。
+[Makefile]
+indent_style = tab
 ```
 
