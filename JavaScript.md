@@ -4201,101 +4201,26 @@ https://github.com/xxx/yyy/zzz 前端跳转，不刷新页面
 - 而对于 `hash` 模式来说，  它虽然看着是改变了 `url` ，但不会被包括在 `http` 请求中。所以，它算是被用来指导浏览器的动作，并不影响服务器端。因此，改变 `hash` 并没有真正地改变 `url` ，所以页面路径还是之前的路径， `nginx` 也就不会拦截。
 - 因此，在使用 `history` 模式时，需要**通过服务端来允许地址可访问**，如果没有设置，就很容易导致出现 `404` 的局面。
 
-#### 防抖和节流
+#### Server-Sent Events
 
-##### 防抖 debounce
+http://www.ruanyifeng.com/blog/2017/05/server-sent_events.html
 
-规定时间内多次触发事件，只执行最后一次。
+##### SSE 的特点
 
-适用场景：
+SSE 与 WebSocket 作用相似，都是建立浏览器与服务器之间的通信渠道，然后服务器向浏览器推送信息。
 
-- 按钮提交场景：防止多次点击提交
-- 输入框：当输入最后一个字符才触发
+总体来说，WebSocket 更强大和灵活。因为它是全双工通道，可以双向通信；SSE 是单向通道，只能服务器向浏览器发送，因为流信息本质上就是下载。如果浏览器向服务器发送信息，就变成了另一次 HTTP 请求。
 
-```js
-// 有时希望立刻执行函数，然后等到停止触发 n 秒后，才可以重新触发执行。
-// immediate是否立即执行
-function debounce(func, wait, immediate) {
-  let timeout;
-  return function () {
-    const context = this;
-    const args = arguments;
-    if (timeout) clearTimeout(timeout);
-    if (immediate) {
-      const callNow = !timeout;
-      timeout = setTimeout(function () {
-        timeout = null;
-      }, wait)
-      if (callNow) func.apply(context, args)
-    } else {
-      timeout = setTimeout(function () {
-        func.apply(context, args)
-      }, wait);
-    }
-  }
-}
-```
+但是，SSE 也有自己的优点。
 
-##### 节流 throttle
+> - SSE 使用 HTTP 协议，现有的服务器软件都支持。WebSocket 是一个独立协议。
+> - SSE 属于轻量级，使用简单；WebSocket 协议相对复杂。
+> - SSE 默认支持断线重连，WebSocket 需要自己实现。
+> - SSE 一般只用来传送文本，二进制数据需要编码后传送，WebSocket 默认支持传送二进制数据。
+> - SSE 支持自定义发送的消息类型。
+> - SSE IE浏览器不支持。
 
-规定时间内多次触发事件，只执行一次。
 
-适用场景：
-
-- 拖拽场景
-- 缩放场景resize
-
-```js
-function throttle(func, wait) {
-  let timeout;
-  return function () {
-    const context = this;
-    const args = arguments;
-    if (!timeout) {
-      timeout = setTimeout(function () {
-        timeout = null;
-        func.apply(context, args)
-      }, wait)
-    }
-  }
-}
-```
-
-#### 手写发布订阅
-
-```js
-// 发布订阅中心, on-订阅, off取消订阅, emit发布, 内部需要一个单独事件中心caches进行存储;
-
-interface CacheProps {
-  [key: string]: Array<(data?: unknown) => void>
-}
-
-class Observer {
-  private caches: CacheProps = {} // 事件中心
-
-  on(eventName: string, fn: (data?: unknown) => void) {
-    // eventName事件名-独一无二, fn是订阅后执行的自定义行为
-    this.caches[eventName] = this.caches[eventName] || []
-    this.caches[eventName].push(fn)
-  }
-
-  emit(eventName: string, data?: unknown) {
-    // 发布 => 将订阅的事件进行统一执行
-    if (this.caches[eventName]) {
-      this.caches[eventName].forEach((fn: (data?: unknown) => void) => fn(data))
-    }
-  }
-
-  off(eventName: string, fn?: (data?: unknown) => void) {
-    // 取消订阅 => 若fn不传, 直接取消该事件所有订阅信息
-    if (this.caches[eventName]) {
-      const newCaches = fn ? this.caches[eventName].filter(e => e !== fn) : []
-      this.caches[eventName] = newCaches
-    }
-  }
-}
-
-```
 
 #### 模块化规范
 

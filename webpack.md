@@ -370,3 +370,44 @@ https://webpack.docschina.org/concepts/manifest/#root
 gulp强调的是前端开发的工作流程，我们可以通过配置一系列的task，定义task处理的事务（例如文件压缩合并、雪碧图、启动server、版本控制等），然后定义执行顺序，来让gulp执行这些task，从而构建项目的整个前端开发流程。
 
 webpack是一个前端模块化方案，更侧重模块打包，我们可以把开发中的所有资源（图片、js文件、css文件等）都看成模块，通过loader（加载器）和plugins（插件）对资源进行处理，打包成符合生产环境部署的前端资源。
+
+#### 常用功能代码
+
+##### 动态生成 entry
+
+```js
+const HtmlWebpackPlugin = require('html-webpack-plugin')
+const path = require('path')
+const glob = require('glob')
+
+// 动态生成 entry 和 html-webpack-plugin
+function getMpa() {
+  const entry = {}, htmlPlugins = []
+  const files = glob.sync('src/*/index.js')
+  files.forEach((file) => {
+    const filename = file.split('/')[1]
+    entry[filename] = path.join(__dirname, file)
+    htmlPlugins.push(
+      new HtmlWebpackPlugin({
+        template: path.join(__dirname, `src/${filename}/index.html`),
+        filename: `${filename}.html`,
+        chunks: [filename],
+      })
+    )
+  })
+  return { entry, htmlPlugins }
+}
+const mpa = getMpa()
+
+// 动态的配置文件
+module.exports = {
+  entry: mpa.entry,
+  output: {
+    path: path.join(__dirname, 'dist'),
+    filename: '[name]-[hash:6].js',
+  },
+  plugins: [...mpa.htmlPlugins],
+}
+
+```
+

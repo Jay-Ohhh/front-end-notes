@@ -4726,7 +4726,7 @@ function s({ a }: E) {}
 
 - 把类型当作参数传递
 
-泛型可跟在函数名、类名、接口名、类型别名 的后面，对象的前面。
+泛型可跟在函数名、类名、接口名、类型别名 的后面，数组、对象的前面。
 
 **简单的例子**
 
@@ -5876,6 +5876,10 @@ if(a?.b){ }
 
 与逻辑或 `||` 运算符不同，逻辑或会在左操作数为 falsy 值时返回右侧操作数。
 
+```ts
+ a ?? false // 可以用来排除a 是 null 或 undefined
+```
+
 ##### ! 非空断言操作符 
 
 在上下文中当类型检查器无法断定类型时，一个新的后缀表达式操作符 `!` 可以用于断言操作对象是非 null 和非undefined 类型。**具体而言，`x!` 将从 x 值域中排除 `null` 和 `undefined` 。**
@@ -6266,6 +6270,7 @@ tsc index.ts --allowJs
     "isolatedModules": true,
     "noEmit": true,
     "noFallthroughCasesInSwitch": true, /* 用于检查switch中是否有case没有使用break跳出switch，默认为false */
+    "noImplicitAny": false,   /* noImplicitAny的值为false时，如果我们没有为一些值设置明确的类型，编译器会默认认为这个值为any，如果noImplicitAny的值为true的话。则没有明确的类型会报错。默认值为false */
     "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"],

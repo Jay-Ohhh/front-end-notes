@@ -47,7 +47,28 @@ files:["package.json","src"]
 
 #### npm package.json 详解
 
+https://juejin.cn/post/6987179395714646024#heading-5
+
 https://docs.npmjs.com/cli/v7/configuring-npm/package-json  
+
+##### bin字段
+
+`bin`项用来指定每个内部命令对应的可执行文件的位置。如果你编写的是一个node工具的时候一定会用到`bin`字段。
+
+当我们编写一个`cli`工具的时候，需要指定工具的运行命令，比如常用的`webpack`模块，他的运行命令就是`webpack`。
+
+```json
+"bin": {
+  "webpack": "bin/index.js",
+}
+复制代码
+```
+
+当我们执行`webpack`命令的时候就会执行`bin/index.js`文件中的代码。
+
+在模块以依赖的方式被安装，如果存在`bin`选项。在`node_modules/.bin/`生成对应的文件， `Npm`会寻找这个文件，在node_modules/.bin/目录下建立符号链接。由于node_modules/.bin/目录会在运行时加入系统的PATH变量，因此在运行npm时，就可以不带路径，直接通过命令来调用这些脚本。
+
+所有node_modules/.bin/目录下的命令，都可以用npm run [命令]的格式运行。在命令行下，键入npm run，然后按tab键，就会显示所有可以使用的命令。
 
 #### npm link
 
@@ -101,3 +122,70 @@ npm unlink common
 ```
 
 这样本地的`common`包模块就解除了，其他项目的软连接也失效了。
+
+#### npm version 更新版本
+
+方式一：修改版本号：使用 `npm version <update_type>` 进行修改，`update_type` 有三个参数
+
+- patch：这个是补丁的意思，补丁最合适；
+- minor：这个是小修小改；
+- major：这个是大改咯；
+
+> 比如我想来个1.0.1版本，注意，是最后一位修改了增1，那么命令：npm version patch
+> 比如我想来个1.1.0版本，注意，是第二位修改了增1，那么命令： npm version minor
+> 比如我想来个2.0.0版本，注意，是第一位修改了增1，那么命令： npm version major
+
+方式二：修改 package.json 的 version。
+
+#### npm 工具
+
+##### nrm
+
+nrm 是一个 npm 源管理器,允许你快速地在 npm源间切换
+
+##### nodemon
+
+nodemon实时监听文件的变更，自动重启node服务
+
+##### pm2
+
+PM2是一个带有负载均衡功能的 Node 应用进程管理器。
+
+##### serve
+
+```sh
+npm install serve -g
+serve folder_name
+```
+
+默认获取 folder_name/index.html
+
+##### tree
+
+```bash
+cd 目标文件夹路径
+```
+
+然后 tree 一下
+
+```undefined
+tree
+```
+
+选项
+
+| 选项       | 含义                                                   |
+| ---------- | ------------------------------------------------------ |
+| -a         | 显示所有文件和目录                                     |
+| -d         | 只显示目录名称，不显示文件                             |
+| -D         | 列出文件或目录的更改时间                               |
+| -L num     | 显示num层目录结构，深度大禹num层的目录和文件将不会显示 |
+| - I        | 过滤文件或文件夹                                       |
+| - e '文件' | 输出到某文件                                           |
+
+tree -I pattern 用于过滤不想要显示的文件或者文件夹。比如要过滤项目中的node_modules文件夹：
+
+```
+tree -I “node_modules”
+```
+

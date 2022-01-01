@@ -226,6 +226,29 @@ export default () => {
 }
 ```
 
+##### CSS Module解决全局或本地使用@keyframes无效问题
+
+原因：@keyframes 名称也被编译了，这样就获取不到 @keyframes 的名称了。
+
+结局：在调用@keyframes的元素后面添加 :local 就行了
+
+```css
+:global {
+  .foo :local {
+    animation: spin 0.5s linear infinite;
+  }   
+}
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+```
+
 #### 常见问题
 
 ##### 父元素宽度由子元素宽度决定
@@ -335,4 +358,12 @@ vertical-align: top; // 设置成顶部对齐，默认是底部对齐
 | ::-webkit-scrollbar-track-piece | 滚动条没有滑块的轨道部分                                |
 | ::-webkit-scrollbar-corner      | 当同时有垂直滚动条和水平滚动条时交汇的部分              |
 | ::-webkit-resizer               | 某些元素的corner部分的部分样式(例:textarea的可拖动按钮) |
+
+##### 移动端避免使用100vh
+
+移动端浏览器的地址栏有时可见有时不可见。
+
+ 这些浏览器没有将`100vh`高度调整为视口高度变化时屏幕的可见部分，而是将`100vh`设置为浏览器的高度。这就导致地址栏可见时，设置的100vh的元素的高度比屏幕的可见部分高度要大，出现滚动条。
+
+解决方案：window.innerHeight。
 

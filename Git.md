@@ -913,6 +913,27 @@ https://zhuanlan.zhihu.com/p/87603185
 - 提交pr
   去自己github仓库对应fork的项目下new pull request
 
+**pr之后自动关闭相应的issue**
+
+Github提供了自动关联功能，commit提交代码时只需要在注释中包含issue编号，#issue_id
+
+关闭相应的issue：在commit 的最后加上
+
+- `fixes #xxx`
+- `fixed #xxx`
+- `fix #xxx`
+- `closes #xxx`
+- `close #xxx`
+- `closed #xxx`
+
+**pr之后自动删除 remote 分支**
+
+拥有仓库管理员权限的用户可以配置 PR 合并后自动删除相应的分支。
+
+1. 打开仓库主页面
+2. 打开 **Settings**
+3. 在 **Merge button** 下面，勾选 **Automatically delete head branches**
+
 #### git远程操作
 
 https://www.ruanyifeng.com/blog/2014/06/git_remote.html
@@ -1028,35 +1049,66 @@ https://www.cnblogs.com/feiquan/p/11538433.html
 
 在.ssh文件下新建并配置config 文件：
 
+工作中常见的使用就是把公钥配置到Github/Gitee/Coding/华为云等网站, 通过ssh来管理托管在这些平台上的项目和代码。
+
 主要配置项说明：
+
+https://www.ssh.com/academy/ssh/config
+
+https://www.lainme.com/doku.php/blog/2011/02/%E4%BD%BF%E7%94%A8ssh_config
 
 ```
 Host    　　主机别名
 HostName　　服务器真实地址
 IdentityFile　　私钥文件路径
-PreferredAuthentications　　认证方式
+PreferredAuthentications　　认证方式  // publickey | password
 User　　用户名
 ```
 
+注意，github的Host必须写成“github.com”。你可以会有其他要求，比如指定端口号、绑定本地端口，这些都可以通过man来查询，比如
+
 ```
-Host XXXX                    // 例如 git@saasdev.fastlion.cn
+Port 端口号
+DynamicForward 本地端口号
+```
 
-HostName XXXX(github).com    // 例如 git@saasdev.fastlion.cn
-
+```
+Host XXXX                    // 例如 git@saasdev.fastlion.cn 或 github.com
+HostName XXXX.com    // 例如 git@saasdev.fastlion.cn 或 github.com
 PreferredAuthentications publickey
-
 IdentityFile ~/.ssh/id_rsa_github
 
 Host XXXX
-
-hostName XXX(gitlab).com
-
+hostName XXX.com
 PreferredAuthentications publickey
-
 IdentityFile ~/.ssh/id_rsa_gitlab
 ```
 
- 
+ 当前我的配置
+
+```
+#Default gitee user Self
+Host gitee.com
+HostName gitee.com
+PreferredAuthentications publickey
+IdentityFile ~/.ssh/id_rsagitee
+User git
+
+
+#Add gitlabOfCompany user
+Host git@saasdev.fastlion.cn
+HostName git@saasdev.fastlion.cn
+PreferredAuthentications publickey
+IdentityFile ~/.ssh/id_rsagitlab
+User git
+
+#Add github user Self
+Host github.com
+HostName github.com
+PreferredAuthentications publickey
+IdentityFile ~/.ssh/id_rsagithub
+User git
+```
 
 添加密钥到ssh：
 
@@ -1066,10 +1118,19 @@ ssh-agent 是用来控制保存公钥身份证所使用的私钥的程序，其�
 
 ```sh
 ssh-agent bash
+
 // 此处add后边是id_rsa_gitlab的绝对路径，~/ 代表前登录用户的用户目录
 // ~/.ssh/id_rsa_gitlab无效的话，可以直接跟绝对路径，例如：C:\\Users\\honor\\.ssh\\id_rsagitee
+
 ssh-add ~/.ssh/id_rsa_gitlab
-ssh -T 地址 // 测试是否连上，例如：ssh -T git@saasdev.fastlion.cn
+
+ssh -T 地址 // 测试是否连上
+// 例如：
+// ssh -T git@github.com
+// ssh -T git@gitee.com
+// ssh -T git@saasdev.fastlion.cn 
+// github的时候，如果user 不是 git，则ssh -T时需要在github.com前加上git@，即
+// ssh -T git@github.com
 ```
 
 > 如果仓库是公司内网的话，需要通过公司提供的VPN连上内网，ssh-add和 ssh -T 才能添加成功
@@ -1078,7 +1139,66 @@ ssh -T 地址 // 测试是否连上，例如：ssh -T git@saasdev.fastlion.cn
 
 https://cli.vuejs.org/zh/guide/deployment.html#github-pages
 
-#### husky
+#### 提交规范(Angular)
+
+使用VSCode插件 git-commit-plugin
+
+https://marketplace.visualstudio.com/items?itemName=redjue.git-commit-plugin
+
+**Format**
+
+This extension follows the [Angular Team Commit Specification](https://github.com/angular/angular.js/blob/master/DEVELOPERS.md#-git-commit-guidelines), as follows:
+
+```
+<type>(<scope>): <subject>
+<BLANK LINE>
+<body>
+<BLANK LINE>
+<footer>
+```
+
+See info on the fields below.
+
+**Type**
+
+Must be one of the following:
+
+| Type         | Description                                                  |
+| ------------ | ------------------------------------------------------------ |
+| **feat**     | A new feature                                                |
+| **fix**      | A bug fix                                                    |
+| **docs**     | Documentation only changes                                   |
+| **style**:   | Changes that do not affect the meaning of the code (white-space, formatting, missing semi-colons, etc) |
+| **refactor** | A code change that neither fixes a bug nor adds a feature    |
+| **perf**     | A code change that improves performance                      |
+| **test**     | Adding missing or correcting existing tests                  |
+| **chore**    | Changes to the build process or auxiliary tools and libraries such as documentation generation |
+
+**Scope**
+
+The scope could be anything specifying place of the commit change. For example `$location`, `$browser`, `$compile`, `$rootScope`, `ngHref`, `ngClick`, `ngView`, etc...
+
+You can use `*` when the change affects more than a single scope.
+
+**Subject**
+
+The subject contains succinct description of the change:
+
+- use the imperative, present tense: "change" not "changed" nor "changes"
+- don't capitalize first letter
+- no dot (`.`) at the end
+
+**Body**
+
+Just as in the **subject**, use the imperative, present tense: "change" not "changed" nor "changes". The body should include the motivation for the change and contrast this with previous behavior.
+
+**Footer**
+
+The footer should contain any information about **Breaking Changes** and is also the place to [reference GitHub issues that this commit closes](https://help.github.com/articles/closing-issues-via-commit-messages/).
+
+**Breaking Changes** should start with the word `BREAKING CHANGE:` with a space or two newlines. The rest of the commit message is then used for this.
+
+A detailed explanation can be found in this [document](https://docs.google.com/document/d/1QrDFcIiPjSLDn3EL15IJygNPiHORgU1_OOAqWjiDU5Y/edit#).
 
 #### 常见问题
 
@@ -1087,3 +1207,18 @@ https://cli.vuejs.org/zh/guide/deployment.html#github-pages
 出现这个问题的最主要原因还是在于本地仓库和远程仓库实际上是独立的两个仓库。
 
 解决：在git pull 或 git merge 命令后加上--allow-unrelated-histories
+
+##### .gitignore无效
+
+`.gitignore` 只对**未跟踪的文件**起作用
+
+> 已跟踪的文件是指那些被纳入了版本控制的文件，在上一次提交中有它们的记录。
+
+解决：
+
+例如我想让已经被跟踪的 yarn.lock 被 git 忽略，但还想保存在本地，gitigonore 加上 yarn.lock
+
+- 先把本地的 yarn.lock 剪切到项目以外的目录（相当于删除了该文件），然后提交到远程仓库
+- 其他协作者 git pull，也会删除掉 yarn.lock
+- 然后把 yarn.lock 拷贝回本项目
+

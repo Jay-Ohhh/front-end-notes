@@ -13,7 +13,8 @@ npm install create-react-app -g
 npx来自npm5.2+或更高版本
 
 ```sh
-npx create-react-app my-app
+# npx命令始终使用最新版本
+npx create-react-app my-app 
 cd my-app
 npm start
 ```
@@ -681,23 +682,27 @@ class Button extends Component {
 
 ##### 添加Sass样式表
 
-要使用Sass，首先安装 `node-sass` ：
+要使用Sass，首先安装 `sass` ：
+
+**LibSass已被弃用（包括node-sass）**
 
 ```bash
-$ npm install node-sass --save
+$ npm install sass
+# 或者
+$ yarn add sass
 ```
 
 > sass-loader已在脚手架集成，不需额外下载
 
 现在你可以将 `src/App.css` 重命名为 `src/App.scss` 并更新 `src/App.js` 以导入 `src/App.scss` 。 此文件和任何其他文件将会自动编译，如果使用扩展名 `.scss` 或 `.sass` 导入的话。
 
-要在 Sass 文件之间共享变量，可以使用 Sass 导入。 例如，`src/App.scss` 和其他组件样式文件可能包含 `@import "./shared.scss";` 中定义的变量。
+要在 Sass 文件间共享变量，可以使用 Sass [`@use` 指令](https://sass-lang.com/documentation/at-rules/use)。例如，`src/App.scss` 和其他组件样式文件可以通过 `@use "./shared.scss";` 引入定义的变量。
 
 App.scss 文件允许你像这样导入：
 
 ```scss
-@import 'styles/_colors.scss'; // 假设 styles 目录 在 src/ 目录下
-@import '~antd/dist/antd.less'; // 从模块导入 一个 less 文件到 App.less
+@use 'styles/_colors.scss'; // 假设 styles 目录 在 src/ 目录下
+@use '~antd/dist/antd.less'; // 从模块导入 一个 less 文件到 App.less
 ```
 
 > **注意：** 你必须在 `node_modules` 之前添加 `~` 前缀，如上所示。
@@ -1346,6 +1351,8 @@ Create React App 使用 `homepage` 字段确定构建的 HTML 文件中的根 UR
 Create React App 使用 `homepage` 字段确定构建的 HTML 文件中的根 URL 。
 
 **第2步：安装 `gh-pages` 并将 `deploy` 添加到 `package.json` 的 `scripts` 中**
+
+**关联远程项目时需要使用SSH而不是HTTPS的github项目地址，否则推送不上去。**
 
 现在，无论何时运行 `npm run build` ，你都会看到一个备忘单，其中包含有关如何部署到 GitHub 页面的说明。
 
