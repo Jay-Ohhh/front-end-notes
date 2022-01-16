@@ -2109,6 +2109,8 @@ ReactDOM.render(<App />, document.getElementById('root'));
 
 ##### 集中式路由配置（JS对象）
 
+**还可以使用 react-router-config 这个库**。
+
 route 定义的一个普通的 JavaScript 对象。 `Router` 把 JSX 的 `<Route>` 转化到这个对象中。 所有的 props 都和 `<Route>` 的 props 一样，除了以下属性。
 
 示例：
@@ -2892,3 +2894,6 @@ const App:React.FC<Iprops> = props => {
 export default withRouter(App)
 ```
 
+#### 路由菜单实践
+
+https://mp.weixin.qq.com/s/wYpX9eLRR0WWHwbD_XHxBw

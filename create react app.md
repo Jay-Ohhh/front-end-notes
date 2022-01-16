@@ -24,17 +24,21 @@ npm start
 使用 [TypeScript](https://www.typescriptlang.org/) 创建新的 Create React App 项目，你可以运行：
 
 ```bash
-$ npx create-react-app my-app --typescript
-$ # 或者
-$ yarn create react-app my-app --typescript
+npx create-react-app my-app --template typescript
+
+# or
+
+yarn create react-app my-app --template typescript
 ```
 
 将 [TypeScript](https://www.typescriptlang.org/) 添加到 Create React App 项目：
 
 ```bash
-$ npm install --save typescript @types/node @types/react @types/react-dom @types/jest
-$ # 或者
-$ yarn add typescript @types/node @types/react @types/react-dom @types/jest
+npm install -D typescript @types/node @types/react @types/react-dom @types/jest
+
+# or
+
+yarn add -D typescript @types/node @types/react @types/react-dom @types/jest 
 ```
 
 ##### 文件架构
@@ -48,7 +52,8 @@ my-app
 ├── public
 │   ├── favicon.ico
 │   ├── index.html
-│   └── manifest.json
+│   ├── manifest.json
+│   └── robots.txt
 └── src
     ├── App.css
     ├── App.js
@@ -56,7 +61,8 @@ my-app
     ├── index.css
     ├── index.js
     ├── logo.svg
-    └── serviceWorker.js
+    ├── serviceWorker.js
+    └── setupTests.js
 ```
 
 对于要构建的项目，这些文件必须以确切的文件名存在：
@@ -87,6 +93,12 @@ serviceWorker.js 用于移动端web开发，可以使你的react项目变成一�
 react-app-env.d.ts是全局变量的声明文件，常用于react、react-dom的一些API类型声明，图片、样式模块类型声明等等。
 
 > 在全局变量的声明文件中，最外层是不允许出现 `import`, `export` 关键字的。一旦出现了，那么他就会被视为一个 npm 包或 UMD 库，就不再是全局变量的声明文件了。故当我们在书写一个全局变量的声明文件时，如果需要引用另一个库的类型，那么就必须用三斜线指令了。
+
+**robots.txt**
+
+`robots.txt`文件是一个提供给搜索引擎蜘蛛读取并遵循严格的语法内容所组成的文本文件，也称为“机器人排除协议”，它不是任何组织制定的官方标准，但是所有主流的搜索引擎都遵循它的规则。
+
+它是告诉搜索引擎蜘蛛，该网站哪些内容是可以抓取，哪些内容是禁止抓取的的方法之一。 它是一个纯文本文件，存放在站点根目录下。它的设置虽然很简单，但是作用却非常强大，因此要谨慎设置，不然对你的网站影响很大。
 
 ##### Scripts
 
@@ -508,19 +520,159 @@ module.exports = {
 
 #### 开发
 
-##### 在编辑器中显示 Lint 输出
+##### Extending or replacing the default ESLint config[](https://create-react-app.bootcss.com/docs/setting-up-your-editor/#extending-or-replacing-the-default-eslint-config)
 
-先为编辑器安装 ESLint 插件。 然后，将名为 `.eslintrc.json` 的文件添加到项目根目录：
+You can extend our base ESLint config, or replace it completely if you need.
+
+There are a few things to remember:
+
+1. We highly recommend extending the base config, as removing it could introduce hard-to-find issues.
+2. When working with TypeScript, you'll need to provide an `overrides` object for rules that should *only* target TypeScript files.
+3. It's important to note that any rules that are set to `"error"` will stop the project from building.
+
+In the below example:
+
+- the base config has been extended by a shared ESLint config,
+- a new rule has been set that applies to all JavaScript and TypeScript files, and
+- a new rule has been set that only targets TypeScript files.
+
+> cra内置了eslint-config-react-app，提供了"react-app","react-app/jest"
+>
+> react-app/jest集成了eslint-plugin-jest等eslint插件。
+>
+> 你可以在 [npmjs.com](https://www.npmjs.com/search?q=eslint-config) 搜索 “eslint-config” 使用别人创建好的配置，这里统称为"shared-config"。
+
+**package.json**
 
 ```json
 {
-  "extends": "react-app"
+  "eslintConfig": {
+    "extends": ["react-app","react-app/jest","shared-config"],
+    "rules": {
+      "additional-rule": "warn"
+    },
+    "overrides": [
+      {
+        "files": ["**/*.ts?(x)"],
+        "rules": {
+          "additional-typescript-only-rule": "warn"
+        }
+      }
+    ]
+  }
 }
 ```
 
-请注意，即使你进一步编辑 `.eslintrc.json` 文件，这些更改也 **只会影响编辑器集成**。它们不会影响终端和浏览器中的 lint 输出。这是因为 Create React App 有意提供了一组最常见的错误规则。
+当然也可以在根目录或子目录创建.eslintrc，文件内的extends不要忘了添加 "react-app","react-app/jest" ，除非你想定制自己的规则，但通常是不必要的，因为对于个别规则可以通过rules自动进行覆盖或扩展。
 
-如果要为项目强制执行编码风格，请考虑使用 [Prettier](https://github.com/jlongster/prettier) 而不是 ESLint 样式规则。
+有时，你可能需要更精细的配置，比如，如果同一个目录下的文件需要有不同的配置。因此，你可以在配置中使用 `overrides` 键，它只适用于匹配特定的 glob 模式的文件。
+
+```
+your-project
+├── package.json
+├── .eslintrc
+├── lib
+│ └── source.js
+└─┬ tests
+  ├── .eslintrc
+  └── test.js
+```
+
+**优先级**
+
+.eslintrc > package.json的eslintConfig
+
+对于 `test.js`：tests/.eslintrc > 根目录.eslintrc > package.json的eslintConfig
+
+- 离要检测的文件最近的 `.eslintrc`文件作为最高优先级
+
+
+
+##### Debugging in the Editor
+
+###### Visual Studio Code
+
+You need to have the latest version of [VS Code](https://code.visualstudio.com/) and VS Code [Chrome Debugger Extension](https://marketplace.visualstudio.com/items?itemName=msjsdiag.debugger-for-chrome) installed.
+
+Then add the block below to your `launch.json` file and put it inside the `.vscode` folder in your app’s root directory.
+
+```json
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Chrome",
+      "type": "chrome",
+      "request": "launch",
+      "url": "http://localhost:3000",
+      "webRoot": "${workspaceFolder}/src",
+      "sourceMapPathOverrides": {
+        "webpack:///src/*": "${webRoot}/*"
+      }
+    }
+  ]
+}
+```
+
+Copy
+
+> Note: the URL may be different if you've made adjustments via the [HOST or PORT environment variables](https://create-react-app.bootcss.com/docs/advanced-configuration).
+
+Start your app by running `npm start`, and start debugging in VS Code by pressing `F5` or by clicking the green debug icon. You can now write code, set breakpoints, make changes to the code, and debug your newly modified code—all from your editor.
+
+
+
+##### Formatting Code Automatically
+
+Prettier is an opinionated code formatter with support for JavaScript, CSS and JSON. With Prettier you can format the code you write automatically to ensure a code style within your project. See [Prettier's GitHub page](https://github.com/prettier/prettier) for more information, and look at this [page to see it in action](https://prettier.io/playground/).
+
+To format our code whenever we make a commit in git, we need to install the following dependencies:
+
+```sh
+npm install --save husky lint-staged prettier
+```
+
+Copy
+
+Alternatively you may use `yarn`:
+
+```sh
+yarn add husky lint-staged prettier
+```
+
+Copy
+
+- `husky` makes it possible to use githooks as if they are npm scripts.
+- `lint-staged` allows us to run scripts on staged files in git. See this [blog post about lint-staged to learn more about it](https://medium.com/@okonetchnikov/make-linting-great-again-f3890e1ad6b8).
+- `prettier` is the JavaScript formatter we will run before commits.
+
+Now we can make sure every file is formatted correctly by adding a few lines to the `package.json` in the project root.
+
+Add the following field to the `package.json` section:
+
+```diff
++  "husky": {
++    "hooks": {
++      "pre-commit": "lint-staged"
++    }
++  }
+```
+
+Copy
+
+Next we add a 'lint-staged' field to the `package.json`, for example:
+
+```diff
+  "dependencies": {
+    // ...
+  },
++ "lint-staged": {
++   "src/**/*.{js,jsx,ts,tsx,json,css,scss,md}": [
++     "prettier --write"
++   ]
++ },
+  "scripts": {
+```
 
 ##### 生产环境打包关闭sourceMap
 
@@ -1158,6 +1310,10 @@ runtime~main.[hash].js
 使用 `Cache-Control: max-age=31536000` 用于 `build/static` 资源，而 `Cache-Control: no-cache` 用于其他所有内容是一个安全有效的起点，可确保用户的浏览器始终检查更新的 `index.html` 文件，并将缓存所有 `build/static` 文件一年。请注意，你可以安全地在 `build/static` 上使用一年到期，因为文件内容哈希嵌入到文件名中。
 
 #### [测试](http://www.html.cn/create-react-app/docs/running-tests/)
+
+http://www.html.cn/create-react-app/docs/running-tests/
+
+https://create-react-app.bootcss.com/docs/running-tests
 
 #### 后端集成
 

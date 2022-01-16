@@ -8662,6 +8662,50 @@ React 同时还依赖于 `requestAnimationFrame`（甚至包括测试环境）�
 
 #### Hook的优缺点
 
+#### Test Render
+
+##### Snapshot Testing
+
+库：react-test-renderer
+
+这个 package 提供了一个 React 渲染器，用于将 React 组件渲染成纯 JavaScript 对象，无需依赖 DOM 或原生移动环境。
+
+这个 package 提供的主要功能是在不依赖浏览器或 [jsdom](https://github.com/tmpvar/jsdom) （Web标准的JavaScript实现，用于node.js）的情况下，返回某个时间点由 React DOM 或者 React Native 平台渲染出的视图结构（类似与 DOM 树）快照。
+
+**TestRenderer**
+
+- [`TestRenderer.create()`](https://zh-hans.reactjs.org/docs/test-renderer.html#testrenderercreate)
+- [`TestRenderer.act()`](https://zh-hans.reactjs.org/docs/test-renderer.html#testrendereract)
+
+**TestRenderer instance**
+
+- [`testRenderer.toJSON()`](https://zh-hans.reactjs.org/docs/test-renderer.html#testrenderertojson)
+- [`testRenderer.toTree()`](https://zh-hans.reactjs.org/docs/test-renderer.html#testrenderertotree)
+- [`testRenderer.update()`](https://zh-hans.reactjs.org/docs/test-renderer.html#testrendererupdate)
+- [`testRenderer.unmount()`](https://zh-hans.reactjs.org/docs/test-renderer.html#testrendererunmount)
+- [`testRenderer.getInstance()`](https://zh-hans.reactjs.org/docs/test-renderer.html#testrenderergetinstance)
+- [`testRenderer.root`](https://zh-hans.reactjs.org/docs/test-renderer.html#testrendererroot)
+
+**TestInstance**
+
+- [`testInstance.find()`](https://zh-hans.reactjs.org/docs/test-renderer.html#testinstancefind)
+- [`testInstance.findByType()`](https://zh-hans.reactjs.org/docs/test-renderer.html#testinstancefindbytype)
+- [`testInstance.findByProps()`](https://zh-hans.reactjs.org/docs/test-renderer.html#testinstancefindbyprops)
+- [`testInstance.findAll()`](https://zh-hans.reactjs.org/docs/test-renderer.html#testinstancefindall)
+- [`testInstance.findAllByType()`](https://zh-hans.reactjs.org/docs/test-renderer.html#testinstancefindallbytype)
+- [`testInstance.findAllByProps()`](https://zh-hans.reactjs.org/docs/test-renderer.html#testinstancefindallbyprops)
+- [`testInstance.instance`](https://zh-hans.reactjs.org/docs/test-renderer.html#testinstanceinstance)
+- [`testInstance.type`](https://zh-hans.reactjs.org/docs/test-renderer.html#testinstancetype)
+- [`testInstance.props`](https://zh-hans.reactjs.org/docs/test-renderer.html#testinstanceprops)
+- [`testInstance.parent`](https://zh-hans.reactjs.org/docs/test-renderer.html#testinstanceparent)
+- [`testInstance.children`](https://zh-hans.reactjs.org/docs/test-renderer.html#testinstancechildren)
+
+
+
+##### DOM Testing
+
+库：@testing-library/react
+
 #### React的ESlint配置（JS）
 
 ##### 项目需要安装的插件

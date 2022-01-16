@@ -1,3 +1,7 @@
+https://wangdoc.com/javascript/index.html
+
+https://wangdoc.com/es6/index.html
+
 #### var、let、const
 
 如果不用var、let、const声明变量，则会声明为全局变量，在浏览器环境下，相当于在window上增加一个属性。
@@ -650,6 +654,14 @@ console.log(curriedSum(1)(2)(3))
 var fn=function(a){
     console.log(a);   //firebug输出12345678，使用=运算符
 }(12345678)
+```
+
+通常需要在立即执行函数的最前面加上分号 `;`
+
+```js
+;(function(a){
+    console.log(a)
+})(123)
 ```
 
 #### Symbol
@@ -1482,9 +1494,9 @@ new Promise((resolve, reject) => {
 
 ##### Promise.prototype.catch(onRejected)
 
-catch内的回调函数接受前一个promise reject的值作为参数。返回一个新的 promise。
+catch内的回调函数接受前一个promise reject的值或者错误作为参数。返回一个新的 promise。
 
-**如果 Promise 状态已经变成resolved，再抛出错误是无效的。**
+##### 如果 Promise 状态已经变成resolved，再抛出错误是无效的。
 
 ```js
 const promise = new Promise(function(resolve, reject) {
@@ -1500,7 +1512,7 @@ promise
 catch是从pending到reject的状态改变，但是一个promise一旦resolve以后，状态就凝固了，无法再发生变化，因此会被忽略。
 ```
 
-**catch的捕获异常**
+##### catch的捕获异常
 
 不能捕获异步操作中产生的异常（`Promise.then`/`setTimeout`都是典型的异步操作）：
 
@@ -1509,9 +1521,27 @@ catch是从pending到reject的状态改变，但是一个promise一旦resolve以
 
 `Promise`的`catch`只会捕获到自身链式中的错误，不能捕获then等内部的其他promise的错误。
 
-**Promise 静态方法**
+如果想捕获**promise**的异常：
 
-##### Promise.resolve() 
+- promise.catch
+
+- ```js
+  ;(async function a (){
+  	try{
+  		await Promise.reject(1)
+  	}catch(e){
+  		console.log(e)
+  	}
+  })()
+  ```
+
+##### Promise.prototype.finally()
+
+在promise**结束**时，无论结果是fulfilled或者是rejected，都会执行指定的回调函数。这避免了同样的语句需要在[`then()`](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Promise/then)和[`catch()`](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Promise/catch)中各写一次的情况。
+
+##### Promise 静态方法
+
+###### Promise.resolve() 
 
 返回一个状态由给定value决定的Promise对象。
 
@@ -1523,7 +1553,7 @@ new Promise(resolve =>{
 })
 ```
 
-##### Promise.reject()
+###### Promise.reject()
 
 返回一个状态为失败的Promise对象，并将给定的失败信息传递给对应的处理方法—then或catch。
 
@@ -1535,20 +1565,20 @@ new Promise((resolve,reject) =>{
 })
 ```
 
-##### Promise.all([ promise1,promise2, . . . ])
+###### Promise.all([ promise1,promise2, . . . ])
 
 接收一个包含Promise对象的可迭代对象为参数，返回一个新的promise对象。该promise对象在数组里所有的promise对象都成功的时候才会触发成功，一旦有任何一个promise对象失败则立即触发该promise对象的失败。这个新的promise对象在触发成功状态以后，会把一个包含所有promise返回值的数组作为成功回调的返回值，顺序跟参数数组的顺序保持一致；如果这个新的promise对象触发了失败状态，它会把数组里第一个触发失败的promise对象的错误信息作为它的失败错误信息。Promise.all方法常被用于处理多个promise对象的状态集合。
 
-##### Promise.allSettled([ promise1,promise2, . . . ])
+###### Promise.allSettled([ promise1,promise2, . . . ])
 
 接收一个包含Promise对象的可迭代对象为参数，等到所有promises都已敲定（settled）（每个promise都已兑现（fulfilled）或已拒绝（rejected））。
 返回一个新promise对象，该promise在所有promise完成后完成。并带有一个对象数组（可以在then中获取），每个对象对应每个promise的结果。
 
-##### Promise.any([ promise1,promise2, . . . ])
+###### Promise.any([ promise1,promise2, . . . ])
 
 接收一个包含Promise对象的可迭代对象为参数，当其中的一个 promise 成功，就返回那个成功的promise对象。
 
-##### Promise.race([ promise1,promise2, . . . ])
+###### Promise.race([ promise1,promise2, . . . ])
 
 接收一个包含Promise对象的可迭代对象为参数。race就是赛跑的意思，意思就是说，Promise.race([p1, p2, p3])里面哪个结果获取得快，就返回那个结果，不管结果本身是成功状态还是失败状态。返回最快的那个promise对象。
 
@@ -1623,8 +1653,8 @@ new Promise((resolve, reject) => {
     console.log(err)
     // 如果是 return 结果 或者return Promise.resolve(结果)，则可以被后面的then接受
     return Promise.resolve('catch里面的resolve可以被之后的then接收')
-    // 如果是return Promise.reject，catch后面必须有一个catch，但不一定是紧跟
-    // return Promise.reject('catch里面的reject可以被之后的catch接收')
+    // 如果是return Promise.reject
+    // return Promise.reject('catch里面的reject可以被之后的catch或then的第二个参数接收')
   })
   .then(res => {
     console.log(res)
@@ -2673,6 +2703,30 @@ child.getBoundingClientRect().top - parent.getBoundingClientRect().top
  (1). 如果finally中存在return语句，则返回finally的return结果，代码运行结束。
  (2). 如果finally不存在return语句，则运行catch中的throw语句，代码运行结束。
 
+##### 捕获异常
+
+**try-catch**只能捕获同步的异常，不能捕获异步的异常，例如：**setTimeout** 和 **promise**
+
+因为**try-catch**是同步任务，执行时已经在JS主线程，当异步函数抛出异常时，**try-catch**已经执行完成了。
+
+如果想捕获**promise**的异常：
+
+- promise.catch
+
+- ```js
+  ;(async function a (){
+  	try{
+  		await Promise.reject(1)
+  	}catch(e){
+  		console.log(e)
+  	}
+  })()
+  ```
+
+**try-catch**捕获到的异常不会冒泡。
+
+
+
 #### 事件循环
 
 ##### 执行机制
@@ -3431,19 +3485,180 @@ var blob = instanceOfBlob.slice([start [, end [, contentType]]])
 
 #### File
 
+##### File 对象
+
 通常情况下， `File` 对象是来自用户在一个 `<input>` 元素上选择文件后返回的 [`FileList`](https://developer.mozilla.org/zh-CN/docs/Web/API/FileList) 对象,也可以是来自由拖放操作生成的 [`DataTransfer`](https://developer.mozilla.org/zh-CN/docs/Web/API/DataTransfer) 对象。
 
 File 继承 自Blob。其他操作二进制数据的API（比如File对象），都是建立在Blob对象基础上的，继承了它的属性和方法。
 
 File 对象负责处理那些以文件形式存在的二进制数据。
 
-##### 方法
+最常见的使用场合是表单的文件上传控件（`<input type="file">`），用户选中文件以后，浏览器就会生成一个数组，里面是每一个用户选中的文件，它们都是 File 实例对象。
+
+```html
+// HTML 代码如下
+// <input id="fileItem" type="file">
+var file = document.getElementById('fileItem').files[0];
+file instanceof File // true
+```
+
+上面代码中，`file`是用户选中的第一个文件，它是 File 的实例。
+
+##### 构造函数
+
+浏览器原生提供一个`File()`构造函数，用来生成 File 实例对象。
+
+```js
+new File(array, name [, options])
+```
+
+`File()`构造函数接受三个参数。
+
+- array：一个数组，成员可以是二进制对象或字符串，表示文件的内容。
+- name：字符串，表示文件名或文件路径。
+- options：配置对象，设置实例的属性。该参数可选。
+
+第三个参数配置对象，可以设置两个属性。
+
+- type：字符串，表示实例对象的 MIME 类型，默认值为空字符串。
+- lastModified：时间戳，表示上次修改的时间，默认为`Date.now()`。
+
+下面是一个例子。
+
+```js
+var file = new File(
+  ['foo'],
+  'foo.txt',
+  {
+    type: 'text/plain',
+  }
+);
+```
+
+##### 实例属性和实例方法
+
+File 对象有以下实例属性。
+
+- File.lastModified：最后修改时间
+- File.name：文件名或文件路径
+- File.size：文件大小（单位字节）
+- File.type：文件的 MIME 类型
+
+```js
+var myFile = new File([], 'file.bin', {
+  lastModified: new Date(2018, 1, 1),
+});
+myFile.lastModified // 1517414400000
+myFile.name // "file.bin"
+myFile.size // 0
+myFile.type // ""
+```
+
+上面代码中，由于`myFile`的内容为空，也没有设置 MIME 类型，所以`size`属性等于0，`type`属性等于空字符串。
 
 `File` 接口没有定义任何方法，但是它从 `Blob` 接口继承了以下方法：
 
-**slice([start [, end [, contentType]]])**
+**Blob.slice([start [, end [, contentType]]])**
+
+
+
+##### FileList 对象
+
+`FileList`对象是一个类似数组的对象，代表一组选中的文件，每个成员都是一个 File 实例。它主要出现在两个场合。
+
+- 文件控件节点（`<input type="file">`）的`files`属性，返回一个 FileList 实例。
+- 拖拉一组文件时，目标区的`DataTransfer.files`属性，返回一个 FileList 实例。
+
+```js
+// HTML 代码如下
+// <input id="fileItem" type="file">
+var files = document.getElementById('fileItem').files;
+files instanceof FileList // true
+```
+
+上面代码中，文件控件的`files`属性是一个 FileList 实例。
+
+FileList 的实例属性主要是`length`，表示包含多少个文件。
+
+FileList 的实例方法主要是`item()`，用来返回指定位置的实例。它接受一个整数作为参数，表示位置的序号（从零开始）。但是，由于 FileList 的实例是一个类似数组的对象，可以直接用方括号运算符，即`myFileList[0]`等同于`myFileList.item(0)`，所以一般用不到`item()`方法。
+
+##### FileReader 对象
+
+FileReader 对象用于读取 File 对象或 Blob 对象所包含的文件内容。
+
+浏览器原生提供一个`FileReader`构造函数，用来生成 FileReader 实例。
+
+```js
+var reader = new FileReader();
+```
+
+FileReader 有以下的实例属性。
+
+- FileReader.error：读取文件时产生的错误对象
+- FileReader.readyState：整数，表示读取文件时的当前状态。一共有三种可能的状态，`0`表示尚未加载任何数据，`1`表示数据正在加载，`2`表示加载完成。
+- FileReader.result：读取完成后的文件内容，有可能是字符串，也可能是一个 ArrayBuffer 实例。
+- FileReader.onabort：`abort`事件（用户终止读取操作）的监听函数。
+- FileReader.onerror：`error`事件（读取错误）的监听函数。
+- FileReader.onload：`load`事件（读取操作完成）的监听函数，通常在这个函数里面使用`result`属性，拿到文件内容。
+- FileReader.onloadstart：`loadstart`事件（读取操作开始）的监听函数。
+- FileReader.onloadend：`loadend`事件（读取操作结束）的监听函数。
+- FileReader.onprogress：`progress`事件（读取操作进行中）的监听函数。
+
+下面是监听`load`事件的一个例子。
+
+```js
+// HTML 代码如下
+// <input type="file" onchange="onChange(event)">
+
+function onChange(event) {
+  var file = event.target.files[0];
+  var reader = new FileReader();
+  reader.onload = function (event) {
+    console.log(event.target.result)
+  };
+
+  reader.readAsText(file);
+}
+```
+
+上面代码中，每当文件控件发生变化，就尝试读取第一个文件。如果读取成功（`load`事件发生），就打印出文件内容。
+
+FileReader 有以下实例方法。
+
+- FileReader.abort()：终止读取操作，`readyState`属性将变成`2`。
+- FileReader.readAsArrayBuffer()：以 ArrayBuffer 的格式读取文件，读取完成后`result`属性将返回一个 ArrayBuffer 实例。
+- FileReader.readAsBinaryString()：读取完成后，`result`属性将返回原始的二进制字符串。
+- FileReader.readAsDataURL()：读取完成后，`result`属性将返回一个 Data URL 格式（Base64 编码）的字符串，代表文件内容。对于图片文件，这个字符串可以用于`<img>`元素的`src`属性。注意，这个字符串不能直接进行 Base64 解码，必须把前缀`data:*/*;base64,`从字符串里删除以后，再进行解码。
+- FileReader.readAsText()：读取完成后，`result`属性将返回文件内容的文本字符串。该方法的第一个参数是代表文件的 Blob 实例，第二个参数是可选的，表示文本编码，默认为 UTF-8。
+
+下面是一个例子。
+
+```js
+/* HTML 代码如下
+  <input type="file" onchange="previewFile()">
+  <img src="" height="200">
+*/
+
+function previewFile() {
+  var preview = document.querySelector('img');
+  var file    = document.querySelector('input[type=file]').files[0];
+  var reader  = new FileReader();
+
+  reader.addEventListener('load', function () {
+    preview.src = reader.result;
+  }, false);
+
+  if (file) {
+    reader.readAsDataURL(file);
+  }
+}
+```
+
+上面代码中，用户选中图片文件以后，脚本会自动读取文件内容，然后作为一个 Data URL 赋值给`<img>`元素的`src`属性，从而把图片展示出来。
 
 #### AurrayBuffer
+
+https://wangdoc.com/es6/arraybuffer.html
 
 **`ArrayBuffer`** 对象用来表示通用的、固定长度的原始二进制数据缓冲区。它是一个字节数组。
 
@@ -3814,7 +4029,177 @@ Web Storage的目的是解决通过客户端存储不需要频繁发送回服务
 
 Window 对象的localStorage 和 sessionStorage 属性引用的是 Storage对象。Storage对象用于保存名/值对数据，直至存储空间上限（由浏览器决定）。一般来说，客户端数据的大小限制是按照每个源（协议、域和端口）来设置的，因此每个源有固定大小的数据存储空间。不同浏览器给localStorage和sessionStorage设置了不同的空间限制，但大多数会限制为每个源5MB。
 
-**localStorage 和 sessionStorage遵循同源策略**
+
+
+###### Storage 对象存储的键值采用什么字符编码
+
+**UTF-16**
+
+localStorage 存储的键和值始终采用 UTF-16 DOMString 格式，每个字符使用两个字节。与对象一样，整数键将自动转换为字符串。
+
+每个字符使用两个字节，是有前提条件的，就是码点小于`0xFFFF`(65535)， 大于这个码点的是四个字节。
+
+
+
+###### 5M 的单位是什么
+
+**字符串的长度值, 或者utf-16的编码单元，更合理的是 10M字节空间**
+
+5M = 5 * 1024 * 1024 
+
+单位  m      kb         b       
+
+字符的个数，并不等于字符的长度。
+
+String.length-字符串的长度：返回字符串中utf-16的编码单元的数量。
+
+```js
+"a".length // 1
+"人".length // 1
+"𠮷".length // 2
+"🔴".length // 2
+```
+
+而根据 UTF-16编码规则，要么2个字节，要么四个字节，**`所以不如说是 10M 的字节数，更为合理。`**
+
+**`当然，2个字节作为一个utf-16的字符编码单元，也可以说是 5M 的utf-16的编码单元。`**
+
+我们先编写一个utf-16字符串计算字节数的方法：非常简单，判断码点决定是2还是4
+
+```js
+function sizeofUtf16Bytes(str) {
+    var total = 0,
+        charCode,
+        i,
+        len;
+    for (i = 0, len = str.length; i < len; i++) {
+        charCode = str.charCodeAt(i);
+        if (charCode <= 0xffff) {
+            total += 2;
+        } else {
+            total += 4;
+        }
+    }
+    return total;
+}
+```
+
+
+
+###### Storage 对象键占不占存储空间
+
+键和值都**占空间**
+
+
+
+###### Storage 对象的键的数量，对写和读性能的影响
+
+**键的数量对读取性能影响不大。值的大小对性能影响更大，不建议保存大的数据。**
+
+不考虑键的大小的问题，如果键太大，你需要先想想键为何取这么大。
+
+我们`500 * 1000`键，如下
+
+```js
+let keyCount = 500 * 1000;
+
+localStorage.clear();
+for (let i = 0; i < keyCount; i++) {
+    localStorage.setItem(i, "");
+}
+
+setTimeout(() => {
+    console.time("save_cost");
+    localStorage.setItem("a", "1");
+    console.timeEnd("save_cost");
+}, 2000)
+
+
+setTimeout(() => {
+    console.time("read_cost");
+    localStorage.getItem("a");
+    console.timeEnd("read_cost");
+
+}, 2000)
+
+// save_cost: 0.05615234375 ms
+// read_cost: 0.008056640625 ms
+```
+
+你单独执行保存代码：
+
+```js
+localStorage.clear();    
+console.time("save_cost");
+localStorage.setItem("a", "1");
+console.timeEnd("save_cost");
+// save_cost: 0.033203125 ms
+```
+
+可以多次测试， 影响肯定是有的，也仅仅是数倍，不是特别的大。
+
+反过来，如果是保存的值表较大呢？
+
+```js
+const charTxt = "a";
+const count = 5 * 1024 * 1024  - 1
+const val1 = new Array(count).fill(charTxt).join("");
+
+setTimeout(() =>{
+    localStorage.clear();
+    console.time("save_cost_1");
+    localStorage.setItem("a", val1);
+    console.timeEnd("save_cost_1");
+},1000)
+
+
+setTimeout(() =>{
+    localStorage.clear();
+    console.time("save_cost_2");
+    localStorage.setItem("a", "a");
+    console.timeEnd("save_cost_2");
+},1000)
+
+// save_cost_1: 12.276123046875 ms
+// save_cost_2: 0.010009765625 ms
+```
+
+可以多测试很多次，单次值的大小对存的性能影响非常大，读取也一样，合情合理之中。
+
+所以尽量不要保存大的值，因为其是同步读取，纯大数据，用indexedDB就好。
+
+
+
+###### 写个方法统计一个localStorage已使用空间
+
+现代浏览器的精写版本：
+
+```js
+function sieOfLS() {
+    return Object.entries(localStorage).map(v => v.join('')).join('').length;
+}
+```
+
+
+
+###### 页面的utf-8编码
+
+**这和localStorage的存储没有半毛钱的关系。**
+
+我们的html页面，经常会出现`<meta charset="UTF-8">`。告知浏览器此页面属于什么字符编码格式，下一步浏览器做好解码工作。
+
+```html
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>容器</title>
+</head>
+```
+
+
+
+###### Storage遵循同源策略
 
 Storage对象定义了如下方法：
 
@@ -3846,7 +4231,7 @@ localStorage 与 sessionStorage 在 API 方面无异。
 
 ##### Web Storage 和 Cookie 和 IndexDB 的区别
 
-| 特性         | cookie                                               | localStorage                                         | sessionStorage                     | indexDB                  |
+| 特性         | cookie                                               | localStorage                                         | sessionStorage                     | IndexedDB                |
 | ------------ | ---------------------------------------------------- | ---------------------------------------------------- | ---------------------------------- | ------------------------ |
 | 数据生命周期 | 一般由服务器生成，可以设置过期时间                   | 除非被清理，否则一直存在                             | 页面关闭就清理                     | 除非被清理，否则一直存在 |
 | 数据存储大小 | 4K                                                   | 5M                                                   | 5M                                 | 无限                     |
@@ -3897,6 +4282,338 @@ https://www.jianshu.com/p/8c4cee29d532
 > 一般的，我们必须给 manifest 文件设置正确的 MIME-type 为 "text/cache-manifest"，它需要在服务器端进行配置。
 
 在 Progressive Web Application 中， Application Cache 配合 Service Worker 承担着主要的任务。
+
+使用 IndexedDB 储存离线数据和 Service Workers 储存离线资源，其简述请查看 [Service Workers 制作离线 PWA](https://developer.mozilla.org/zh-CN/docs/Web/Progressive_web_apps/Offline_Service_workers)。
+
+##### IndexedDB
+
+IndexedDB 是一种底层 API，用于在客户端存储大量的结构化数据（也包括文件/二进制大型对象（blobs））。该 API 使用索引实现对数据的高性能搜索。虽然 [Web Storage](https://developer.mozilla.org/zh-CN/docs/Web/API/Web_Storage_API) 在存储较少量的数据很有用，但对于存储更大量的结构化数据来说力不从心。
+
+就数据库类型而言，IndexedDB 不属于关系型数据库（不支持 SQL 查询语句），更接近 NoSQL 数据库。
+
+IndexedDB API是强大的，但对于简单的情况可能看起来太复杂。如果你更喜欢一个简单的API，请尝试  [localForage](https://localforage.github.io/localForage/)、[dexie.js](https://www.dexie.org/)、[PouchDB](https://pouchdb.com/)、[idb](https://www.npmjs.com/package/idb)、[idb-keyval](https://www.npmjs.com/package/idb-keyval)、[JsStore](https://jsstore.net/) 或者 [lovefield](https://github.com/google/lovefield) 之类的库，这些库使 IndexedDB 对开发者来说更加友好。
+
+使用 IndexedDB 执行的操作是异步执行的，以免阻塞应用程序。IndexedDB 最初包括同步和异步 API。同步 API 仅用于 [Web Workers](https://developer.mozilla.org/en-US/docs/Web/Guide/Performance/Using_web_workers)，且已从规范中移除，因为尚不清晰是否需要。但如果 Web 开发人员有足够的需求，可以重新引入同步 API。
+
+###### 特点
+
+**（1）键值对储存。** IndexedDB 内部采用对象仓库（object store）存放数据。所有类型的数据都可以直接存入，包括 JavaScript 对象。对象仓库中，数据以"键值对"的形式保存，每一个数据记录都有对应的主键，主键是独一无二的，不能有重复，否则会抛出一个错误。
+
+**（2）异步。** IndexedDB 操作时不会锁死浏览器，用户依然可以进行其他操作，这与 LocalStorage 形成对比，后者的操作是同步的。异步设计是为了防止大量数据的读写，拖慢网页的表现。
+
+**（3）支持事务。** IndexedDB 支持事务（transaction），这意味着一系列操作步骤之中，只要有一步失败，整个事务就都取消，数据库回滚到事务发生之前的状态，不存在只改写一部分数据的情况。
+
+**（4）同源限制** IndexedDB 受到同源限制，每一个数据库对应创建它的域名。网页只能访问自身域名下的数据库，而不能访问跨域的数据库。
+
+**（5）储存空间大** IndexedDB 的储存空间比 LocalStorage 大得多，一般来说不少于 250MB，甚至没有上限。
+
+**（6）支持二进制储存。** IndexedDB 不仅可以储存字符串，还可以储存二进制数据（ArrayBuffer 对象和 Blob 对象）。
+
+###### 对象接口
+
+IndexedDB 把不同的实体，抽象成一个个对象接口。
+
+```
+数据库：IDBDatabase 对象
+对象仓库：IDBObjectStore 对象
+索引： IDBIndex 对象
+事务： IDBTransaction 对象
+操作请求：IDBRequest 对象
+指针： IDBCursor 对象
+主键集合：IDBKeyRange 对象
+```
+
+**（1）数据库**
+
+数据库是一系列相关数据的容器。每个域名（严格的说，是协议 + 域名 + 端口）都可以新建任意多个数据库。
+
+IndexedDB 数据库有版本的概念。同一个时刻，只能有一个版本的数据库存在。如果要修改数据库结构（新增或删除表、索引或者主键），只能通过升级数据库版本完成。
+
+**（2）对象仓库**
+
+每个数据库包含若干个对象仓库（object store）。它类似于关系型数据库的表格。
+
+**（3）数据记录**
+
+对象仓库保存的是数据记录。每条记录类似于关系型数据库的行，但是只有主键和数据体两部分。主键用来建立默认的索引，必须是不同的，否则会报错。主键可以是数据记录里面的一个属性，也可以指定为一个递增的整数编号。
+
+> ```javascript
+> { id: 1, text: 'foo' }
+> ```
+
+上面的对象中，`id`属性可以当作主键。
+
+数据体可以是任意数据类型，不限于对象。
+
+**（4）索引**
+
+为了加速数据的检索，可以在对象仓库里面，为不同的属性建立索引。
+
+**（5）事务**
+
+数据记录的读写和删改，都要通过事务完成。事务对象提供`error`、`abort`和`complete`三个事件，用来监听操作结果。
+
+###### 操作流程
+
+IndexedDB 数据库的各种操作，一般是按照下面的流程进行的。这个部分只给出简单的代码示例，用于快速上手，详细的各个对象的 API 请看[这里](https://wangdoc.com/javascript/bom/indexeddb.html#indexeddb-对象)。
+
+**3.1 打开数据库**
+
+使用 IndexedDB 的第一步是打开数据库，使用`indexedDB.open()`方法。
+
+> ```javascript
+> var request = window.indexedDB.open(databaseName, version);
+> ```
+
+这个方法接受两个参数，第一个参数是字符串，表示数据库的名字。如果指定的数据库不存在，就会新建数据库。第二个参数是整数，表示数据库的版本。如果省略，打开已有数据库时，默认为当前版本；新建数据库时，默认为`1`。
+
+`indexedDB.open()`方法返回一个 IDBRequest 对象。这个对象通过三种事件`error`、`success`、`upgradeneeded`，处理打开数据库的操作结果。
+
+**（1）error 事件**
+
+`error`事件表示打开数据库失败。
+
+> ```javascript
+> request.onerror = function (event) {
+>   console.log('数据库打开报错');
+> };
+> ```
+
+**（2）success 事件**
+
+`success`事件表示成功打开数据库。
+
+> ```javascript
+> var db;
+> 
+> request.onsuccess = function (event) {
+>   db = request.result;
+>   console.log('数据库打开成功');
+> };
+> ```
+
+这时，通过`request`对象的`result`属性拿到数据库对象。
+
+**（3）upgradeneeded 事件**
+
+如果指定的版本号，大于数据库的实际版本号，就会发生数据库升级事件`upgradeneeded`。
+
+> ```javascript
+> var db;
+> 
+> request.onupgradeneeded = function (event) {
+>   db = event.target.result;
+> }
+> ```
+
+这时通过事件对象的`target.result`属性，拿到数据库实例。
+
+**3.2 新建数据库**
+
+新建数据库与打开数据库是同一个操作。如果指定的数据库不存在，就会新建。不同之处在于，后续的操作主要在`upgradeneeded`事件的监听函数里面完成，因为这时版本从无到有，所以会触发这个事件。
+
+通常，新建数据库以后，第一件事是新建对象仓库（即新建表）。
+
+> ```javascript
+> request.onupgradeneeded = function(event) {
+>   db = event.target.result;
+>   var objectStore = db.createObjectStore('person', { keyPath: 'id' });
+> }
+> ```
+
+上面代码中，数据库新建成功以后，新增一张叫做`person`的表格，主键是`id`。
+
+更好的写法是先判断一下，这张表格是否存在，如果不存在再新建。
+
+> ```javascript
+> request.onupgradeneeded = function (event) {
+>   db = event.target.result;
+>   var objectStore;
+>   if (!db.objectStoreNames.contains('person')) {
+>     objectStore = db.createObjectStore('person', { keyPath: 'id' });
+>   }
+> }
+> ```
+
+主键（key）是默认建立索引的属性。比如，数据记录是`{ id: 1, name: '张三' }`，那么`id`属性可以作为主键。主键也可以指定为下一层对象的属性，比如`{ foo: { bar: 'baz' } }`的`foo.bar`也可以指定为主键。
+
+如果数据记录里面没有合适作为主键的属性，那么可以让 IndexedDB 自动生成主键。
+
+> ```javascript
+> var objectStore = db.createObjectStore(
+>   'person',
+>   { autoIncrement: true }
+> );
+> ```
+
+上面代码中，指定主键为一个递增的整数。
+
+新建对象仓库以后，下一步可以新建索引。
+
+> ```javascript
+> request.onupgradeneeded = function(event) {
+>   db = event.target.result;
+>   var objectStore = db.createObjectStore('person', { keyPath: 'id' });
+>   objectStore.createIndex('name', 'name', { unique: false });
+>   objectStore.createIndex('email', 'email', { unique: true });
+> }
+> ```
+
+上面代码中，`IDBObject.createIndex()`的三个参数分别为索引名称、索引所在的属性、配置对象（说明该属性是否包含重复的值）。
+
+**3.3 新增数据**
+
+新增数据指的是向对象仓库写入数据记录。这需要通过事务完成。
+
+> ```javascript
+> function add() {
+>   var request = db.transaction(['person'], 'readwrite')
+>     .objectStore('person')
+>     .add({ id: 1, name: '张三', age: 24, email: 'zhangsan@example.com' });
+> 
+>   request.onsuccess = function (event) {
+>     console.log('数据写入成功');
+>   };
+> 
+>   request.onerror = function (event) {
+>     console.log('数据写入失败');
+>   }
+> }
+> 
+> add();
+> ```
+
+上面代码中，写入数据需要新建一个事务。新建时必须指定表格名称和操作模式（"只读"或"读写"）。新建事务以后，通过`IDBTransaction.objectStore(name)`方法，拿到 IDBObjectStore 对象，再通过表格对象的`add()`方法，向表格写入一条记录。
+
+写入操作是一个异步操作，通过监听连接对象的`success`事件和`error`事件，了解是否写入成功。
+
+**3.4 读取数据**
+
+读取数据也是通过事务完成。
+
+> ```javascript
+> function read() {
+>    var transaction = db.transaction(['person']);
+>    var objectStore = transaction.objectStore('person');
+>    var request = objectStore.get(1);
+> 
+>    request.onerror = function(event) {
+>      console.log('事务失败');
+>    };
+> 
+>    request.onsuccess = function( event) {
+>       if (request.result) {
+>         console.log('Name: ' + request.result.name);
+>         console.log('Age: ' + request.result.age);
+>         console.log('Email: ' + request.result.email);
+>       } else {
+>         console.log('未获得数据记录');
+>       }
+>    };
+> }
+> 
+> read();
+> ```
+
+上面代码中，`objectStore.get()`方法用于读取数据，参数是主键的值。
+
+**3.5 遍历数据**
+
+遍历数据表格的所有记录，要使用指针对象 IDBCursor。
+
+> ```javascript
+> function readAll() {
+>   var objectStore = db.transaction('person').objectStore('person');
+> 
+>    objectStore.openCursor().onsuccess = function (event) {
+>      var cursor = event.target.result;
+> 
+>      if (cursor) {
+>        console.log('Id: ' + cursor.key);
+>        console.log('Name: ' + cursor.value.name);
+>        console.log('Age: ' + cursor.value.age);
+>        console.log('Email: ' + cursor.value.email);
+>        cursor.continue();
+>     } else {
+>       console.log('没有更多数据了！');
+>     }
+>   };
+> }
+> 
+> readAll();
+> ```
+
+上面代码中，新建指针对象的`openCursor()`方法是一个异步操作，所以要监听`success`事件。
+
+**3.6 更新数据**
+
+更新数据要使用`IDBObject.put()`方法。
+
+> ```javascript
+> function update() {
+>   var request = db.transaction(['person'], 'readwrite')
+>     .objectStore('person')
+>     .put({ id: 1, name: '李四', age: 35, email: 'lisi@example.com' });
+> 
+>   request.onsuccess = function (event) {
+>     console.log('数据更新成功');
+>   };
+> 
+>   request.onerror = function (event) {
+>     console.log('数据更新失败');
+>   }
+> }
+> 
+> update();
+> ```
+
+上面代码中，`put()`方法自动更新了主键为`1`的记录。
+
+**3.7 删除数据**
+
+`IDBObjectStore.delete()`方法用于删除记录。
+
+> ```javascript
+> function remove() {
+>   var request = db.transaction(['person'], 'readwrite')
+>     .objectStore('person')
+>     .delete(1);
+> 
+>   request.onsuccess = function (event) {
+>     console.log('数据删除成功');
+>   };
+> }
+> 
+> remove();
+> ```
+
+**3.8 使用索引**
+
+索引的意义在于，可以让你搜索任意字段，也就是说从任意字段拿到数据记录。如果不建立索引，默认只能搜索主键（即从主键取值）。
+
+假定新建表格的时候，对`name`字段建立了索引。
+
+> ```javascript
+> objectStore.createIndex('name', 'name', { unique: false });
+> ```
+
+现在，就可以从`name`找到对应的数据记录了。
+
+> ```javascript
+> var transaction = db.transaction(['person'], 'readonly');
+> var store = transaction.objectStore('person');
+> var index = store.index('name');
+> var request = index.get('李四');
+> 
+> request.onsuccess = function (e) {
+>   var result = e.target.result;
+>   if (result) {
+>     // ...
+>   } else {
+>     // ...
+>   }
+> }
+> ```
 
 #### Token
 
@@ -4040,6 +4757,646 @@ Authorization: Bearer <token>
 （5）JWT 本身包含了认证信息，一旦泄露，任何人都可以获得该令牌的所有权限。为了减少盗用，JWT 的有效期应该设置得比较短。对于一些比较重要的权限，使用时应该再次对用户进行认证。
 
 （6）为了减少盗用，JWT 不应该使用 HTTP 协议明码传输，要使用 HTTPS 协议传输。
+
+#### 同源限制
+
+##### 概述
+
+###### 含义
+
+1995年，同源政策由 Netscape 公司引入浏览器。目前，所有浏览器都实行这个政策。
+
+最初，它的含义是指，A 网页设置的 Cookie，B 网页不能打开，除非这两个网页“同源”。所谓“同源”指的是“三个相同”。
+
+> - 协议相同
+> - 域名相同
+> - 端口相同（这点可以忽略，详见下文）
+
+举例来说，`http://www.example.com/dir/page.html`这个网址，协议是`http://`，域名是`www.example.com`，端口是`80`（默认端口可以省略），它的同源情况如下。
+
+- `http://www.example.com/dir2/other.html`：同源
+- `http://example.com/dir/other.html`：不同源（域名不同）
+- `http://v2.www.example.com/dir/other.html`：不同源（域名不同）
+- `http://www.example.com:81/dir/other.html`：不同源（端口不同）
+- `https://www.example.com/dir/page.html`：不同源（协议不同）
+
+注意，标准规定端口不同的网址不是同源（比如8000端口和8001端口不是同源），但是浏览器没有遵守这条规定。实际上，同一个网域的不同端口，是可以互相读取 Cookie 的。
+
+###### 目的
+
+同源政策的目的，是为了保证用户信息的安全，防止恶意的网站窃取数据。
+
+设想这样一种情况：A 网站是一家银行，用户登录以后，A 网站在用户的机器上设置了一个 Cookie，包含了一些隐私信息。用户离开 A 网站以后，又去访问 B 网站，如果没有同源限制，B 网站可以读取 A 网站的 Cookie，那么隐私就泄漏了。更可怕的是，Cookie 往往用来保存用户的登录状态，如果用户没有退出登录，其他网站就可以冒充用户，为所欲为。因为浏览器同时还规定，提交表单不受同源政策的限制。
+
+由此可见，同源政策是必需的，否则 Cookie 可以共享，互联网就毫无安全可言了。
+
+###### 限制范围
+
+随着互联网的发展，同源政策越来越严格。目前，如果非同源，共有三种行为受到限制。
+
+> （1） 无法读取非同源网页的 Cookie、LocalStorage 和 IndexedDB。
+>
+> （2） 无法接触非同源网页的 DOM。
+>
+> （3） 无法向非同源地址发送 AJAX 请求（可以发送，但浏览器会拒绝接受响应）。
+
+另外，通过 JavaScript 脚本可以拿到其他窗口的`window`对象。如果是非同源的网页，目前允许一个窗口可以接触其他网页的`window`对象的九个属性和四个方法。
+
+- window.closed
+- window.frames
+- window.length
+- window.location
+- window.opener
+- window.parent
+- window.self
+- window.top
+- window.window
+- window.blur()
+- window.close()
+- window.focus()
+- window.postMessage()
+
+上面的九个属性之中，只有`window.location`是可读写的，其他八个全部都是只读。而且，即使是`location`对象，非同源的情况下，也只允许调用`location.replace()`方法和写入`location.href`属性。
+
+虽然这些限制是必要的，但是有时很不方便，合理的用途也受到影响。下面介绍如何规避上面的限制。
+
+##### Cookie
+
+Cookie 是服务器写入浏览器的一小段信息，只有同源的网页才能共享。如果两个网页一级域名相同，只是次级域名不同，浏览器允许通过设置`document.domain`共享 Cookie。
+
+举例来说，A 网页的网址是`http://w1.example.com/a.html`，B 网页的网址是`http://w2.example.com/b.html`，那么只要设置相同的`document.domain`，两个网页就可以共享 Cookie。因为浏览器通过`document.domain`属性来检查是否同源。
+
+```js
+// 两个网页都需要设置
+document.domain = 'example.com';
+```
+
+注意，A 和 B 两个网页都需要设置`document.domain`属性，才能达到同源的目的。因为设置`document.domain`的同时，会把端口重置为`null`，因此如果只设置一个网页的`document.domain`，会导致两个网址的端口不同，还是达不到同源的目的。
+
+现在，A 网页通过脚本设置一个 Cookie。
+
+```
+document.cookie = "test1=hello";
+```
+
+B 网页就可以读到这个 Cookie。
+
+```
+var allCookie = document.cookie;
+```
+
+注意，这种方法只适用于 Cookie 和 iframe 窗口，LocalStorage 和 IndexedDB 无法通过这种方法，规避同源政策，而要使用下文介绍 PostMessage API。
+
+另外，服务器也可以在设置 Cookie 的时候，指定 Cookie 的所属域名为一级域名，比如`example.com`。
+
+```
+Set-Cookie: key=value; domain=example.com; path=/
+```
+
+这样的话，二级域名和三级域名不用做任何设置，都可以读取这个 Cookie。
+
+##### iframe 和多窗口通信
+
+`iframe`元素可以在当前网页之中，嵌入其他网页。每个`iframe`元素形成自己的窗口，即有自己的`window`对象。`iframe`窗口之中的脚本，可以获得父窗口和子窗口。但是，只有在同源的情况下，父窗口和子窗口才能通信；如果跨域，就无法拿到对方的 DOM。
+
+比如，父窗口运行下面的命令，如果`iframe`窗口不是同源，就会报错。
+
+```js
+document
+.getElementById("myIFrame")
+.contentWindow
+.document
+// Uncaught DOMException: Blocked a frame from accessing a cross-origin frame.
+```
+
+上面命令中，父窗口想获取子窗口的 DOM，因为跨域导致报错。
+
+反之亦然，子窗口获取主窗口的 DOM 也会报错。
+
+```js
+window.parent.document.body
+// 报错
+```
+
+这种情况不仅适用于`iframe`窗口，还适用于`window.open`方法打开的窗口，只要跨域，父窗口与子窗口之间就无法通信。
+
+如果两个窗口一级域名相同，只是二级域名不同，那么设置上一节介绍的`document.domain`属性，就可以规避同源政策，拿到 DOM。
+
+对于完全不同源的网站，目前有两种方法，可以解决跨域窗口的通信问题。
+
+> - 片段识别符（fragment identifier）
+> - 跨文档通信API（Cross-document messaging）
+
+###### 片段识别符
+
+片段标识符（fragment identifier）指的是，URL 的`#`号后面的部分，比如`http://example.com/x.html#fragment`的`#fragment`。如果只是改变片段标识符，页面不会重新刷新。
+
+父窗口可以把信息，写入子窗口的片段标识符。
+
+```js
+var src = originURL + '#' + data;
+document.getElementById('myIFrame').src = src;
+```
+
+上面代码中，父窗口把所要传递的信息，写入 iframe 窗口的片段标识符。
+
+子窗口通过监听`hashchange`事件得到通知。
+
+```js
+window.onhashchange = checkMessage;
+
+function checkMessage() {
+  var message = window.location.hash;
+  // ...
+}
+```
+
+同样的，子窗口也可以改变父窗口的片段标识符。
+
+```js
+parent.location.href = target + '#' + hash;
+```
+
+###### window.postMessage()
+
+上面的这种方法属于破解，HTML5 为了解决这个问题，引入了一个全新的API：跨文档通信 API（Cross-document messaging）。
+
+这个 API 为`window`对象新增了一个`window.postMessage`方法，允许跨窗口通信，不论这两个窗口是否同源。举例来说，父窗口`aaa.com`向子窗口`bbb.com`发消息，调用`postMessage`方法就可以了。
+
+```js
+// 父窗口打开一个子窗口
+var popup = window.open('http://bbb.com', 'title');
+// 父窗口向子窗口发消息
+popup.postMessage('Hello World!', 'http://bbb.com');
+```
+
+`postMessage`方法的第一个参数是具体的信息内容，第二个参数是接收消息的窗口的源（origin），即“协议 + 域名 + 端口”。也可以设为`*`，表示不限制域名，向所有窗口发送。
+
+子窗口向父窗口发送消息的写法类似。
+
+```js
+// 子窗口向父窗口发消息
+window.opener.postMessage('Nice to see you', 'http://aaa.com');
+```
+
+父窗口和子窗口都可以通过`message`事件，监听对方的消息。
+
+```js
+// 父窗口和子窗口都可以用下面的代码，
+// 监听 message 消息
+window.addEventListener('message', function (e) {
+  console.log(e.data);
+},false);
+```
+
+`message`事件的参数是事件对象`event`，提供以下三个属性。
+
+> - `event.source`：发送消息的窗口
+> - `event.origin`: 消息发向的网址
+> - `event.data`: 消息内容
+
+下面的例子是，子窗口通过`event.source`属性引用父窗口，然后发送消息。
+
+```js
+window.addEventListener('message', receiveMessage);
+function receiveMessage(event) {
+  event.source.postMessage('Nice to see you!', '*');
+}
+```
+
+上面代码有几个地方需要注意。首先，`receiveMessage`函数里面没有过滤信息的来源，任意网址发来的信息都会被处理。其次，`postMessage`方法中指定的目标窗口的网址是一个星号，表示该信息可以向任意网址发送。通常来说，这两种做法是不推荐的，因为不够安全，可能会被恶意利用。
+
+`event.origin`属性可以过滤不是发给本窗口的消息。
+
+```js
+window.addEventListener('message', receiveMessage);
+function receiveMessage(event) {
+  if (event.origin !== 'http://aaa.com') return;
+  if (event.data === 'Hello World') {
+    event.source.postMessage('Hello', event.origin);
+  } else {
+    console.log(event.data);
+  }
+}
+```
+
+###### LocalStorage
+
+通过`window.postMessage`，读写其他窗口的 LocalStorage 也成为了可能。
+
+下面是一个例子，主窗口写入 iframe 子窗口的`localStorage`。
+
+```js
+window.onmessage = function(e) {
+  if (e.origin !== 'http://bbb.com') {
+    return;
+  }
+  var payload = JSON.parse(e.data);
+  localStorage.setItem(payload.key, JSON.stringify(payload.data));
+};
+```
+
+上面代码中，子窗口将父窗口发来的消息，写入自己的 LocalStorage。
+
+父窗口发送消息的代码如下。
+
+```js
+var win = document.getElementsByTagName('iframe')[0].contentWindow;
+var obj = { name: 'Jack' };
+win.postMessage(
+  JSON.stringify({key: 'storage', data: obj}),
+  'http://bbb.com'
+);
+```
+
+加强版的子窗口接收消息的代码如下。
+
+```js
+window.onmessage = function(e) {
+  if (e.origin !== 'http://bbb.com') return;
+  var payload = JSON.parse(e.data);
+  switch (payload.method) {
+    case 'set':
+      localStorage.setItem(payload.key, JSON.stringify(payload.data));
+      break;
+    case 'get':
+      var parent = window.parent;
+      var data = localStorage.getItem(payload.key);
+      parent.postMessage(data, 'http://aaa.com');
+      break;
+    case 'remove':
+      localStorage.removeItem(payload.key);
+      break;
+  }
+};
+```
+
+加强版的父窗口发送消息代码如下。
+
+```js
+var win = document.getElementsByTagName('iframe')[0].contentWindow;
+var obj = { name: 'Jack' };
+// 存入对象
+win.postMessage(
+  JSON.stringify({key: 'storage', method: 'set', data: obj}),
+  'http://bbb.com'
+);
+// 读取对象
+win.postMessage(
+  JSON.stringify({key: 'storage', method: "get"}),
+  "*"
+);
+window.onmessage = function(e) {
+  if (e.origin != 'http://aaa.com') return;
+  console.log(JSON.parse(e.data).name);
+};
+```
+
+##### AJAX
+
+同源政策规定，AJAX 请求只能发给同源的网址，否则就报错。
+
+除了架设服务器代理（浏览器请求同源服务器，再由后者请求外部服务），有三种方法规避这个限制。
+
+> - JSONP
+> - WebSocket
+> - CORS
+
+###### JSONP
+
+JSONP 是服务器与客户端跨源通信的常用方法。最大特点就是简单易用，没有兼容性问题，老式浏览器全部支持，服务端改造非常小。
+
+它的做法如下。
+
+第一步，网页添加一个`<script>`元素，向服务器请求一个脚本，这不受同源政策限制，可以跨域请求。
+
+```html
+<script src="http://api.foo.com?callback=bar"></script>
+```
+
+注意，请求的脚本网址有一个`callback`参数（`?callback=bar`），用来告诉服务器，客户端的回调函数名称（`bar`）。
+
+第二步，服务器收到请求后，拼接一个字符串，将 JSON 数据放在函数名里面，作为字符串返回（`bar({...})`）。
+
+第三步，客户端会将服务器返回的字符串，作为代码解析，因为浏览器认为，这是`<script>`标签请求的脚本内容。这时，客户端只要定义了`bar()`函数，就能在该函数体内，拿到服务器返回的 JSON 数据。
+
+下面看一个实例。首先，网页动态插入`<script>`元素，由它向跨域网址发出请求。
+
+```js
+function addScriptTag(src) {
+  var script = document.createElement('script');
+  script.setAttribute('type', 'text/javascript');
+  script.src = src;
+  document.body.appendChild(script);
+}
+
+window.onload = function () {
+  addScriptTag('http://example.com/ip?callback=foo');
+}
+
+function foo(data) {
+  console.log('Your public IP address is: ' + data.ip);
+};
+```
+
+上面代码通过动态添加`<script>`元素，向服务器`example.com`发出请求。注意，该请求的查询字符串有一个`callback`参数，用来指定回调函数的名字，这对于 JSONP 是必需的。
+
+服务器收到这个请求以后，会将数据放在回调函数的参数位置返回。
+
+```js
+foo({
+  'ip': '8.8.8.8'
+});
+```
+
+由于`<script>`元素请求的脚本，直接作为代码运行。这时，只要浏览器定义了`foo`函数，该函数就会立即调用。作为参数的 JSON 数据被视为 JavaScript 对象，而不是字符串，因此避免了使用`JSON.parse`的步骤。
+
+###### WebSocket
+
+WebSocket 是一种通信协议，使用`ws://`（非加密）和`wss://`（加密）作为协议前缀。该协议不实行同源政策，只要服务器支持，就可以通过它进行跨源通信。
+
+下面是一个例子，浏览器发出的 WebSocket 请求的头信息（摘自[维基百科](https://en.wikipedia.org/wiki/WebSocket)）。
+
+```
+GET /chat HTTP/1.1
+Host: server.example.com
+Upgrade: websocket
+Connection: Upgrade
+Sec-WebSocket-Key: x3JJHMbDL1EzLkh9GBhXDw==
+Sec-WebSocket-Protocol: chat, superchat
+Sec-WebSocket-Version: 13
+Origin: http://example.com
+```
+
+上面代码中，有一个字段是`Origin`，表示该请求的请求源（origin），即发自哪个域名。
+
+正是因为有了`Origin`这个字段，所以 WebSocket 才没有实行同源政策。因为服务器可以根据这个字段，判断是否许可本次通信。如果该域名在白名单内，服务器就会做出如下回应。
+
+```
+HTTP/1.1 101 Switching Protocols
+Upgrade: websocket
+Connection: Upgrade
+Sec-WebSocket-Accept: HSmrc0sMlYUkAGmm5OPpG2HaGWk=
+Sec-WebSocket-Protocol: chat
+```
+
+###### CORS
+
+CORS 是跨源资源分享（Cross-Origin Resource Sharing）的缩写。它是 W3C 标准，属于跨源 AJAX 请求的根本解决方法。相比 JSONP 只能发`GET`请求，CORS 允许任何类型的请求。
+
+下一章将详细介绍，如何通过 CORS 完成跨源 AJAX 请求。
+
+#### CORS
+
+##### 简介
+
+CORS 需要浏览器和服务器同时支持。目前，所有浏览器都支持该功能。
+
+整个 CORS 通信过程，都是浏览器自动完成，不需要用户参与。对于开发者来说，CORS 通信与普通的 AJAX 通信没有差别，代码完全一样。浏览器一旦发现 AJAX 请求跨域，就会自动添加一些附加的头信息，有时还会多出一次附加的请求，但用户不会有感知。因此，实现 CORS 通信的关键是服务器。只要服务器实现了 CORS 接口，就可以跨域通信。
+
+##### 两种请求
+
+CORS 请求分成两类：简单请求（simple request）和非简单请求（not-so-simple request）。
+
+只要同时满足以下两大条件，就属于简单请求。
+
+（1）请求方法是以下三种方法之一。
+
+> - HEAD
+> - GET
+> - POST
+
+（2）HTTP 的头信息不超出以下几种字段。
+
+> - Accept
+> - Accept-Language
+> - Content-Language
+> - Last-Event-ID
+> - Content-Type：只限于三个值`application/x-www-form-urlencoded`、`multipart/form-data`、`text/plain`
+
+凡是不同时满足上面两个条件，就属于非简单请求。一句话，简单请求就是简单的 HTTP 方法与简单的 HTTP 头信息的结合。
+
+这样划分的原因是，表单在历史上一直可以跨域发出请求。简单请求就是表单请求，浏览器沿袭了传统的处理方式，不把行为复杂化，否则开发者可能转而使用表单，规避 CORS 的限制。对于非简单请求，浏览器会采用新的处理方式。
+
+##### 简单请求
+
+###### 基本流程
+
+对于简单请求，浏览器直接发出 CORS 请求。具体来说，就是在头信息之中，增加一个`Origin`字段。
+
+下面是一个例子，浏览器发现这次跨域 AJAX 请求是简单请求，就自动在头信息之中，添加一个`Origin`字段。
+
+```
+GET /cors HTTP/1.1
+Origin: http://api.bob.com
+Host: api.alice.com
+Accept-Language: en-US
+Connection: keep-alive
+User-Agent: Mozilla/5.0...
+```
+
+上面的头信息中，`Origin`字段用来说明，本次请求来自哪个域（协议 + 域名 + 端口）。服务器根据这个值，决定是否同意这次请求。
+
+如果`Origin`指定的源，不在许可范围内，服务器会返回一个正常的 HTTP 回应。浏览器发现，这个回应的头信息没有包含`Access-Control-Allow-Origin`字段（详见下文），就知道出错了，从而抛出一个错误，被`XMLHttpRequest`的`onerror`回调函数捕获。注意，这种错误无法通过状态码识别，因为 HTTP 回应的状态码有可能是200。
+
+如果`Origin`指定的域名在许可范围内，服务器返回的响应，会多出几个头信息字段。
+
+```
+Access-Control-Allow-Origin: http://api.bob.com
+Access-Control-Allow-Credentials: true
+Access-Control-Expose-Headers: FooBar
+Content-Type: text/html; charset=utf-8
+```
+
+上面的头信息之中，有三个与 CORS 请求相关的字段，都以`Access-Control-`开头。
+
+**（1）`Access-Control-Allow-Origin`**
+
+该字段是必须的。它的值要么是请求时`Origin`字段的值，要么是一个`*`，表示接受任意域名的请求。
+
+**（2）`Access-Control-Allow-Credentials`**
+
+该字段可选。它的值是一个布尔值，表示是否允许发送 Cookie。默认情况下，Cookie 不包括在 CORS 请求之中。设为`true`，即表示服务器明确许可，浏览器可以把 Cookie 包含在请求中，一起发给服务器。这个值也只能设为`true`，如果服务器不要浏览器发送 Cookie，不发送该字段即可。
+
+**（3）`Access-Control-Expose-Headers`**
+
+该字段可选。CORS 请求时，`XMLHttpRequest`对象的`getResponseHeader()`方法只能拿到6个服务器返回的基本字段：`Cache-Control`、`Content-Language`、`Content-Type`、`Expires`、`Last-Modified`、`Pragma`。如果想拿到其他字段，就必须在`Access-Control-Expose-Headers`里面指定。上面的例子指定，`getResponseHeader('FooBar')`可以返回`FooBar`字段的值。
+
+###### withCredentials 属性
+
+上面说到，CORS 请求默认不包含 Cookie 信息（以及 HTTP 认证信息等），这是为了降低 CSRF 攻击的风险。但是某些场合，服务器可能需要拿到 Cookie，这时需要服务器显式指定`Access-Control-Allow-Credentials`字段，告诉浏览器可以发送 Cookie。
+
+```
+Access-Control-Allow-Credentials: true
+```
+
+同时，开发者必须在 AJAX 请求中打开`withCredentials`属性。
+
+```
+var xhr = new XMLHttpRequest();
+xhr.withCredentials = true;
+```
+
+否则，即使服务器要求发送 Cookie，浏览器也不会发送。或者，服务器要求设置 Cookie，浏览器也不会处理。
+
+但是，有的浏览器默认将`withCredentials`属性设为`true`。这导致如果省略`withCredentials`设置，这些浏览器可能还是会一起发送 Cookie。这时，可以显式关闭`withCredentials`。
+
+```
+xhr.withCredentials = false;
+```
+
+需要注意的是，如果服务器要求浏览器发送 Cookie，`Access-Control-Allow-Origin`就不能设为星号，必须指定明确的、与请求网页一致的域名。同时，Cookie 依然遵循同源政策，只有用服务器域名设置的 Cookie 才会上传，其他域名的 Cookie 并不会上传，且（跨域）原网页代码中的`document.cookie`也无法读取服务器域名下的 Cookie。
+
+##### 非简单请求
+
+###### 预检请求
+
+非简单请求是那种对服务器提出特殊要求的请求，比如请求方法是`PUT`或`DELETE`，或者`Content-Type`字段的类型是`application/json`。
+
+非简单请求的 CORS 请求，会在正式通信之前，增加一次 HTTP 查询请求，称为“预检”请求（preflight）。浏览器先询问服务器，当前网页所在的域名是否在服务器的许可名单之中，以及可以使用哪些 HTTP 方法和头信息字段。只有得到肯定答复，浏览器才会发出正式的`XMLHttpRequest`请求，否则就报错。这是为了防止这些新增的请求，对传统的没有 CORS 支持的服务器形成压力，给服务器一个提前拒绝的机会，这样可以防止服务器收到大量`DELETE`和`PUT`请求，这些传统的表单不可能跨域发出的请求。
+
+下面是一段浏览器的 JavaScript 脚本。
+
+```js
+var url = 'http://api.alice.com/cors';
+var xhr = new XMLHttpRequest();
+xhr.open('PUT', url, true);
+xhr.setRequestHeader('X-Custom-Header', 'value');
+xhr.send();
+```
+
+上面代码中，HTTP 请求的方法是`PUT`，并且发送一个自定义头信息`X-Custom-Header`。
+
+浏览器发现，这是一个非简单请求，就自动发出一个“预检”请求，要求服务器确认可以这样请求。下面是这个“预检”请求的 HTTP 头信息。
+
+```
+OPTIONS /cors HTTP/1.1
+Origin: http://api.bob.com
+Access-Control-Request-Method: PUT
+Access-Control-Request-Headers: X-Custom-Header
+Host: api.alice.com
+Accept-Language: en-US
+Connection: keep-alive
+User-Agent: Mozilla/5.0...
+```
+
+“预检”请求用的请求方法是`OPTIONS`，表示这个请求是用来询问的。头信息里面，关键字段是`Origin`，表示请求来自哪个源。
+
+除了`Origin`字段，“预检”请求的头信息包括两个特殊字段。
+
+**（1）`Access-Control-Request-Method`**
+
+该字段是必须的，用来列出浏览器的 CORS 请求会用到哪些 HTTP 方法，上例是`PUT`。
+
+**（2）`Access-Control-Request-Headers`**
+
+该字段是一个逗号分隔的字符串，指定浏览器 CORS 请求会额外发送的头信息字段，上例是`X-Custom-Header`。
+
+###### 预检请求的回应
+
+服务器收到“预检”请求以后，检查了`Origin`、`Access-Control-Request-Method`和`Access-Control-Request-Headers`字段以后，确认允许跨源请求，就可以做出回应。
+
+```
+HTTP/1.1 200 OK
+Date: Mon, 01 Dec 2008 01:15:39 GMT
+Server: Apache/2.0.61 (Unix)
+Access-Control-Allow-Origin: http://api.bob.com
+Access-Control-Allow-Methods: GET, POST, PUT
+Access-Control-Allow-Headers: X-Custom-Header
+Content-Type: text/html; charset=utf-8
+Content-Encoding: gzip
+Content-Length: 0
+Keep-Alive: timeout=2, max=100
+Connection: Keep-Alive
+Content-Type: text/plain
+```
+
+上面的 HTTP 回应中，关键的是`Access-Control-Allow-Origin`字段，表示`http://api.bob.com`可以请求数据。该字段也可以设为星号，表示同意任意跨源请求。
+
+```
+Access-Control-Allow-Origin: *
+```
+
+如果服务器否定了“预检”请求，会返回一个正常的 HTTP 回应，但是没有任何 CORS 相关的头信息字段，或者明确表示请求不符合条件。
+
+```
+OPTIONS http://api.bob.com HTTP/1.1
+Status: 200
+Access-Control-Allow-Origin: https://notyourdomain.com
+Access-Control-Allow-Method: POST
+```
+
+上面的服务器回应，`Access-Control-Allow-Origin`字段明确不包括发出请求的`http://api.bob.com`。
+
+这时，浏览器就会认定，服务器不同意预检请求，因此触发一个错误，被`XMLHttpRequest`对象的`onerror`回调函数捕获。控制台会打印出如下的报错信息。
+
+```
+XMLHttpRequest cannot load http://api.alice.com.
+Origin http://api.bob.com is not allowed by Access-Control-Allow-Origin.
+```
+
+服务器回应的其他 CORS 相关字段如下。
+
+```
+Access-Control-Allow-Methods: GET, POST, PUT
+Access-Control-Allow-Headers: X-Custom-Header
+Access-Control-Allow-Credentials: true
+Access-Control-Max-Age: 1728000
+```
+
+**（1）`Access-Control-Allow-Methods`**
+
+该字段必需，它的值是逗号分隔的一个字符串，表明服务器支持的所有跨域请求的方法。注意，返回的是所有支持的方法，而不单是浏览器请求的那个方法。这是为了避免多次“预检”请求。
+
+**（2）`Access-Control-Allow-Headers`**
+
+如果浏览器请求包括`Access-Control-Request-Headers`字段，则`Access-Control-Allow-Headers`字段是必需的。它也是一个逗号分隔的字符串，表明服务器支持的所有头信息字段，不限于浏览器在“预检”中请求的字段。
+
+**（3）`Access-Control-Allow-Credentials`**
+
+该字段与简单请求时的含义相同。
+
+**（4）`Access-Control-Max-Age`**
+
+该字段可选，用来指定本次预检请求的有效期，单位为秒。上面结果中，有效期是20天（1728000秒），即允许缓存该条回应1728000秒（即20天），在此期间，不用发出另一条预检请求。
+
+##### 浏览器的正常请求和回应
+
+一旦服务器通过了“预检”请求，以后每次浏览器正常的 CORS 请求，就都跟简单请求一样，会有一个`Origin`头信息字段。服务器的回应，也都会有一个`Access-Control-Allow-Origin`头信息字段。
+
+下面是“预检”请求之后，浏览器的正常 CORS 请求。
+
+```
+PUT /cors HTTP/1.1
+Origin: http://api.bob.com
+Host: api.alice.com
+X-Custom-Header: value
+Accept-Language: en-US
+Connection: keep-alive
+User-Agent: Mozilla/5.0...
+```
+
+上面头信息的`Origin`字段是浏览器自动添加的。
+
+下面是服务器正常的回应。
+
+```
+Access-Control-Allow-Origin: http://api.bob.com
+Content-Type: text/html; charset=utf-8
+```
+
+上面头信息中，`Access-Control-Allow-Origin`字段是每次回应都必定包含的。
+
+##### 与 JSONP 的比较
+
+CORS 与 JSONP 的使用目的相同，但是比 JSONP 更强大。JSONP 只支持`GET`请求，CORS 支持所有类型的 HTTP 请求。JSONP 的优势在于支持老式浏览器，以及可以向不支持 CORS 的网站请求数据。
+
+##### 参考链接
+
+- [Using CORS](https://www.html5rocks.com/en/tutorials/cors/), Monsur Hossain
+- [HTTP access control (CORS)](https://developer.mozilla.org/en-US/docs/Web/HTTP/Access_control_CORS), MDN
+- [CORS](https://frontendian.co/cors), Ryan Miller
+- [Do You Really Know CORS?](http://performantcode.com/web/do-you-really-know-cors), Grzegorz Mirek
 
 #### 常见跨域方式
 

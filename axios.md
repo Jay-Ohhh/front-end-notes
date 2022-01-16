@@ -612,4 +612,11 @@ onDownloadProgress: function (event) {
 },
 ```
 
-#### 跨域请求携带凭证 withCredentials：true
+#### 跨域请求携带凭证 withCredentials
+
+withCredentials : boolean，表示跨域请求时是否需要使用凭证
+
+对于附带身份凭证的请求（通常是 `Cookie`），服务器不得设置 `Access-Control-Allow-Origin` 的值为“`*`”。
+
+这是因为请求的首部中携带了 `Cookie` 信息，如果 `Access-Control-Allow-Origin` 的值为“`*`”，请求将会失败。而将 `Access-Control-Allow-Origin` 的值设置为具体域名，例如 `https://example.com`，则请求将成功执行。
+

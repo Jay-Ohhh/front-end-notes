@@ -189,3 +189,6 @@ tree -I pattern 用于过滤不想要显示的文件或者文件夹。比如要�
 tree -I “node_modules”
 ```
 
+#### npm scripts hooks
+
+http://www.ruanyifeng.com/blog/2016/10/npm_scripts.html

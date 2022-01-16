@@ -124,6 +124,36 @@ module.exports = {
 - loader：webpack 只能理解 JavaScript 和 JSON 文件。**loader** 让 webpack 能够去处理其他类型的文件，并将它们转换为有效 [模块](https://webpack.docschina.org/concepts/modules)
 - plugin：plugins扩展了webpack的功能，在webpack运行时会广播很多事件，plugin可以监听这些事件，然后通过webpack提供的API来改变输出结果。
 
+##### loader执行顺序
+
+从右往左进行
+
+```js
+{
+  test: /\.less$/,
+  use: [
+    'style-loader',
+    'css-loader',
+    'less-loader'
+  ]
+}
+```
+
+执行顺序其实是less-loader > css-loader > style-loader
+
+**为什么是从右往左**
+
+只是Webpack选择了compose方式，而不是pipe的方式而已，在技术上实现从左往右也不会有难度。
+
+函数组合：函数组合是函数式编程中非常重要的思想。
+
+函数组合的两种形式：一种是pipe，另一种是compose。前者从左向右组合函数，后者方向相反。
+
+
+##### plugin执行顺序
+
+plugin会绑定到webpack自身的事件钩子，如果多个plugin绑定同一个事件钩子，则按照配置文件数组索引顺序执行。
+
 #### 常用 loader
 
 https://juejin.cn/post/6844904031240863758#heading-9
