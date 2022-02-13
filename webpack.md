@@ -42,7 +42,7 @@ filename是主入口的文件名，chunkFilename是非主入口的文件名。
 | [id]        | 模块标识符(module identifier)               |
 | [query]     | 模块的 query，例如，文件名 `?` 后面的字符串 |
 
-##### output
+###### publicPath
 
 ```javascript
 module.exports = {
@@ -56,6 +56,69 @@ module.exports = {
     publicPath: 'assets/', // 相对于 HTML 页面
     publicPath: '../assets/', // 相对于 HTML 页面
     publicPath: '', // 相对于 HTML 页面（目录相同）
+  },
+};
+```
+
+##### resolve
+
+###### alias
+
+创建 `import` 或 `require` 的别名
+
+pakage.json
+
+```json
+resolve: {
+	alias: { '@':  path.resolve(__dirname, 'src'), },
+},
+```
+
+tsconfig.json
+
+```json
+{
+	"compilerOptions": {
+		"paths": {
+			"@/*": ["./src/*"]
+		}
+	},
+}
+
+```
+
+###### extensions
+
+```
+[string] = ['.js', '.json', '.wasm']
+```
+
+尝试按顺序解析这些后缀名。如果有多个文件有相同的名字，但后缀名不同，webpack 会解析列在数组首位的后缀的文件 并跳过其余的后缀。
+
+**webpack.config.js**
+
+```js
+module.exports = {
+  //...
+  resolve: {
+    extensions: ['.js', '.json', '.wasm'],
+  },
+};
+```
+
+能够使用户在引入模块时不带扩展：
+
+```js
+import File from '../path/to/file';
+```
+
+请注意，以上这样使用 `resolve.extensions` 会 **覆盖默认数组**，这就意味着 webpack 将不再尝试使用默认扩展来解析模块。然而你可以使用 `'...'` 访问默认拓展名：
+
+```js
+module.exports = {
+  //...
+  resolve: {
+    extensions: ['.ts', '...'],
   },
 };
 ```
@@ -88,9 +151,43 @@ source map模式详细说明：https://blog.csdn.net/zwkkkk1/article/details/887
 
 使用webpack打包项目时一方面我们要防止单个文件太大，另一方面要防止文件碎片化，即打包文件太多，导致网络请求过多。所以合理的配置应该是兼顾打包文件的数量以及打包文件的个数。
 
+**splitChunks.chunks**
+
+Chunks 有三个提供的值，分别是 async、initial、all
+
+- async 只对动态（异步）导入的模块进行分离
+- initial 对所有模块进行分离，如果一个模块既被异步引用，也被同步引用，那么会生成两个包
+- all 对所有模块进行分离，如果一个模块既被异步引用，也被同步引用，那么只会生成一个共享包
+
+具体可以参考这篇文章: [Webpack 4 Mysterious SplitChunks Plugin](https://link.juejin.cn/?target=https%3A%2F%2Fmedium.com%2Fdailyjs%2Fwebpack-4-splitchunks-plugin-d9fbbe091fd0)
+
+**splitChunks.minChunk**
+
+某个包的引用次数必须大于等于设置的数值，该模包才能被拆分出来；
+
+**splitChunks.minSize**
+
+字面意思就可以看出来是满足相应大小的包才会被提取出来，单位是字节，minSize的值为30000，也就是说小于这个数的包不会被提取而是会被打到引用的文件中去，maxSize与之相反，但优先级小于minSize，另外值得注意的是，这两个值只对静态引入的公共包有影响，对于异步引入的包，不管大小多少哪怕minSize设置的很大，也同样是会被提取出来的。
+
+maxSize如果为非0值时，切忌小于minSize；
+
+**splitChunks.cacheGroups**
+
+缓存组可以继承和/或覆盖来自 `splitChunks.*` 的任何选项。但是 `test`、`priority` 和 `reuseExistingChunk` 只能在缓存组级别上进行配置。将它们设置为 `false`以禁用任何默认缓存组。
+
+**splitChunks.cacheGroups.{cacheGroup}.priority**
+
+```
+number = -20
+```
+
+一个模块可以属于多个缓存组。优化将优先考虑具有更高 `priority`（优先级）的缓存组。默认组的优先级为负，以允许自定义组获得更高的优先级（自定义组的默认值为 `0`）。
+
 ###### runtimeChunk
 
-runtimeChunk：用来优化持久化缓存的, runtime 指的是 webpack 的运行环境(具体作用就是模块解析, 加载) 和 模块信息清单, 模块信息清单在每次有模块变更(hash 变更)时都会变更, 所以我们想把这部分代码单独打包出来, 配合后端缓存策略, 这样就不会因为某个模块的变更导致包含模块信息的模块(通常会被包含在最后一个 bundle 中)缓存失效. optimization.runtimeChunk 就是告诉 webpack 是否要把这部分单独打包出来。
+runtimeChunk：将 runtime 代码拆分为一个单独的 chunk。
+
+runtimeChunk：可用来优化持久化缓存的。runtime，以及伴随的 manifest 数据，主要是指：在浏览器运行过程中，webpack 用来连接模块化应用程序所需的所有代码。模块信息清单（runtime 代码、manifest 数据）在每次有模块变更(hash 变更)时都会变更, 所以我们想把这部分代码单独打包出来, 配合后端缓存策略, 这样就不会因为某个模块的变更导致包含模块信息的模块(通常会被包含在最后一个 bundle 中)缓存失效。optimization.runtimeChunk 就是告诉 webpack 是否要把这部分单独打包出来。
 
 ```js
 // 常用配置
@@ -100,6 +197,10 @@ module.exports = {
     name: 'manifest',
   }
 };
+
+new HtmlWebpackPlugin({
+  chunks:['manifest'], // 加上 'manifest'
+})
 ```
 
 
@@ -275,7 +376,168 @@ module.exports = {
 
 - `webpack.BannerPlugin`：为每个 chunk 文件头部添加 banner。
 
-#### 优化打包体积
+##### html-webpack-plugin
+
+**inject**
+
+注入选项。有四个选项值 true, body, head, false.
+
+- true
+  - 默认值，script标签位于html文件的 body 底部
+- body
+  - 同 true
+- head
+  - script 标签位于 head 标签内
+- false
+  - 不插入生成的 js 文件，只是单纯的生成一个 html 文件
+
+**favicon**
+
+给生成的 html 文件生成一个 favicon。属性值为 favicon 文件所在的路径名。
+
+```
+// webpack.config.js
+...
+plugins: [
+    new HtmlWebpackPlugin({
+        ...
+        favicon: 'path/to/yourfile.ico'
+    }) 
+]
+```
+
+生成的 html 标签中会包含这样一个 link 标签
+
+```
+<link rel="shortcut icon" href="example.ico">
+```
+
+同 title 和 filename 一样，如果在模板文件指定了 favicon，会忽略该属性。
+
+**minify**
+
+minify 的作用是对 html 文件进行压缩，minify 的属性值是一个压缩选项或者 false 。默认值为false, 不对生成的 html 文件进行压缩。来看看这个压缩选项。
+
+html-webpack-plugin 内部集成了 [html-minifier](https://link.segmentfault.com/?enc=jnwbINXHGXdtyX023fHyRA%3D%3D.Ci3TrbWFUN8CEjxA%2Be4RlQY0pmyFEx1O2YQFSHX5FzS4IhHXPuRQbVJ7A0aoA%2BkXduW4P36yC%2BNbNlCh7uhvUA%3D%3D) ,这个压缩选项同 html-minify 的压缩选项完全一样，
+看一个简单的例子。
+
+```
+// webpack.config.js
+...
+plugins: [
+    new HtmlWebpackPlugin({
+        ...
+        minify: {
+            removeAttributeQuotes: true // 移除属性的引号
+        }
+    })
+]
+<!-- 原html片段 -->
+<div id="example" class="example">test minify</div>
+<!-- 生成的html片段 -->
+<div id=example class=example>test minify</div>
+```
+
+**hash**
+
+hash选项的作用是 给生成的 js 文件一个独特的 hash 值，该 hash 值是该次 webpack 编译的 hash 值。默认值为 false 。同样看一个例子。
+
+```js
+// webpack.config.js
+plugins: [
+    new HtmlWebpackPlugin({
+        ...
+        hash: true
+    })
+]
+<script type=text/javascript src=bundle.js?22b9692e22e7be37b57e></script>
+```
+
+执行 webpack 命令后，你会看到你的生成的 html 文件的 script 标签内引用的 js 文件，是不是有点变化了。
+bundle.js 文件后跟的一串 hash 值就是此次 webpack 编译对应的 hash 值。
+
+```
+$ webpack
+Hash: 22b9692e22e7be37b57e
+Version: webpack 1.13.2
+```
+
+**cache**
+
+默认值是 true。表示只有在内容变化时才生成一个新的文件。
+
+**showErrors**
+
+showErrors 的作用是，如果 webpack 编译出现错误，webpack会将错误信息包裹在一个 pre 标签内，属性的默认值为 true ，也就是显示错误信息。
+
+**chunks**
+
+chunks 选项的作用主要是针对多入口(entry)文件。当你有多个入口文件的时候，对应就会生成多个编译后的 js 文件。那么 chunks 选项就可以决定是否都使用这些生成的 js 文件。
+
+chunks 默认会在生成的 html 文件中引用所有的 js 文件，当然你也可以指定引入哪些特定的文件。
+
+看一个小例子。
+
+```js
+// webpack.config.js
+entry: {
+    index: path.resolve(__dirname, './src/index.js'),
+    index1: path.resolve(__dirname, './src/index1.js'),
+    index2: path.resolve(__dirname, './src/index2.js')
+}
+...
+plugins: [
+    new HtmlWebpackPlugin({
+        ...
+        chunks: ['index','index2']
+    })
+]
+```
+
+执行 webpack 命令之后，你会看到生成的 index.html 文件中，只引用了 index.js 和 index2.js
+
+```html
+...
+<script type=text/javascript src=index.js></script>
+<script type=text/javascript src=index2.js></script>
+```
+
+而如果没有指定 chunks 选项，默认会全部引用。
+
+**excludeChunks**
+
+弄懂了 chunks 之后，excludeChunks 选项也就好理解了，跟 chunks 是相反的，排除掉某些 js 文件。 比如上面的例子，其实等价于下面这一行
+
+```
+...
+excludeChunks: ['index1.js']
+```
+
+**chunksSortMode**
+
+这个选项决定了 script 标签的引用顺序。默认有四个选项，'none', 'auto', 'dependency', '{function}'。
+
+- 'dependency' 不用说，按照不同文件的依赖关系来排序。
+- 'auto' 默认值，插件的内置的排序方式，具体顺序这里我也不太清楚...
+- 'none' 无序？ 不太清楚...
+- {function} 提供一个函数？但是函数的参数又是什么? 不太清楚...
+
+> 如果有使用过这个选项或者知道其具体含义的同学，还请告知一下。。。
+
+**xhtml**
+
+一个布尔值，默认值是 false ，如果为 true ,则以兼容 xhtml 的模式引用文件。
+
+
+
+#### 优化打包速度
+
+- thread-loader  多线程打包
+- cache-loader  缓存其之前的loaders的结果到磁盘中。读取和保存缓存文件会有开销，隐藏仅仅需要在一些性能开销较大的 loader 之前（数组index靠前）添加此 loader
+-  babel-loader  options: {cacheDirectory :true} 指定的目录将用来缓存 loader 的执行结果。
+- TerserWebpackPlugin：{parallel:true}  开启多线程
+
+####  优化打包体积
 
 ##### webpack-bundle-analyzer
 
@@ -387,13 +649,35 @@ chunk的修改才改变对应的hash值
 
 `chunkHash`可以用于`js`打包`，contentHash`可以用到`css`文件打包。
 
-#### chunk和bundle
+#### chunk、bundle、module
 
-https://juejin.cn/post/6844903889393680392
+![image.png](https://p1-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/6ae2804df7064ee183b64c391e229f09~tplv-k3u1fbpfcp-watermark.awebp) 
+
+看这个图就很明白了：
+
+1. 对于一份同逻辑的代码，当我们手写下一个一个的文件，它们无论是 ESM 还是 commonJS 或是 AMD，他们都是 **module** ；
+2. 当我们写的 module 源文件传到 webpack 进行打包时，webpack 会根据文件引用关系生成 **chunk** 文件，webpack 会对这个 chunk 文件进行一些操作；
+3. webpack 处理好 chunk 文件后，最后会输出 **bundle** 文件，这个 bundle 文件包含了经过加载和编译的最终源文件，所以它可以直接在浏览器中运行。
+
+一般来说一个 chunk 对应一个 bundle，比如上图中的 `utils.js -> chunks 1 -> utils.bundle.js`；但也有例外，比如说上图中，我就用 `MiniCssExtractPlugin` 从 chunks 0 中抽离出了 `index.bundle.css` 文件。
+
+ 
+
+**总结：**
+
+`module`，`chunk` 和 `bundle` 其实就是同一份逻辑代码在不同转换场景下的取了三个名字：
+
+我们直接写出来的是 module，webpack 处理时是 chunk，最后生成浏览器可以直接运行的 bundle。
 
 #### runtime和manifest
 
 https://webpack.docschina.org/concepts/manifest/#root
+
+webpack manifest用来引导所有模块的交互。manifest包含了加载和处理模块的逻辑。
+
+当webpack编译器处理和映射应用代码时，它把模块的详细的信息都记录到了manifest中。当模块被打包并运输到浏览器上时，runtime就会根据manifest来处理和加载模块。利用manifest就知道从哪里去获取模块代码。
+
+manifest数据被包含在某个js文件中，可使用 [`optimization.runtimeChunk`](https://webpack.docschina.org/configuration/optimization/#optimizationruntimechunk) 选项将 runtime 代码（包含manifest数据）拆分为一个单独的 chunk。
 
 #### webpack和gulp
 
@@ -439,5 +723,225 @@ module.exports = {
   plugins: [...mpa.htmlPlugins],
 }
 
+```
+
+#### 采用TS编写webpack配置
+
+https://webpack.docschina.org/configuration/configuration-languages/#typescript
+
+```sh
+npm install --save-dev typescript ts-node @types/node @types/webpack
+# 如果使用版本低于 v4.7.0 的 webpack-dev-server，还需要安装以下依赖
+npm install --save-dev @types/webpack-dev-server
+```
+
+要使用 [Typescript](https://www.typescriptlang.org/) 来编写 webpack 配置，你需要先安装必要的依赖，比如 Typescript 以及其相应的类型声明，类型声明可以从 [DefinitelyTyped](https://definitelytyped.org/) 项目中获取，依赖安装如下所示：
+
+```bash
+npm install --save-dev typescript ts-node @types/node @types/webpack
+# 如果使用版本低于 v4.7.0 的 webpack-dev-server，还需要安装以下依赖
+npm install --save-dev @types/webpack-dev-server
+```
+
+完成依赖安装后便可以开始编写配置文件，示例如下：
+
+**webpack.config.ts**
+
+```typescript
+import * as path from 'path';
+import * as webpack from 'webpack';
+// in case you run into any typescript error when configuring `devServer`
+import 'webpack-dev-server';
+
+const config: webpack.Configuration = {
+  mode: 'production',
+  entry: './foo.js',
+  output: {
+    path: path.resolve(__dirname, 'dist'),
+    filename: 'foo.bundle.js',
+  },
+};
+
+export default config;
+```
+
+该示例需要 typescript 版本在 2.7 及以上，并在 `tsconfig.json` 文件的 compilerOptions 中添加 `esModuleInterop` 和 `allowSyntheticDefaultImports` 两个配置项。
+
+值得注意的是你需要确保 `tsconfig.json` 的 `compilerOptions` 中 `module` 选项的值为 `commonjs`,否则 webpack 的运行会失败报错，因为 `ts-node` 不支持 `commonjs` 以外的其他模块规范。
+
+你可以通过三个途径来完成 module 的设置：
+
+- 直接修改 `tsconfig.json` 文件
+
+- 修改 `tsconfig.json` 并且添加 `ts-node` 的设置。
+
+- 使用 `tsconfig-paths`
+
+**第一种方法**就是打开你的 `tsconfig.json` 文件，找到 `compilerOptions` 的配置，然后设置 `target` 和 `module` 的选项分别为 `"ES5"` 和 `"CommonJs"` (在 `target` 设置为 `es5` 时你也可以不显示编写 `module` 配置)。
+
+**第二种方法** 就是添加 ts-node 设置：
+
+你可以为 `tsc` 保持 `"module": "ESNext"`配置，如果你是用 webpack 或者其他构建工具的话，为 ts-node 设置一个重载（override）。[ts-node 配置项](https://typestrong.org/ts-node/docs/imports/)
+
+```json
+{
+  "compilerOptions": {
+    "module": "ESNext",
+  },
+  "ts-node": {
+    "compilerOptions": {
+      "module": "CommonJS"
+    }
+  }
+}
+```
+
+**第二种方法**需要先安装 `tsconfig-paths` 这个 npm 包，如下所示：
+
+```bash
+npm install --save-dev tsconfig-paths
+```
+
+安装后你可以为 webpack 配置创建一个单独的 TypeScript 配置文件，示例如下：
+
+**tsconfig-for-webpack-config.json**
+
+```json
+{
+  "compilerOptions": {
+    "module": "commonjs",
+    "target": "es5",
+    "esModuleInterop": true
+  }
+}
+```
+
+**Tip**
+
+ts-node 可以根据 `tsconfig-paths` 提供的环境变量 `process.env.TS_NODE_PROJECT` 来找到 `tsconfig.json` 文件路径。
+
+`process.env.TS_NODE_PROJECT` 变量的设置如下所示:
+
+**package.json**
+
+```json
+{
+  "scripts": {
+    "build": "cross-env TS_NODE_PROJECT=\"tsconfig-for-webpack-config.json\" webpack"
+  }
+}
+```
+
+之所以要添加 `cross-env`，是因为我们在直接使用 `TS_NODE_PROJECT` 时遇到过 `"TS_NODE_PROJECT" unrecognized command` 报错的反馈，添加 `cross-env` 之后该问题也似乎得到了解决，你可以查看[这个 issue](https://github.com/webpack/webpack.js.org/issues/2733)获取到关于该问题的更多信息。
+
+**package.json**
+
+需安装 typescript 、ts-node
+
+```json
+{
+	scripts:{
+		"dev": "cross-env TS_NODE_PROJECT='./build/webpack.tsconfig.json' NODE_ENV=development webpack-dev-server --config build/webpack.conf.ts --color --progress"
+	}
+}
+```
+
+#### webpack初始化项目
+
+- 如果你使用 webpack v4+ 版本，并且想要在命令行中调用 `webpack`，你还需要安装 [CLI](https://webpack.docschina.org/api/cli/)。
+
+- [webpack-dev-server](https://github.com/webpack/webpack-dev-server) 可用于快速开发应用程序。请查阅 [开发指南](https://webpack.docschina.org/guides/development/) 开始使用。
+
+> `webpack-dev-server` 会从 `output.path` 中定义的目录为服务提供 bundle 文件，即，文件将可以通过 `http://[devServer.host]:[devServer.port]/[output.publicPath]/[output.filename]` 进行访问。
+
+- webpack-merge 合并webpack的多个配置，通常用来合并common和pro、dev的配置
+
+```
+$ mkdir test-app && cd test-app
+$ npm init -y
+$ npm install -D webpack webpack-cli webpack-dev-server webpack-merge
+```
+
+**package.json**
+
+--color：Enable colors on console.
+
+--progress：Print compilation progress during build.
+
+```json
+"scripts": {
+		"start": "cross-env TS_NODE_PROJECT='./build/webpack.tsconfig.json' NODE_ENV=development webpack-dev-server --config build/webpack.conf.ts --color --progress",
+		"build": "cross-env TS_NODE_PROJECT='./build/webpack.tsconfig.json' NODE_ENV=production webpack --config build/webpack.conf.ts --color --progress",
+},
+	
+```
+
+#### webpack编译 ts 、tsx、jsx，搭建react环境
+
+https://juejin.cn/post/7020972849649156110
+
+ts-loader 可以转换 ts、tsx 文件
+
+babel-loader 可以转换 js、jsx、ts、tsx 文件 （推荐）
+
+这里我们选择使用 babel-loader 
+
+```shell
+npm i -D @babel/core @babel/preset-env @babel/preset-react @babel/preset-typescript @babel/runtime-corejs3 @babel/plugin-transform-runtime @babel/plugin-proposal-class-properties @babel/plugin-proposal-decorators core-js@3 babel-loader
+```
+
+```sh
+npm i react react-dom
+npm i -D @types/react @types/react-dom typescript 
+```
+
+**webpack.config.js**
+
+```json
+{
+		module: {
+		rules: [
+			// js、jsx、ts、tsx
+			{
+				test: /\.(j|t)sx?$/,
+				use: [
+					{ loader: 'cache-loader' },
+					{ loader: 'thread-loader', options: { workers: 3 } },
+					{ loader: 'babel-loader', options: { cacheDirectory: true } },
+				],
+				include: [srcPath],
+				exclude: /node_modules/,
+			},
+		],
+	},
+}
+```
+
+**babel.config.js**
+
+```json
+
+module.exports = {
+  // 由于@babel/polyfill在7.4.0中被弃用，我们建议直接添加core js并通过corejs选项设置版本
+	presets: [
+		[
+			"@babel/preset-env",
+			{
+				modules: false, // Tree Shaking需要设置为false
+				targets: { browsers: ["> 1%", "last 2 versions", "not ie <= 8"] },
+        // when using useBuiltIns: "usage", set the proposals option to true. This will enable polyfilling of every proposal supported by core-js@xxx
+				useBuiltIns: "usage", 
+				corejs: { version: 3, proposals: true }
+			}
+		],
+		"@babel/react",
+		"@babel/preset-typescript",
+	],
+	plugins: [
+		["@babel/plugin-transform-runtime", { corejs: { version: 3, proposals: true } }], // 用于babel的编译(必须)
+		["@babel/plugin-proposal-decorators", { legacy: true }], // 需要放在@babel/plugin-proposal-class-propertie之前
+		["@babel/plugin-proposal-class-properties", { loose: true }], // 用于解析class语法(react必选)
+	]
+}
 ```
 

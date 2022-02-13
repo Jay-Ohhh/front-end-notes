@@ -4045,7 +4045,7 @@ localStorage 存储的键和值始终采用 UTF-16 DOMString 格式，每个字�
 
 **字符串的长度值, 或者utf-16的编码单元，更合理的是 10M字节空间**
 
-5M = 5 * 1024 * 1024 
+5M = 5 * 1024 * 1024
 
 单位  m      kb         b       
 
@@ -4170,14 +4170,17 @@ setTimeout(() =>{
 
 
 
-###### 写个方法统计一个localStorage已使用空间
+###### 写个方法统计一个 Storage 已使用空间
 
 现代浏览器的精写版本：
 
 ```js
-function sieOfLS() {
-    return Object.entries(localStorage).map(v => v.join('')).join('').length;
+function sieOfLS(storege=sessionStorage) {
+  	const strLength = Object.entries(storege).map(v => v.join('')).join('').length;
+    console.log(`当前已使用${strLength}个utf-16的编码单元，占用率为${(strLength/(5*1024*1024)*100).toFixed(2)}%`)
+    return strLength;
 }
+sieOfLS()
 ```
 
 
@@ -4821,6 +4824,8 @@ Authorization: Bearer <token>
 虽然这些限制是必要的，但是有时很不方便，合理的用途也受到影响。下面介绍如何规避上面的限制。
 
 ##### Cookie
+
+https://juejin.cn/post/7052507369690890270
 
 Cookie 是服务器写入浏览器的一小段信息，只有同源的网页才能共享。如果两个网页一级域名相同，只是次级域名不同，浏览器允许通过设置`document.domain`共享 Cookie。
 

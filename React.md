@@ -5145,6 +5145,8 @@ React 会针对每个子元素 mutate 而不是保持相同的 `Duke` 和 `Villa
 
 ##### keys
 
+**key、Ref 不能通过props获取。**
+
 为了解决以上问题，React 支持 `key` 属性。当子元素拥有 key 时，React 使用 key 来匹配原有树上的子元素以及最新树上的子元素。以下例子在新增 `key` 之后使得之前的低效转换变得高效：
 
 ```jsx

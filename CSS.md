@@ -50,7 +50,7 @@ export default () => {
 
 ##### 全局、局部作用域
 
-SS Modules 允许使用`:global(.className)`的语法，声明一个全局规则。凡是这样声明的`class`，都不会被编译成哈希字符串。
+CSS Modules 允许使用`:global(.className)`的语法，声明一个全局规则。凡是这样声明的`class`，都不会被编译成哈希字符串。
 
 `App.css`加入一个全局`class`，即使没加`:global`，也是全局class，因为是`App.css`全局css文件。
 
@@ -94,6 +94,22 @@ CSS Modules 还提供一种显式的局部作用域语法`:local(.className)`，
 /** === */
 .title {
   color: red;
+}
+```
+
+**全局作用域和局部作用域可以混合使用**
+
+```css
+:global{
+  .side{
+    :local(.title) {
+      :global{
+        .head{
+          color:red;
+        }
+      }
+		}
+  }
 }
 ```
 
@@ -365,5 +381,22 @@ vertical-align: top; // 设置成顶部对齐，默认是底部对齐
 
  这些浏览器没有将`100vh`高度调整为视口高度变化时屏幕的可见部分，而是将`100vh`设置为浏览器的高度。这就导致地址栏可见时，设置的100vh的元素的高度比屏幕的可见部分高度要大，出现滚动条。
 
-解决方案：window.innerHeight。
+解决方案：
+
+- 将高度设置为window.innerHeight
+
+  iOS Safari解决：
+
+- ```css
+  body{
+  	height:100vh;
+  }
+  @supports (-webkit-touch-callout:none){
+  	body{
+  		height:-webkit-fill-available;
+  	}
+  }
+  ```
+
+  
 
