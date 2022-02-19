@@ -3,6 +3,8 @@
 [WebSocket-菜鸟教程](https://www.runoob.com/html/html5-websocket.html)
 [轮询](https://www.cnblogs.com/huchong/p/8595644.html)
 
+[短连接轮询、长连接、Websocket 横向对比](https://mp.weixin.qq.com/s/HXF_AO24WeiOoq4Q5G_pBw)
+
 #### 简介
 - WebSocket和http都是基于tcp协议的应用层协议，tcp是传输层协议。
   tcp传输层协议：连接建立以后，客户端和服务器端就可以通过 TCP 连接直接交换数据。

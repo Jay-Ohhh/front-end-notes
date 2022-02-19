@@ -1737,7 +1737,7 @@ p.then(function (x) {
 
 3、async 修饰的函数  隐式返回一个 promise（即使不写return）。箭头函数也能用async修饰。
 
-async函数内return  xxx ，实际上是 return new Promise (resolve => resolve(xxx))，跟Promise的用法一样。
+async函数内return  xxx ，实际上是 return new Promise (resolve => resolve(xxx)) === return Promise.solve(xxx)，跟Promise的用法一样。reject的话则 return Promise.reject()
 
 4、在 await 外层  包一层  try{} catch(e){} 使用 可以获取异常
 
@@ -5600,7 +5600,9 @@ SSE 与 WebSocket 作用相似，都是建立浏览器与服务器之间的通�
 
 - 暴露模块：`module.exports.xxx = value`或`exports.xxx = value`
 
-  > exports = module.exports = { } // 不能改变 exports 的指向
+  > **exports指向的是module.exports**
+  >
+  > exports = module.exports = { } // wrong，不能改变 exports （module.exports）的指向
 
 - 引入模块：`require(xxx)`,如果是第三方模块，xxx为模块名；如果是自定义模块，xxx为模块文件路径
 
@@ -5632,9 +5634,11 @@ SSE 与 WebSocket 作用相似，都是建立浏览器与服务器之间的通�
 
 统一AMD和CommonJS规范，解决跨平台问题
 
-UMD先判断是否支持Node.js的模块（exports）是否存在，存在则使用Node.js模块模式；在判断是否支持AMD（define是否存在），存在则使用AMD方式加载模块
+UMD先判断是否支持Node.js的模块（exports）是否存在，存在则使用Node.js模块模式；再判断是否支持AMD（define是否存在），存在则使用AMD方式加载模块
 
 ###### ES6 Module
+
+[Pure ESM package](https://gist.github.com/sindresorhus/a39789f98801d908bbc7ff3ecc99d99c)
 
 浏览器和服务器通用的模块解决方案
 

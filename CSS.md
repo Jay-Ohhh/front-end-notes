@@ -398,5 +398,38 @@ vertical-align: top; // 设置成顶部对齐，默认是底部对齐
   }
   ```
 
-  
+
+#### :last-child无效
+
+注意：当只有一个子元素时，`:first-child` 和 `:last-child`两个选择器的同个样式会按先后顺序进行覆盖
+
+```html
+ <div>
+   <div class="item">11</div>
+   <div class="item">11</div>
+   <div class="item">11</div>
+   <div class="last"></div>
+</div>
+```
+
+无效
+
+```css
+.item.last-child{
+ // ...
+}
+```
+
+因为父元素包裹的不仅仅只有.item，还有.last，它们在同一个父级元素内，所以需要把.item再用一个元素包裹
+
+```html
+ <div class="wrap">
+      <div>
+        <div class="item">11</div>
+        <div class="item">11</div>
+        <div class="item">11</div>
+      </div>
+      <div class="last"></div>
+ </div>
+```
 

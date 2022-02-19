@@ -51,6 +51,10 @@ https://juejin.cn/post/6987179395714646024#heading-5
 
 https://docs.npmjs.com/cli/v7/configuring-npm/package-json  
 
+##### package.json 非官方字段集合
+
+https://segmentfault.com/a/1190000016365409
+
 ##### bin字段
 
 `bin`项用来指定每个内部命令对应的可执行文件的位置。如果你编写的是一个node工具的时候一定会用到`bin`字段。
@@ -61,14 +65,148 @@ https://docs.npmjs.com/cli/v7/configuring-npm/package-json
 "bin": {
   "webpack": "bin/index.js",
 }
-复制代码
 ```
 
 当我们执行`webpack`命令的时候就会执行`bin/index.js`文件中的代码。
 
-在模块以依赖的方式被安装，如果存在`bin`选项。在`node_modules/.bin/`生成对应的文件， `Npm`会寻找这个文件，在node_modules/.bin/目录下建立符号链接。由于node_modules/.bin/目录会在运行时加入系统的PATH变量，因此在运行npm时，就可以不带路径，直接通过命令来调用这些脚本。
+在模块以依赖的方式被安装，如果存在`bin`选项。在`node_modules/.bin/`生成对应的文件， `Npm`会寻找这个文件，在node_modules/.bin/目录下建立符号链接。由于node_modules/.bin/目录会在运行时加入系统的`PATH`变量，因此在运行npm时，就可以不带路径，直接通过命令来调用这些脚本。执行结束后，再将 `PATH` 变量恢复原样。
 
 所有node_modules/.bin/目录下的命令，都可以用npm run [命令]的格式运行。在命令行下，键入npm run，然后按tab键，就会显示所有可以使用的命令。
+
+#####  main字段
+
+`main`字段指定了加载的入口文件，`require`导入的时候就会加载这个文件。这个字段的默认值是模块根目录下面的`index.js`。
+
+##### module（提案）
+
+指定ESM规范的入口文件，可被webpack、rollup打包器识别。
+
+- 如果打包器已经支持 `module` 字段则会优先使用 `ES6` 模块规范的版本，这样可以启用 `Tree Shaking` 机制。
+- 如果打包器还不识别 `module` 字段则会使用我们已经编译成 `CommonJS` 规范的版本，也不会阻碍打包流程。
+
+使得 webpack 、rollup 本身就可以解析ESM模块语法，如果用户只用到 library 的某些部分，则允许通过 [tree shaking](https://webpack.docschina.org/guides/tree-shaking/) 打包更轻量的包。
+
+[This article on Rollup 1.0](https://levelup.gitconnected.com/code-splitting-for-libraries-bundling-for-npm-with-rollup-1-0-2522c7437697#9f6f) says it another way:
+
+> The `main` field makes sure that Node users using `require` will be served the UMD version. 
+>
+> The `module` field is not an official npm feature but a common convention among bundlers to designate how to import an ESM version of our library.
+
+##### typings 
+
+TypeScript 的入口文件
+
+```json
+{
+	"typings": "dist/index.d.ts",
+}
+```
+
+##### peerDependencies
+
+目的是提示宿主环境去安装满足插件peerDependencies所指定依赖的包，然后在插件import或者require所依赖的包的时候，永远都是引用宿主环境统一安装的npm包，最终解决插件与所依赖包不一致的问题。
+
+比方其中有一个依赖包PackageA，该包的package.json文件指定了对PackageB的依赖：
+
+```json
+{
+    "dependencies": {
+        "PackageB": "1.0.0"
+    }
+}
+```
+
+如果我们在我们的MyProject项目中执行npm install PackageA, 我们会发现我们项目的目录结构会是如下形式：
+
+```ruby
+MyProject
+|- node_modules
+   |- PackageA
+      |- node_modules
+         |- PackageB
+```
+
+那么在我们的项目中，我们能通过下面语句引入"PackageA"：
+
+```jsx
+var packageA = require('PackageA')
+```
+
+但是，如果你想在项目中直接引用PackageB:
+
+```jsx
+var packageA = require('PackageA')
+var packageB = require('PackageB')
+```
+
+这是不行的，即使PackageB被安装过；因为Node只会在“MyProject/node_modules”目录下查找PackageB，它不会在进入PackageA模块下的node_modules下查找。
+
+所以，为了解决这个问题，在MyProject项目package.json中我们必须直接声明对PackageB的依赖并安装。
+
+**peerDependencies的引入**
+
+例如上面PackageA的package.json文件如果是下面这样：
+
+```json
+{
+    "peerDependencies": {
+        "PackageB": "1.0.0"
+    }
+}
+```
+
+那么，它会告诉npm：如果某个package把我列为依赖的话，那么那个package也必需应该有对PackageB的依赖。
+
+也就是说，如果你npm install PackageA，你将会得到下面的如下的目录结构：
+
+```ruby
+MyProject
+|- node_modules
+   |- PackageA
+   |- PackageB
+```
+
+In npm versions 3 through 6, `peerDependencies` were not automatically installed, and would raise a warning if an invalid version of the peer dependency was found in the tree. As of npm v7, peerDependencies *are* installed by default.
+
+
+
+##### files
+
+当你发布package时，具体那些文件会发布上去
+
+```json
+"files": [
+  "src",
+  "dist/*.js",
+  "types/*.d.ts"
+],
+```
+
+**sideEffects**
+
+用于webpack，声明该模块是否包含 sideEffects（副作用），从而可以为 tree-shaking 提供更大的优化空间
+
+
+
+##### unpkg
+
+```json
+{
+  "unpkg": "dist/jquery.js"
+}
+```
+
+正常情况下，访问 `jquery` 的发布文件通过 `https://unpkg.com/jquery@3.3.1/dist/jquery.js`，当你使用省略的 url `https://unpkg.com/jquery` 时，便会按照如下的方式获取文件：
+
+```asciidoc
+# [latestVersion] 指最新版本号，pkg 指 package.json
+
+# 定义了 unpkg 属性时
+https://unpkg.com/jquery@[latestVersion]/[pkg.unpkg]
+
+# 未定义 unpkg 属性时，将回退到 main 字段
+https://unpkg.com/jquery@[latestVersion]/[pkg.main] 
+```
 
 #### npm link
 

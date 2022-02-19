@@ -1,6 +1,6 @@
 #### 简介
 
-**webpack** 是一个用于现代 JavaScript 应用程序的 静态模块 打包工具。当 webpack 处理应用程序时，它会在内部构建一个 [依赖图(dependency graph)](https://webpack.docschina.org/concepts/dependency-graph/)，此依赖图对应映射到项目所需的每个模块，并生成一个或多个 *bundle*。
+**webpack**是一个用于现代 JavaScript 应用程序的 静态模块 打包工具。当 webpack 处理应用程序时，它会在内部构建一个 [依赖图(dependency graph)](https://webpack.docschina.org/concepts/dependency-graph/)，此依赖图对应映射到项目所需的每个模块，并生成一个或多个 *bundle*。
 
 #### 功能
 
@@ -288,6 +288,45 @@ module.exports = {
 对于 Vue、React 的脚手架，内部均使用了 PostCSS，默认开启 autoprefixer 添加浏览器前缀
 
 你可以根据 [Browserslist 规范](https://github.com/browserslist/browserslist#readme) 调整 `package.json` 中的 `browserslist` 来自定义目标支持浏览器。
+
+###### style-loader和MiniCssExtractPlugin.loader
+
+- style-loader：把js中import导入的样式文件打包到js文件中，运行js文件时，将样式自动插入到<style>标签中。
+
+- mini-css-extract-plugin：把js中import导入的样式文件，单独打包成一个css文件，结合html-webpack-plugin，以link的形式插入到html文件中。
+
+  > 此插件不支持HMR，若修改了样式文件，是不能即时在浏览器中显示出来的，需要手动刷新页面。
+
+```js
+// 编译less
+				{
+					test: /\.less$/,
+					use: [
+						{
+							// 打包时用MiniCssExtractPlugin.loader替换掉style-loader
+							loader: MiniCssExtractPlugin.loader,
+							options: {
+								publicPath: '../',
+							},
+						},
+						{
+							loader: 'css-loader',
+							options: {
+								// 用于配置 css-loader 总用于 @import 的资源之前有多少个loader，0 => 无 loader(默认)，1=>post-loader，2=>postcss-loader，less-loader
+								importLoaders: 1,
+								modules: {
+									compileType: 'module',
+									auto: /\.module\.\w+$/i,
+									localIdentName: '[path][name]_[local]_[hash:base64:5]',
+									localIdentContext: srcPath,
+								},
+							},
+						},
+						{ loader: 'postcss-loader', options: { postcssOptions: postcssOptions } },
+						{ loader: 'less-loader', options: { sourceMap: false } },
+					],
+				},
+```
 
 ###### 其余
 
@@ -586,6 +625,26 @@ module.exports = {
 
 Tree Shaking是一个术语，通常用于描述移除 JavaScript 上下文中的未引用代码(dead-code)。
 
+为了利用 *tree shaking* 的优势， 你必须...
+
+- 使用 ES2015 模块语法（即 `import` 和 `export`）。
+
+  > 因为在使用 CommonJS 时，会导入整个库(library)对象
+  >
+  > 但是在使用 ES6 模块时，可以只导入(import)我们所需的对象或函数
+
+- 确保没有编译器将您的 ES2015 模块语法转换为 CommonJS 的（顺带一提，这是现在常用的 @babel/preset-env 的默认行为，详细信息请参阅[文档](https://babeljs.io/docs/en/babel-preset-env#modules)）。
+
+- 在项目的 `package.json` 文件中，添加 `"sideEffects"` 属性。
+
+- 使用 `mode` 为 `"production"` 的配置项以启用[更多优化项](https://webpack.docschina.org/concepts/mode/#usage)，包括压缩代码与 tree shaking。
+
+你可以将应用程序想象成一棵树。绿色表示实际用到的 source code(源码) 和 library(库)，是树上活的树叶。灰色表示未引用代码，是秋天树上枯萎的树叶。为了除去死去的树叶，你必须摇动这棵树，使它们落下。
+
+如果你对优化输出很感兴趣，请进入到下个指南，来了解 [生产环境](https://webpack.docschina.org/guides/production) 构建的详细细节。
+
+
+
 但是要想使其生效，生成的代码必须是ES6模块。不能使用其它类型的模块如`CommonJS`之流。如果使用`Babel`的话，这里有一个小问题，因为`Babel`的预案（preset）默认会将任何模块类型都转译成`CommonJS`类型，这样会导致`tree-shaking`失效。修正这个问题也很简单，在`.babelrc`文件或在`webpack.config.js`文件中设置`modules： false`就好了
 
 ```js
@@ -679,7 +738,9 @@ webpack manifest用来引导所有模块的交互。manifest包含了加载和�
 
 manifest数据被包含在某个js文件中，可使用 [`optimization.runtimeChunk`](https://webpack.docschina.org/configuration/optimization/#optimizationruntimechunk) 选项将 runtime 代码（包含manifest数据）拆分为一个单独的 chunk。
 
-#### webpack和gulp
+#### webpack、rollup、gulp
+
+**在开发应用时使用 Webpack，开发库时使用 Rollup**
 
 gulp强调的是前端开发的工作流程，我们可以通过配置一系列的task，定义task处理的事务（例如文件压缩合并、雪碧图、启动server、版本控制等），然后定义执行顺序，来让gulp执行这些task，从而构建项目的整个前端开发流程。
 
@@ -927,7 +988,9 @@ module.exports = {
 		[
 			"@babel/preset-env",
 			{
-				modules: false, // Tree Shaking需要设置为false
+        // esm转换成其他模块语法，cjs、amd、umd等
+        // Tree Shaking需要设置为false
+				modules: false, 
 				targets: { browsers: ["> 1%", "last 2 versions", "not ie <= 8"] },
         // when using useBuiltIns: "usage", set the proposals option to true. This will enable polyfilling of every proposal supported by core-js@xxx
 				useBuiltIns: "usage", 
@@ -938,10 +1001,27 @@ module.exports = {
 		"@babel/preset-typescript",
 	],
 	plugins: [
-		["@babel/plugin-transform-runtime", { corejs: { version: 3, proposals: true } }], // 用于babel的编译(必须)
+		["@babel/plugin-transform-runtime", { corejs: { version: 3, proposals: true } }], // 用于babel的编译(必须)，将重复的辅助函数自动替换，节省大量体积
 		["@babel/plugin-proposal-decorators", { legacy: true }], // 需要放在@babel/plugin-proposal-class-propertie之前
 		["@babel/plugin-proposal-class-properties", { loose: true }], // 用于解析class语法(react必选)
 	]
 }
 ```
 
+#### 搭建脚手架
+
+https://mp.weixin.qq.com/s/C40Izv2Q3Wlv6t81RxYrbA
+
+https://mp.weixin.qq.com/s/q2x-EAoeQFan5y64adk4Wg
+
+https://mp.weixin.qq.com/s/xoYQeUhNSxXhAc3_l9xRJA
+
+- [commander](https://mp.weixin.qq.com/s?__biz=MzI1ODE4NzE1Nw==&mid=2247491366&idx=1&sn=ef7d34e289489547b352c2f746331567&chksm=ea0d55dcdd7adcca9e18ea49344b2100a5e587ea33e2125331ab46988178a0fbbd929f68f632&scene=126&sessionid=1644802905&subscene=207&key=cd1943ff5cfa93f320a19d0c6e3ea103aba9677a6d703b6c2d975ebb4264ff6f0be5306ba26534c65c54bfff1fe770932be4cf04397e5de1b2bcb3e52d48d91a3fbdf597f9df611f721eb90928165ee9d6db787f952b565144a5ffd59adf180bcb2cbed500280acd1ea7547bf0a8c2e7c8ace68f7be7e842b9a1d5bdca7ff967&ascene=0&uin=NjMxODk4NDM4&devicetype=Windows+10+x64&version=6305002e&lang=zh_CN&exportkey=AVR8JBMfkP52oz2%2BCjBNXpE%3D&acctmode=0&pass_ticket=8UPJ8hYIh0hvfF5WxtSBB1zrgsMVuni9ytVnaJO%2FHs%2BwB4K282MYq6GT1WzQ%2Fr5k&wx_header=0&fontgear=2) —— 提供 cli 命令与参数
+- [glob](https://mp.weixin.qq.com/s?__biz=MzI1ODE4NzE1Nw==&mid=2247491366&idx=1&sn=ef7d34e289489547b352c2f746331567&chksm=ea0d55dcdd7adcca9e18ea49344b2100a5e587ea33e2125331ab46988178a0fbbd929f68f632&scene=126&sessionid=1644802905&subscene=207&key=cd1943ff5cfa93f320a19d0c6e3ea103aba9677a6d703b6c2d975ebb4264ff6f0be5306ba26534c65c54bfff1fe770932be4cf04397e5de1b2bcb3e52d48d91a3fbdf597f9df611f721eb90928165ee9d6db787f952b565144a5ffd59adf180bcb2cbed500280acd1ea7547bf0a8c2e7c8ace68f7be7e842b9a1d5bdca7ff967&ascene=0&uin=NjMxODk4NDM4&devicetype=Windows+10+x64&version=6305002e&lang=zh_CN&exportkey=AVR8JBMfkP52oz2%2BCjBNXpE%3D&acctmode=0&pass_ticket=8UPJ8hYIh0hvfF5WxtSBB1zrgsMVuni9ytVnaJO%2FHs%2BwB4K282MYq6GT1WzQ%2Fr5k&wx_header=0&fontgear=2) —— 遍历文件
+- [shelljs](https://mp.weixin.qq.com/s?__biz=MzI1ODE4NzE1Nw==&mid=2247491366&idx=1&sn=ef7d34e289489547b352c2f746331567&chksm=ea0d55dcdd7adcca9e18ea49344b2100a5e587ea33e2125331ab46988178a0fbbd929f68f632&scene=126&sessionid=1644802905&subscene=207&key=cd1943ff5cfa93f320a19d0c6e3ea103aba9677a6d703b6c2d975ebb4264ff6f0be5306ba26534c65c54bfff1fe770932be4cf04397e5de1b2bcb3e52d48d91a3fbdf597f9df611f721eb90928165ee9d6db787f952b565144a5ffd59adf180bcb2cbed500280acd1ea7547bf0a8c2e7c8ace68f7be7e842b9a1d5bdca7ff967&ascene=0&uin=NjMxODk4NDM4&devicetype=Windows+10+x64&version=6305002e&lang=zh_CN&exportkey=AVR8JBMfkP52oz2%2BCjBNXpE%3D&acctmode=0&pass_ticket=8UPJ8hYIh0hvfF5WxtSBB1zrgsMVuni9ytVnaJO%2FHs%2BwB4K282MYq6GT1WzQ%2Fr5k&wx_header=0&fontgear=2) —— 常用的 shell 命令支持
+- [prompts](https://mp.weixin.qq.com/s?__biz=MzI1ODE4NzE1Nw==&mid=2247491366&idx=1&sn=ef7d34e289489547b352c2f746331567&chksm=ea0d55dcdd7adcca9e18ea49344b2100a5e587ea33e2125331ab46988178a0fbbd929f68f632&scene=126&sessionid=1644802905&subscene=207&key=cd1943ff5cfa93f320a19d0c6e3ea103aba9677a6d703b6c2d975ebb4264ff6f0be5306ba26534c65c54bfff1fe770932be4cf04397e5de1b2bcb3e52d48d91a3fbdf597f9df611f721eb90928165ee9d6db787f952b565144a5ffd59adf180bcb2cbed500280acd1ea7547bf0a8c2e7c8ace68f7be7e842b9a1d5bdca7ff967&ascene=0&uin=NjMxODk4NDM4&devicetype=Windows+10+x64&version=6305002e&lang=zh_CN&exportkey=AVR8JBMfkP52oz2%2BCjBNXpE%3D&acctmode=0&pass_ticket=8UPJ8hYIh0hvfF5WxtSBB1zrgsMVuni9ytVnaJO%2FHs%2BwB4K282MYq6GT1WzQ%2Fr5k&wx_header=0&fontgear=2) —— 读取控制台用户输入
+- [fs-extra](https://mp.weixin.qq.com/s?__biz=MzI1ODE4NzE1Nw==&mid=2247491366&idx=1&sn=ef7d34e289489547b352c2f746331567&chksm=ea0d55dcdd7adcca9e18ea49344b2100a5e587ea33e2125331ab46988178a0fbbd929f68f632&scene=126&sessionid=1644802905&subscene=207&key=cd1943ff5cfa93f320a19d0c6e3ea103aba9677a6d703b6c2d975ebb4264ff6f0be5306ba26534c65c54bfff1fe770932be4cf04397e5de1b2bcb3e52d48d91a3fbdf597f9df611f721eb90928165ee9d6db787f952b565144a5ffd59adf180bcb2cbed500280acd1ea7547bf0a8c2e7c8ace68f7be7e842b9a1d5bdca7ff967&ascene=0&uin=NjMxODk4NDM4&devicetype=Windows+10+x64&version=6305002e&lang=zh_CN&exportkey=AVR8JBMfkP52oz2%2BCjBNXpE%3D&acctmode=0&pass_ticket=8UPJ8hYIh0hvfF5WxtSBB1zrgsMVuni9ytVnaJO%2FHs%2BwB4K282MYq6GT1WzQ%2Fr5k&wx_header=0&fontgear=2) —— 文件读写等操作
+- [inquirer](https://mp.weixin.qq.com/s?__biz=MzI1ODE4NzE1Nw==&mid=2247491366&idx=1&sn=ef7d34e289489547b352c2f746331567&chksm=ea0d55dcdd7adcca9e18ea49344b2100a5e587ea33e2125331ab46988178a0fbbd929f68f632&scene=126&sessionid=1644802905&subscene=207&key=cd1943ff5cfa93f320a19d0c6e3ea103aba9677a6d703b6c2d975ebb4264ff6f0be5306ba26534c65c54bfff1fe770932be4cf04397e5de1b2bcb3e52d48d91a3fbdf597f9df611f721eb90928165ee9d6db787f952b565144a5ffd59adf180bcb2cbed500280acd1ea7547bf0a8c2e7c8ace68f7be7e842b9a1d5bdca7ff967&ascene=0&uin=NjMxODk4NDM4&devicetype=Windows+10+x64&version=6305002e&lang=zh_CN&exportkey=AVR8JBMfkP52oz2%2BCjBNXpE%3D&acctmode=0&pass_ticket=8UPJ8hYIh0hvfF5WxtSBB1zrgsMVuni9ytVnaJO%2FHs%2BwB4K282MYq6GT1WzQ%2Fr5k&wx_header=0&fontgear=2) —— 类似于 prompts
+- [chalk](https://mp.weixin.qq.com/s?__biz=MzI1ODE4NzE1Nw==&mid=2247491366&idx=1&sn=ef7d34e289489547b352c2f746331567&chksm=ea0d55dcdd7adcca9e18ea49344b2100a5e587ea33e2125331ab46988178a0fbbd929f68f632&scene=126&sessionid=1644802905&subscene=207&key=cd1943ff5cfa93f320a19d0c6e3ea103aba9677a6d703b6c2d975ebb4264ff6f0be5306ba26534c65c54bfff1fe770932be4cf04397e5de1b2bcb3e52d48d91a3fbdf597f9df611f721eb90928165ee9d6db787f952b565144a5ffd59adf180bcb2cbed500280acd1ea7547bf0a8c2e7c8ace68f7be7e842b9a1d5bdca7ff967&ascene=0&uin=NjMxODk4NDM4&devicetype=Windows+10+x64&version=6305002e&lang=zh_CN&exportkey=AVR8JBMfkP52oz2%2BCjBNXpE%3D&acctmode=0&pass_ticket=8UPJ8hYIh0hvfF5WxtSBB1zrgsMVuni9ytVnaJO%2FHs%2BwB4K282MYq6GT1WzQ%2Fr5k&wx_header=0&fontgear=2) —— 彩色日志
+- [debug](https://mp.weixin.qq.com/s?__biz=MzI1ODE4NzE1Nw==&mid=2247491366&idx=1&sn=ef7d34e289489547b352c2f746331567&chksm=ea0d55dcdd7adcca9e18ea49344b2100a5e587ea33e2125331ab46988178a0fbbd929f68f632&scene=126&sessionid=1644802905&subscene=207&key=cd1943ff5cfa93f320a19d0c6e3ea103aba9677a6d703b6c2d975ebb4264ff6f0be5306ba26534c65c54bfff1fe770932be4cf04397e5de1b2bcb3e52d48d91a3fbdf597f9df611f721eb90928165ee9d6db787f952b565144a5ffd59adf180bcb2cbed500280acd1ea7547bf0a8c2e7c8ace68f7be7e842b9a1d5bdca7ff967&ascene=0&uin=NjMxODk4NDM4&devicetype=Windows+10+x64&version=6305002e&lang=zh_CN&exportkey=AVR8JBMfkP52oz2%2BCjBNXpE%3D&acctmode=0&pass_ticket=8UPJ8hYIh0hvfF5WxtSBB1zrgsMVuni9ytVnaJO%2FHs%2BwB4K282MYq6GT1WzQ%2Fr5k&wx_header=0&fontgear=2) —— 类似于 chalk
+- [execa](https://mp.weixin.qq.com/s?__biz=MzI1ODE4NzE1Nw==&mid=2247491366&idx=1&sn=ef7d34e289489547b352c2f746331567&chksm=ea0d55dcdd7adcca9e18ea49344b2100a5e587ea33e2125331ab46988178a0fbbd929f68f632&scene=126&sessionid=1644802905&subscene=207&key=cd1943ff5cfa93f320a19d0c6e3ea103aba9677a6d703b6c2d975ebb4264ff6f0be5306ba26534c65c54bfff1fe770932be4cf04397e5de1b2bcb3e52d48d91a3fbdf597f9df611f721eb90928165ee9d6db787f952b565144a5ffd59adf180bcb2cbed500280acd1ea7547bf0a8c2e7c8ace68f7be7e842b9a1d5bdca7ff967&ascene=0&uin=NjMxODk4NDM4&devicetype=Windows+10+x64&version=6305002e&lang=zh_CN&exportkey=AVR8JBMfkP52oz2%2BCjBNXpE%3D&acctmode=0&pass_ticket=8UPJ8hYIh0hvfF5WxtSBB1zrgsMVuni9ytVnaJO%2FHs%2BwB4K282MYq6GT1WzQ%2Fr5k&wx_header=0&fontgear=2) —— 执行 shell 指令
