@@ -3407,6 +3407,18 @@ https://developer.mozilla.org/zh-CN/docs/Web/API/FormData
 
 **FormDataInstance.append(key, value [, filename])**
 
+- `name`
+
+  `value中包含的数据对应的表单名称。`
+
+- `value`
+
+  `表单的值。`可以是[`USVString`](https://developer.mozilla.org/zh-CN/docs/Web/API/USVString) 或 [`Blob`](https://developer.mozilla.org/zh-CN/docs/Web/API/Blob) (包括子类型，如 [`File`](https://developer.mozilla.org/zh-CN/docs/Web/API/File))。
+
+- `filename `可选
+
+  传给服务器的文件名称 (一个 [`USVString`](https://developer.mozilla.org/zh-CN/docs/Web/API/USVString)), 当一个 [`Blob`](https://developer.mozilla.org/zh-CN/docs/Web/API/Blob) 或 [`File`](https://developer.mozilla.org/zh-CN/docs/Web/API/File) 被作为第二个参数的时候， [`Blob`](https://developer.mozilla.org/zh-CN/docs/Web/API/Blob) 对象的默认文件名是 "blob"。 [`File`](https://developer.mozilla.org/zh-CN/docs/Web/API/File) 对象的默认文件名是该文件的名称。
+
 向 `FormData` 中添加新的属性值，`FormData` 对应的属性值存在也不会覆盖原值，而是新增一个值，如果属性不存在则新增一项属性值。
 
 可以直接向FormData对象附加File或Blob类型的文件。
@@ -3430,6 +3442,63 @@ headers: {
 既可以上传键值对，也可以上传文件。
 
 上传文件是以二进制（binary）的形式提交。
+
+##### 例子
+
+下面的代码将创建一个空的FormData对象:
+
+```
+var formData = new FormData(); // 当前为空
+```
+
+Copy to Clipboard
+
+你可以使用[`FormData.append`](https://developer.mozilla.org/zh-CN/docs/Web/API/FormData/append)来添加键/值对到表单里面；
+
+```js
+formData.append('username', 'Chris');
+```
+
+或者你可以使用可选的`*form参数来创建一个带预置数据的FormData对象*`:
+
+```html
+<form id="myForm" name="myForm">
+  <div>
+    <label for="username">Enter name:</label>
+    <input type="text" id="username" name="username">
+  </div>
+  <div>
+    <label for="useracc">Enter account number:</label>
+    <input type="text" id="useracc" name="useracc">
+  </div>
+  <div>
+    <label for="userfile">Upload file:</label>
+    <input type="file" id="userfile" name="userfile">
+  </div>
+<input type="submit" value="Submit!">
+</form>
+```
+
+**注意**: 所有的输入元素都需要有**name**属性，否则无法访问到值。
+
+```js
+var myForm = document.getElementById('myForm');
+formData = new FormData(myForm);
+```
+
+##### 上传文件例子
+
+```html
+<input id="file" type="file">
+```
+
+```js
+//初始化实例
+var formData = new FormData();
+//通过append() 方法向对象中添加content键值对
+formData.append("file",document.getElementById('file').files[0]);
+axios.post(url,formData)
+```
 
 #### Blob
 
@@ -3497,7 +3566,7 @@ File 对象负责处理那些以文件形式存在的二进制数据。
 
 ```html
 // HTML 代码如下
-// <input id="fileItem" type="file">
+<input id="fileItem" type="file">
 var file = document.getElementById('fileItem').files[0];
 file instanceof File // true
 ```

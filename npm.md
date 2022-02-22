@@ -102,6 +102,27 @@ TypeScript 的入口文件
 }
 ```
 
+##### dependencies 和 devDependencies
+
+- dependencies：您的应用程序在生产中所需的包。
+- devDependencies：只需要本地开发和测试的包
+
+**区别主要有如下两点：**
+
+- 如果使用 --production 参数，只安装 dependencies 字段的模块。
+
+```sh
+$ npm install --production
+或者
+$ NODE_ENV=production npm install
+```
+
+对于自己要发布上线的项目，eslint、prettier以及ts的type等等这些发布完全用不到的可以放到`devDependencies`下，然后上线打包部署的时候可以用`npm install --production`可以减少一些依赖安装时间吧，**前提一定是不参与打包的**
+
+- 如果我们对外提供的是一个依赖包，在别人引用我们的包的时候devDependencies中的依赖不会被 npm 下
+
+是否将模块打包和dependencies、devDependencies没有任何关系，只要引入且使用了模块，就会被模块打包器识别并打包。
+
 ##### peerDependencies
 
 目的是提示宿主环境去安装满足插件peerDependencies所指定依赖的包，然后在插件import或者require所依赖的包的时候，永远都是引用宿主环境统一安装的npm包，最终解决插件与所依赖包不一致的问题。

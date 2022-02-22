@@ -742,6 +742,10 @@ manifest数据被包含在某个js文件中，可使用 [`optimization.runtimeCh
 
 **在开发应用时使用 Webpack，开发库时使用 Rollup**
 
+rollup的定位是偏向于JavaScript库的构建，打包的体积也比webpack的小。
+
+Rollup有一项webpack不具有的功能：通过配置output.format开发者可以选择输出资源的模块形式（cjs（CommonJS），esm（ES6 Modules），amd，umd，iife，system等），此特性对于打包JavaScript库特别有用，因为往往一个库需要支持多种不同的模块形式，而通过rollup几个命令就可以把一份源代码打包为多份。
+
 gulp强调的是前端开发的工作流程，我们可以通过配置一系列的task，定义task处理的事务（例如文件压缩合并、雪碧图、启动server、版本控制等），然后定义执行顺序，来让gulp执行这些task，从而构建项目的整个前端开发流程。
 
 webpack是一个前端模块化方案，更侧重模块打包，我们可以把开发中的所有资源（图片、js文件、css文件等）都看成模块，通过loader（加载器）和plugins（插件）对资源进行处理，打包成符合生产环境部署的前端资源。
@@ -937,7 +941,7 @@ $ npm install -D webpack webpack-cli webpack-dev-server webpack-merge
 	
 ```
 
-#### webpack编译 ts 、tsx、jsx，搭建react环境
+#### webpack、babel编译 ts 、tsx、jsx，搭建react环境
 
 https://juejin.cn/post/7020972849649156110
 
@@ -955,6 +959,9 @@ npm i -D @babel/core @babel/preset-env @babel/preset-react @babel/preset-typescr
 npm i react react-dom
 npm i -D @types/react @types/react-dom typescript 
 ```
+
+- @babel/core——babel核心
+- core-js——polyfill的类库
 
 **webpack.config.js**
 
@@ -980,10 +987,14 @@ npm i -D @types/react @types/react-dom typescript
 
 **babel.config.js**
 
+https://zhuanlan.zhihu.com/p/394782898 babel插件详解
+
 ```json
 
 module.exports = {
   // 由于@babel/polyfill在7.4.0中被弃用，我们建议直接添加core js并通过corejs选项设置版本
+  // @babel/env===@babel/preset-env  @babel/react === @babel/preset-react ...
+  // 当在presets中使用@babel/env，babel会自动加上preset-
 	presets: [
 		[
 			"@babel/preset-env",
@@ -993,15 +1004,24 @@ module.exports = {
 				modules: false, 
 				targets: { browsers: ["> 1%", "last 2 versions", "not ie <= 8"] },
         // when using useBuiltIns: "usage", set the proposals option to true. This will enable polyfilling of every proposal supported by core-js@xxx
+        // 按需加载，将 useBuiltIns 改为 "usage"，babel 就可以按需加载 polyfill，并且不需要手动引入 @babel/polyfill，不过@babel/polyfill已被废弃，请使用安装core-js，并使用corejs选项
 				useBuiltIns: "usage", 
-				corejs: { version: 3, proposals: true }
+				corejs: { 
+          version: 3, // 需安装 core-js3.x的版本
+          proposals: true, // 支持js提案语法
+        }
 			}
 		],
-		"@babel/react",
+		"@babel/preset-react",  
 		"@babel/preset-typescript",
 	],
 	plugins: [
-		["@babel/plugin-transform-runtime", { corejs: { version: 3, proposals: true } }], // 用于babel的编译(必须)，将重复的辅助函数自动替换，节省大量体积
+		["@babel/plugin-transform-runtime", { 
+      corejs: { 
+      	version: 3, // 需安装 @babel/runtime-corejs3
+        proposals: true 
+      }
+    }], // 用于babel的编译(必须)，将重复的辅助函数自动替换，节省大量体积
 		["@babel/plugin-proposal-decorators", { legacy: true }], // 需要放在@babel/plugin-proposal-class-propertie之前
 		["@babel/plugin-proposal-class-properties", { loose: true }], // 用于解析class语法(react必选)
 	]

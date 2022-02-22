@@ -1899,7 +1899,7 @@ CustomButton.defaultProps = {
 ReactDOM.render(element, container[, callback])
 ```
 
-在提供的 `container` 里渲染一个 React 元素，并返回对该组件的[引用](https://react.docschina.org/docs/more-about-refs.html)（或者针对[无状态组件](https://react.docschina.org/docs/components-and-props.html#function-and-class-components)返回 `null`，目前应该避免使用返回的引用，因为它是历史遗留下来的内容，而且在未来版本的 React 中，组件渲染在某些情况下可能会是异步的。 如果你真的需要获得对根组件 `ReactComponent` 实例的引用，那么推荐为根元素添加 [callback ref](https://react.docschina.org/docs/more-about-refs.html#the-ref-callback-attribute)。）。
+在提供的 `container` 里渲染一个 React 元素，并返回对该组件实例的[引用](https://react.docschina.org/docs/more-about-refs.html)（或者针对[无状态组件](https://react.docschina.org/docs/components-and-props.html#function-and-class-components)（函数组件）返回 `null`，目前应该避免使用返回的引用，因为它是历史遗留下来的内容，而且在未来版本的 React 中，组件渲染在某些情况下可能会是异步的。 如果你真的需要获得对根组件 `ReactComponent` 实例的引用，那么推荐为根元素添加 [callback ref](https://zh-hans.reactjs.org/docs/refs-and-the-dom.html#callback-refs)。）。
 
 渲染多个 **dom** 元素外层需使用一个标签（根元素）进行包裹。
 
@@ -7053,7 +7053,7 @@ function FriendStatus(props) {
 
 **为什么要在 effect 中返回一个函数？** 这是 effect 可选的清除机制。每个 effect 都可以返回一个清除函数。如此可以将添加和移除订阅的逻辑放在一起。它们都属于 effect 的一部分。
 
-**React 何时清除 effect？**  effect 的清除阶段在每次重新渲染时都会执行，而不是只在卸载组件的时候执行一次。这就是为什么 React 会在执行当前 effect 之前对上一个 effect 进行清除。我们稍后将讨论[为什么这将助于避免 bug](https://react.docschina.org/docs/hooks-effect.html#explanation-why-effects-run-on-each-update)以及[如何在遇到性能问题时跳过此行为](https://react.docschina.org/docs/hooks-effect.html#tip-optimizing-performance-by-skipping-effects)。
+**React 何时清除 effect？**  **effect 的清除阶段在每次重新渲染时都会执行，而不是只在卸载组件的时候执行一次。**这就是为什么 React 会在执行当前 effect 之前对上一个 effect 进行清除。我们稍后将讨论[为什么这将助于避免 bug](https://react.docschina.org/docs/hooks-effect.html#explanation-why-effects-run-on-each-update)以及[如何在遇到性能问题时跳过此行为](https://react.docschina.org/docs/hooks-effect.html#tip-optimizing-performance-by-skipping-effects)。
 
 > 注意
 >

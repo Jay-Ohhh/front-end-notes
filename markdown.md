@@ -47,6 +47,22 @@ URL即图片的url地址，如果引用本仓库中的图片，直接使用**相
 [![alt](http://path/to/img.jpg "title")](http://path/to/img.jpg "title")
 ```
 
+##### 折叠语法
+
+
+<details>
+  <summary>Title</summary>
+  content!!!
+</details>
+
+```xml
+<details>
+  <summary>Title</summary>
+
+  content!!!
+</details>
+```
+
 #### emoji
 
 https://gitmoji.js.org/
