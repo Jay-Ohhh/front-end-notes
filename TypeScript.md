@@ -6175,7 +6175,7 @@ tsconfig.josn需要放在项目的根目录。
 tsc index.ts --allowJs
 ```
 
-**配置说明**
+##### 配置说明
 
 ```json
 {
@@ -6183,11 +6183,12 @@ tsc index.ts --allowJs
     /* Basic Options */
     "target": "es5" /* target用于指定编译后js文件里的语法应该遵循哪个JavaScript的版本的版本目标: 'ES3' (default), 'ES5', 'ES2015', 'ES2016', 'ES2017', 'ES2018', 'ES2019' or 'ESNEXT'. */,
     "module": "commonjs" /* 用来指定编译后的js要使用的模块标准: 'none', 'commonjs', 'amd', 'system', 'umd', 'es2015', or 'ESNext'. */,
-    "lib": ["dom", "dom.iterable", "esnext"] /* lib用于指定要包含在编译中的库文件 */,
+    "lib": ["dom", "dom.iterable", "esnext"] /* 编译过程中需要引入的库文件的列表 */,
     "allowJs": true, /* allowJs设置的值为true或false，用来指定是否允许编译js文件，默认是false，即不编译js文件 */
     "checkJs": true, /* checkJs的值为true或false，用来指定是否检查和报告js文件中的错误，默认是false */
     "jsx": "preserve", /* 指定jsx代码用于的开发环境: 'preserve', 'react-native', or 'react'. */
     "declaration": true, /* declaration的值为true或false，用来指定是否在编译的时候生成相应的".d.ts"声明文件。如果设为true，编译每个ts文件之后会生成一个js文件和一个声明文件。但是declaration和allowJs不能同时设为true */
+    "declarationDir":'', /* 生成声明文件的输出路径。 */
     "declarationMap": true, /* 值为true或false，指定是否为声明文件.d.ts生成map文件 */
     "sourceMap": true, /* sourceMap的值为true或false，用来指定编译时是否生成.map文件 */
     "outFile": "./", /* outFile用于指定将输出文件合并为一个文件，它的值为一个文件路径名。比如设置为"./dist/main.js"，则输出的文件为一个main.js文件。但是要注意，只有设置module的值为amd和system模块时才支持这个配置 */
@@ -6197,11 +6198,12 @@ tsc index.ts --allowJs
     "incremental": true, /* Enable incremental compilation */
     "tsBuildInfoFile": "./", /* Specify file to store incremental compilation information */
     "removeComments": true, /* removeComments的值为true或false，用于指定是否将编译后的文件中的注释删掉，设为true的话即删掉注释，默认为false */
-    "noEmit": true, /* 不生成编译文件，这个一般比较少用 */
+    "noEmit": true, /* 不生成编译文件(js) */
     "importHelpers": true,  /* importHelpers的值为true或false，指定是否引入tslib里的辅助工具函数，默认为false */
     "downlevelIteration": true, /* 当target为'ES5' or 'ES3'时，为'for-of', spread, and destructuring'中的迭代器提供完全支持 */
     "isolatedModules": true,  /* isolatedModules的值为true或false，指定是否将每个文件作为单独的模块，默认为true，它不可以和declaration同时设定 */
 		"skipLibCheck":true,  /* 忽略所有的声明文件（ *.d.ts）的类型检查 */
+    
     /* Strict Type-Checking Options */
     "strict": true /* strict的值为true或false，用于指定是否启动所有类型检查，如果设为true则会同时开启下面这几个严格类型检查，默认为false */,
     "noImplicitAny": true,   /* noImplicitAny的值为false时，如果我们没有为一些值设置明确的类型，编译器会默认认为这个值为any，如果noImplicitAny的值为true的话。则没有明确的类型会报错。默认值为false */
@@ -6211,6 +6213,7 @@ tsc index.ts --allowJs
     "strictPropertyInitialization": true,  /* 设为true后会检查类的非undefined属性是否已经在构造函数里初始化，如果要开启这项，需要同时开启strictNullChecks，默认为false */
     "noImplicitThis": true, /* 当this表达式的值为any类型的时候，生成一个错误 */
     "alwaysStrict": true,  /* alwaysStrict的值为true或false，指定始终以严格模式检查每个模块，并且在编译之后的js文件中加入"use strict"字符串，用来告诉浏览器该js为严格模式 */
+    "forceConsistentCasingInFileNames": false, /* 禁止对同一个文件的不一致的引用 */
 
     /* Additional Checks */
     "noUnusedLocals": true,   /* 用于检查是否有定义了但是没有使用的变量，对于这一点的检测，使用eslint可以在你书写代码的时候做提示，你可以配合使用。它的默认值为false */
@@ -6236,9 +6239,9 @@ tsc index.ts --allowJs
     "inlineSources": true,                 /* 用于指定是否进一步将.ts文件的内容也包含到输入文件中 */
 
     /* Experimental Options */
-    "experimentalDecorators": true /* 用于指定是否启用实验性的装饰器特性 */
+    "experimentalDecorators": true, /* 用于指定是否启用实验性的装饰器特性 */
     "emitDecoratorMetadata": true,         /* 用于指定是否为装饰器提供元数据支持，关于元数据，也是ES6的新标准，可以通过Reflect提供的静态方法获取元数据，如果需要使用Reflect的一些方法，需要引入ES2015.Reflect这个库 */
-  }
+  },
   "files": [], // files可以配置一个数组列表，里面包含指定文件的相对或绝对路径，编译器在编译的时候只会编译包含在files中列出的文件，如果不指定，则取决于有没有设置include选项，如果没有include选项，则默认会编译根目录以及所有子目录中的文件。这里列出的路径必须是指定文件，而不是某个文件夹，而且不能使用* ? **/ 等通配符
   "include": [],  // include也可以指定要编译的路径列表，但是和files的区别在于，这里的路径可以是文件夹，也可以是文件，可以使用相对和绝对路径，而且可以使用通配符，比如"./src"即表示要编译src文件夹下的所有文件以及子文件夹的文件
   "exclude": [],  // exclude表示要排除的、不编译的文件，它也可以指定一个列表，规则和include一样，可以是文件或文件夹，可以是相对路径或绝对路径，可以使用通配符
@@ -6249,25 +6252,24 @@ tsc index.ts --allowJs
 
 ```
 
-**常用选项**
+##### 常用选项
 
 ```json
 {
   "compilerOptions": {
     "module": "esnext",
     "target": "es5",
-    "allowSyntheticDefaultImports": true,
+    "allowSyntheticDefaultImports": true, /* 用来指定允许从没有默认导出的模块中默认导入 */
     "jsx": "react",
-    "lib": ["dom", "dom.iterable", "esnext"],
+    "lib": ["dom", "dom.iterable", "esnext"], /* 编译过程中需要引入的库文件的列表 */
     "strict": true,
     "moduleResolution": "node",
-    "experimentalDecorators": true,
-    "downlevelIteration": true,
+    "experimentalDecorators": true, /* 用于指定是否启用实验性的装饰器特性 */
+    "downlevelIteration": true, /* 当target为'ES5' or 'ES3'时，为'for-of', spread, and destructuring'中的迭代器提供完全支持 */
     "allowJs": true,
-    "esModuleInterop": true,
-    "forceConsistentCasingInFileNames": true,
-    "isolatedModules": true,
-    "noEmit": true,
+    "esModuleInterop": true, /* 通过为导入内容创建命名空间，实现CommonJS和ES模块之间的互操作性，esModuleInterop选项的作用是支持使用import d from 'cjs'的方式引入commonjs包 */
+    "forceConsistentCasingInFileNames": true, /* 	禁止对同一个文件的不一致的引用。 */
+    "noEmit": true, /* 不生成编译文件(js) */
     "noFallthroughCasesInSwitch": true, /* 用于检查switch中是否有case没有使用break跳出switch，默认为false */
     "noImplicitAny": false,   /* noImplicitAny的值为false时，如果我们没有为一些值设置明确的类型，编译器会默认认为这个值为any，如果noImplicitAny的值为true的话。则没有明确的类型会报错。默认值为false */
     "baseUrl": ".",
@@ -6282,7 +6284,7 @@ tsc index.ts --allowJs
     }
   },
   "include": ["src"],
-  "exclude": ["node_modules", "build"]
+  "exclude": ["**/node_modules/**", "build"]
 }
 ```
 

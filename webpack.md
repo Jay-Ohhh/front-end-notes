@@ -207,7 +207,11 @@ new HtmlWebpackPlugin({
 
 ##### externals 选项（外部扩展）
 
-将不需要打包的静态资源从构建逻辑中剔除出去，而使用 `CDN` 的方式，去引用它们
+ `string` `object` `function` `RegExp` `[string, object, function, RegExp]`
+
+防止将某些 `import` 的包(package) 打包到 bundle 中，而是在运行时(runtime)再去从外部获取这些 扩展依赖(external dependencies)。
+
+例如：
 
 **webpack.config.js / vue.config.js**
 
@@ -219,6 +223,111 @@ module.exports = {
   }
 };
 ```
+
+外部 library 可能是以下任何一种形式：
+
+- **root**：可以通过一个全局变量访问 library（例如，通过 script 标签）。
+
+  > 通过 script 标签引入的库，应该为 umd 或 iife 格式。
+
+- **commonjs**：可以将 library 作为一个 CommonJS 模块访问。
+
+- **commonjs2**：和上面的类似，但导出的是 `module.exports.default`.
+
+- **amd**：类似于 `commonjs`，但使用 AMD 模块系统。
+
+可以接受以下语法……
+
+###### string
+
+请查看上面的例子。属性名称是 `jquery`，表示应该排除 `import $ from 'jquery'` 中的 `jquery` 模块。为了替换这个模块，`jQuery` 的值将被用来检索一个全局的 `jQuery` 变量。换句话说，当值为一个字符串时，它将被视为上述的`root`形式。
+
+**若是通过 script 标签 中引入**，则在其引入的全局变量中寻找对应的变量`jQuery `代替 `jquery`。
+
+> **script标签**中的全局作用域下声明变量，实际上是挂载在window上
+
+另一方面，如果你想将一个符合 CommonJS 模块化规则的类库外部化，你可以提供外联类库的类型以及类库的名称。
+
+```javascript
+module.exports = {
+  // ...
+  externals: {
+    'fs-extra': 'commonjs2 fs-extra',
+  },
+};
+```
+
+这样的做法会让任何依赖的模块都不变，正如以下所示的代码：
+
+```javascript
+import fs from 'fs-extra';
+```
+
+会将代码编译成：
+
+```javascript
+const fs = require('fs-extra');
+```
+
+###### [string]
+
+```javascript
+module.exports = {
+  //...
+  externals: {
+    subtract: ['./math', 'subtract'],
+  },
+};
+```
+
+`subtract: ['./math', 'subtract']` 转换为父子结构，其中 `./math` 是父模块，而 bundle 只引用 `subtract` 变量下的子集。该例子会编译成 `require('./math').subtract;`
+
+###### 对象
+
+一个形如 `{ root, amd, commonjs, ... }` 的对象仅允许用于 [`libraryTarget: 'umd'`](https://webpack.docschina.org/configuration/output/#outputlibrarytarget) 这样的配置.它不被允许用于其它的 library targets 配置值.
+
+```javascript
+module.exports = {
+  externals: {
+    lodash: {
+      commonjs: 'lodash',
+      amd: 'lodash',
+      root: '_', // 指向全局变量
+    },
+  },
+};
+```
+
+若设置[ouput.library.type = 'umd'](https://webpack.docschina.org/configuration/output/#outputlibrarytype)，即将本项目打包成 `umd`模块， 而本项目用到 `lodash`这个外部库，则此语法用于描述外部 library 所有可用的访问方式。这里 `lodash` 这个外部 library 可以在 AMD 和 CommonJS 模块系统中通过 `lodash` 访问，但在全局变量形式下用 `_` 访问。`subtract` 可以通过全局 `math` 对象下的属性 `subtract` 访问（例如 `window['math']['subtract']`）。
+
+###### RegExp
+
+匹配给定正则表达式的每个依赖，都将从输出 bundle 中排除。
+
+对于想要实现从一个依赖中调用多个文件的那些 library：
+
+```js
+import A from 'library/one';
+import B from 'library/two';
+
+// ...
+```
+
+无法通过在 externals 中指定整个 `library` 的方式，将它们从 bundle 中排除。而是需要逐个或者使用一个正则表达式，来排除它们。
+
+```js
+module.exports = {
+  //...
+  externals: [
+    'library/one',
+    'library/two',
+    // 匹配以 "library/" 开始的所有依赖
+    /^library\/.+$/,
+  ],
+};
+```
+
+
 
 #### loader和plugin
 
@@ -852,6 +961,7 @@ export default config;
 {
   "compilerOptions": {
     "module": "ESNext",
+    "esModuleInterop": true, /* 通过为导入内容创建命名空间，实现CommonJS和ES模块之间的互操作性，esModuleInterop选项的作用是支持使用import d from 'cjs'的方式引入commonjs包 */
   },
   "ts-node": {
     "compilerOptions": {
@@ -924,7 +1034,7 @@ ts-node 可以根据 `tsconfig-paths` 提供的环境变量 `process.env.TS_NODE
 ```
 $ mkdir test-app && cd test-app
 $ npm init -y
-$ npm install -D webpack webpack-cli webpack-dev-server webpack-merge
+$ npm install -D webpack webpack-cli webpack-dev-server webpack-merge cross-env
 ```
 
 **package.json**
