@@ -6223,6 +6223,7 @@ tsc index.ts --allowJs
 
     /* Module Resolution Options */
     "moduleResolution": "node",            /* 用于选择模块解析策略，有'node'和'classic'两种类型' */
+    "resolveJsonModule": true,             /* 允许引入json */
     "baseUrl": "./",                       /* baseUrl用于设置解析非相对模块名称的基本目录，相对模块不会受baseUrl的影响 */
     "paths": {},                           /* 用于设置模块名称到基于baseUrl的路径映射 */
     "rootDirs": [],                        /* rootDirs可以指定一个路径列表，在构建时编译器会将这个路径列表中的路径的内容都放到一个文件夹中 */
@@ -6268,6 +6269,7 @@ tsc index.ts --allowJs
     "downlevelIteration": true, /* 当target为'ES5' or 'ES3'时，为'for-of', spread, and destructuring'中的迭代器提供完全支持 */
     "allowJs": true,
     "esModuleInterop": true, /* 通过为导入内容创建命名空间，实现CommonJS和ES模块之间的互操作性，esModuleInterop选项的作用是支持使用import d from 'cjs'的方式引入commonjs包 */
+    "resolveJsonModule": true, // 允许引入json
     "forceConsistentCasingInFileNames": true, /* 	禁止对同一个文件的不一致的引用。 */
     "noEmit": true, /* 不生成编译文件(js) */
     "noFallthroughCasesInSwitch": true, /* 用于检查switch中是否有case没有使用break跳出switch，默认为false */
@@ -6284,7 +6286,7 @@ tsc index.ts --allowJs
     }
   },
   "include": ["src"],
-  "exclude": ["**/node_modules/**", "build"]
+  "exclude": ["node_modules", "build"]
 }
 ```
 

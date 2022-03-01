@@ -1051,6 +1051,160 @@ $ npm install -D webpack webpack-cli webpack-dev-server webpack-merge cross-env
 	
 ```
 
+#### babel前置知识
+
+Babel 转译后的代码要实现源代码同样的功能需要借助一些帮助函数，例如，`{ [name]: 'JavaScript' }` 转译后的代码如下所示：
+
+```javascript
+'use strict';
+function _defineProperty(obj, key, value) {
+  if (key in obj) {
+    Object.defineProperty(obj, key, {
+      value: value,
+      enumerable: true,
+      configurable: true,
+      writable: true
+    });
+  } else {
+    obj[key] = value;
+  }
+  return obj;
+}
+var obj = _defineProperty({}, 'name', 'JavaScript');
+```
+
+类似上面的帮助函数 _defineProperty 可能会重复出现在一些模块里，导致编译后的代码体积变大。Babel 为了解决这个问题，提供了单独的包 `@babel/runtime` 供编译模块复用工具函数。
+
+启用插件 `@babel/plugin-transform-runtime` 后，Babel 就会使用 `@babel/runtime` 下的工具函数，转译代码如下：
+
+```javascript
+'use strict';
+// 之前的 _defineProperty 函数已经作为公共模块 `@babel/runtime/helpers/defineProperty` 使用
+var _defineProperty2 = require('@babel/runtime/helpers/defineProperty');
+var _defineProperty3 = _interopRequireDefault(_defineProperty2);
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+var obj = (0, _defineProperty3.default)({}, 'name', 'JavaScript');
+```
+
+除此之外，babel 还为源代码的非实例方法（`Object.assign`，实例方法是类似这样的 `"foobar".includes("foo")`）和`@babel/runtime` 下的工具函数自动引用了 polyfill。这样可以避免污染全局命名空间，非常适合于 JavaScript 库和工具包的实现。例如 `const obj = {}, Object.assign(obj, { age: 30 });` 转译后的代码如下所示：
+
+```javascript
+'use strict';
+// 使用了 core-js 提供的 assign
+var _assign = require('@babel/runtime/core-js/object/assign');
+var _assign2 = _interopRequireDefault(_assign);
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+var obj = {};
+(0, _assign2.default)(obj, {
+  age: 30
+});
+```
+
+思考：babel-runtime 为什么适合 JavaScript 库和工具包的实现？
+
+1. 避免 babel 编译的工具函数在每个模块里重复出现，减小库和工具包的体积；
+2. 在没有使用 `@babel/runtime` 之前，库和工具包一般不会直接引入 `@babel/polyfill` 。否则像 Promise 这样的全局对象会污染全局命名空间，这就要求库的使用者自己提供 polyfill。这些 polyfill 一般在库和工具的使用说明中会提到，比如很多库都会有要求提供 es5 的 polyfill。在使用 `@babel/runtime`  后，库和工具只要在 package.json 中增加依赖 `@babel/runtime`  、 `@babel/polyfill`，交给 `@babel/runtime` 去引入 polyfill 就行了；
+
+总结：
+
+1. 具体项目还是需要使用`@babel/polyfill`，只使用 `@babel/runtime` 的话，实例方法不能正常工作（例如 `"foobar".includes("foo")`）；
+2. JavaScript 库和工具可以使用 `@babel/runtime` ，在实际项目中使用这些库和工具，需要该项目本身提供 polyfill。
+
+> @babel/polyfill在7.4.0已被废弃，请使用安装core-js，并使用corejs选项
+>
+> core-js：标准的模块化 JS 库，包含最新的 ESMA 标准和提案，以及相关的 WHATWG/W3C 标准和提案的polyfill。
+
+
+
+##### babel插件详解
+
+https://zhuanlan.zhihu.com/p/394782898 babel插件详解
+
+###### `@babel/core` 核心包
+
+首先是 [@babel/core](https://zhuanlan.zhihu.com/p/270936113/@babel/core · Babel)代表 babel 编译器本身，提供了编程方式使用 babel 的 api。
+
+
+
+###### @babel/preset-env
+
+[@babel/preset-env](https://zhuanlan.zhihu.com/p/270936113/@babel/preset-env · Babel)是一个使你在**指定环境**使用**最新 js 语法**和**可选的 polyfill**的预设，首先这是个预设即意味着可以转换最新 js 语法，其他实现如下
+
+**指定环境**
+
+通过特定版本的浏览器和对应支持的特性及语法的映射，来确定对特定环境进行哪些处理。 可以通过 targets 选项设置，也可以通过.browserslistrc 文件或 package.json 中的 browserslist 字段配置，如果不指定环境则会转换所有的 ES6+到 ES5
+
+**可选的 polyfill**
+
+利用 **useBuiltIns** 的选项设置 core-js 的使用，注意会直接引用对应 core-js 实现，进而会污染全局作用域
+可选值为："usage" | "entry" | false, defaults to false.
+另外还需要结合 core-js 选项指定具体版本,其可选值为：2, 3 or { version: 2 | 3, proposals: boolean }, defaults to 2
+
+```text
+npm install core-js@3 --save
+# or
+npm install core-js@2 --save
+```
+
+对于 useBuiltIns 选项的各个值意义如下
+
+- false 不使用 core-js
+- entry 只能在 app 入口使用 import "core-js"; and import "regenerator-runtime/runtime"，引入多次会报错，会根据运行环境加载具体的包，比如 输入
+
+```text
+import "core-js";
+```
+
+输出（不同环境有所区别）
+
+```text
+import "core-js/modules/es.string.pad-start";
+import "core-js/modules/es.string.pad-end";
+```
+
+- usage 当项目中使用对应 feature 时自动引入对应实现
+
+
+
+###### @babel/plugin-transform-runtime
+
+1. 利用 core-js 选项，在必要情况下利用 core-js 的 helper 函数进行 polyfill
+2. 利用 helpers 选项，移除行内 babel helpers 函数，使其引用[@babel/runtime]
+3. 利用 regenerator 选项可以在使用 generators/async 函数时自动引入[@babel/runtime/regenerator](https://link.zhihu.com/?target=https%3A//github.com/babel/babel/blob/main/packages/babel-runtime/regenerator/index.js)，而不会污染全局环境。
+
+注意以上功能都是在@babel/runtime 存在的情况下使用的，而且后者会直接参与生产代码的构建，因此要作为生产依赖，而不是开发依赖。 
+
+`corejs`
+
+`false`, `2`, `3` or `{ version: 2 | 3, proposals: boolean }`, defaults to `false`.
+
+通过提供了一个沙箱环境，利用 core-js 中实现的别名来 polyfill 对应功能，避免了污染全局。各个可选值表示以及对应依赖的 runtime helper 包分别为
+
+- false 不会 polyfill，@babel/runtime
+- 2，依赖 core-js2,只支持全局变量和静态属性，@babel/runtime-corejs2
+- 3，在 2 的基础上添加了实例属性，并且可以利用 proposals 选项启用提案的 polyfill，@babel/runtime-corejs3
+
+| `corejs` option | Install command                             |
+| --------------- | ------------------------------------------- |
+| `false`         | `npm install --save @babel/runtime`         |
+| `2`             | `npm install --save @babel/runtime-corejs2` |
+| `3`             | `npm install --save @babel/runtime-corejs3` |
+
+`helpers`
+
+可选值为：boolean, defaults to true
+babel 使用过程中的 helper 函数默认会分散在使用到的地方，开启这个选项就会移除行内 helper 函数，改为引用 runtime helper
+
+`regenerator`
+
+可选值：boolean, defaults to true. 开启后可以不污染全局作用域的转换 generator 函数
+
+
+
+
+
+
+
 #### webpack、babel编译 ts 、tsx、jsx，搭建react环境
 
 https://juejin.cn/post/7020972849649156110
@@ -1071,7 +1225,6 @@ npm i -D @types/react @types/react-dom typescript
 ```
 
 - @babel/core——babel核心
-- core-js——polyfill的类库
 
 **webpack.config.js**
 
@@ -1097,12 +1250,8 @@ npm i -D @types/react @types/react-dom typescript
 
 **babel.config.js**
 
-https://zhuanlan.zhihu.com/p/394782898 babel插件详解
-
 ```json
-
 module.exports = {
-  // 由于@babel/polyfill在7.4.0中被弃用，我们建议直接添加core js并通过corejs选项设置版本
   // @babel/env===@babel/preset-env  @babel/react === @babel/preset-react ...
   // 当在presets中使用@babel/env，babel会自动加上preset-
 	presets: [
@@ -1114,7 +1263,7 @@ module.exports = {
 				modules: false, 
 				targets: { browsers: ["> 1%", "last 2 versions", "not ie <= 8"] },
         // when using useBuiltIns: "usage", set the proposals option to true. This will enable polyfilling of every proposal supported by core-js@xxx
-        // 按需加载，将 useBuiltIns 改为 "usage"，babel 就可以按需加载 polyfill，并且不需要手动引入 @babel/polyfill，不过@babel/polyfill已被废弃，请使用安装core-js，并使用corejs选项
+        // 按需加载，将 useBuiltIns 改为 "usage"，babel 就可以按需加载 polyfill，并且不需要手动引入 @babel/polyfill，不过@babel/polyfill在7.4.0已被废弃，请使用安装core-js（polyfill类库），并使用corejs选项
 				useBuiltIns: "usage", 
 				corejs: { 
           version: 3, // 需安装 core-js3.x的版本
@@ -1131,9 +1280,12 @@ module.exports = {
       	version: 3, // 需安装 @babel/runtime-corejs3
         proposals: true 
       }
-    }], // 用于babel的编译(必须)，将重复的辅助函数自动替换，节省大量体积
+    }],
 		["@babel/plugin-proposal-decorators", { legacy: true }], // 需要放在@babel/plugin-proposal-class-propertie之前
 		["@babel/plugin-proposal-class-properties", { loose: true }], // 用于解析class语法(react必选)
+    // @babel/plugin-proposal-private-methods 和 @babel/plugin-proposal-private-property-in-object内置于preset-env,且他们的loose值必须与@babel/plugin-proposal-class-properties的一致
+    ['@babel/plugin-proposal-private-methods', { 'loose': true }],
+    ['@babel/plugin-proposal-private-property-in-object', { loose: true }],
 	]
 }
 ```

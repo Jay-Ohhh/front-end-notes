@@ -8,8 +8,8 @@ Rollup有一项webpack不具有的功能：通过配置output.format开发者可
 
 ### 使用TypeScript编写配置文件
 
-```
-npm i -D @rollup/plugin-typescript
+```sh
+npm i -D rollup-plugin-typescript2
 ```
 
 项目根目录添加 `tsconfig.json`
@@ -17,15 +17,32 @@ npm i -D @rollup/plugin-typescript
 **rollup.config.ts**
 
 ```ts
-export default {
-	plugins:[
-		typescript()
-	]
-}
-```
+import { RollupOptions } from 'rollup';
+
+const isProd = process.env.NODE_ENV === 'production';
+
+const options: RollupOptions[] = [
+  {
+    input: 'src/index.ts',
+    output: [
+      {
+        file: 'dist/index.js',
+        format: 'cjs',
+      },
+      {
+        file: 'dist/index.esm.js',
+        format: 'esm',
+      },
+    ],
+  },
+];
+
+export default options;
 
 ```
-rollup --config rollup.config.ts --configPlugin typescript
+
+```sh
+rollup --config rollup.config.ts --configPlugin typescript2
 ```
 
 ### 配置选项
@@ -128,7 +145,7 @@ CLI: `-i`/`--input <filename>`
 
 多入口：
 
-此时不应使用 `output.file`，而是使用 `ouput.entryFileNames`。
+除非使用了 `output.file`，否则遵循 `ouput.entryFileNames`。
 
 如果使用对象形式，则 [name] 的值对应为对象的 key
 
@@ -151,7 +168,34 @@ export default {
 };
 ```
 
+或
 
+```js
+// rollup.config.js (building more than one bundle)
+
+export default [
+  {
+    input: 'main-a.js',
+    output: {
+      file: 'dist/bundle-a.js',
+      format: 'cjs'
+    }
+  },
+  {
+    input: 'main-b.js',
+    output: [
+      {
+        file: 'dist/bundle-b1.js',
+        format: 'cjs'
+      },
+      {
+        file: 'dist/bundle-b2.js',
+        format: 'es'
+      }
+    ]
+  }
+];
+```
 
 #### Output
 
@@ -567,6 +611,7 @@ export default {
 ```
 -c, --config <filename>     Use this config file (if argument is used but value
                               is unspecified, defaults to rollup.config.js)
+--configPlugin              Allows specifying Rollup plugins to transpile or otherwise control the parsing                               of your configuration file.           
 -d, --dir <dirname>         Directory for chunks (if absent, prints to stdout)
 -e, --external <ids>        Comma-separate list of module IDs to exclude
 -f, --format <format>       Type of output (amd, cjs, es, iife, umd, system)
@@ -649,8 +694,6 @@ rollup --config rollup.config.prod.js
 
 https://github.com/rollup/awesome
 
-https://github.com/rollup/plugins
-
 | 插件名                                                       | 描述                                                         |
 | ------------------------------------------------------------ | ------------------------------------------------------------ |
 | [alias](https://github.com/rollup/plugins/blob/master/packages/alias) | Define and resolve aliases for bundle dependencies 路径起别名 |
@@ -685,12 +728,81 @@ https://github.com/rollup/plugins
 | [yaml](https://github.com/rollup/plugins/blob/master/packages/yaml) | Convert YAML files to ES6 modules                            |
 | [progress](https://github.com/jkuri/rollup-plugin-progress)  | Show build progress in the console.                          |
 
-### 常用配置
+### 常用插件
+
+#### 常用配置
+
+```ts
+// rollup.config.ts
+import { RollupOptions } from 'rollup';
+import typescript from 'rollup-plugin-typescript2';
+import babel from '@rollup/plugin-babel';
+import resolve from '@rollup/plugin-node-resolve';
+import commonjs from '@rollup/plugin-commonjs';
+import { terser } from 'rollup-plugin-terser';
+import clear from 'rollup-plugin-clear';
+import progress from 'rollup-plugin-progress';
+import { visualizer } from 'rollup-plugin-visualizer';
+
+const isProd = process.env.NODE_ENV === 'production';
+
+const options: RollupOptions[] = [
+  {
+    input: 'src/index.ts',
+    output: [
+      {
+        file: 'dist/index.js',
+        format: 'cjs',
+      },
+      {
+        file: 'dist/index.esm.js',
+        format: 'esm',
+      },
+    ],
+    plugins: [
+      clear({
+        // required, point out which directories should be clear.
+        targets: ['some directory'],
+        // optional, whether clear the directores when rollup recompile on --watch mode.
+        watch: true, // default: false
+      }),
+      progress({
+        clearLine: false, // default: true
+      }),
+      commonjs(),
+      resolve(),
+      typescript(),
+      babel({
+        include: 'src/**/*',
+        exclude: '**/node_modules/**',
+        babelHelpers: 'runtime', // 构建库时使用
+      }),
+      isProd &&
+        terser({
+          compress: {
+            // 默认会去掉debugger
+            drop_console: true, // 去掉console
+          },
+        }),
+      // put it the last one
+      isProd &&
+        visualizer({
+          filename: './out/report.html',
+          open: true,
+          gzipSize: true,
+        }),
+    ],
+    external: [/@babel\/runtime/], //  babelHelpers:'runtime' 使用
+  },
+];
+
+export default options;
+```
 
 #### TypeScript
 
 ```sh
-npm install -D rollup typescript tslib @types/node ts-node @rollup/plugin-typescript cross-env
+npm install -D rollup typescript tslib @types/node ts-node rollup-plugin-typescript2 cross-env
 ```
 
 **tsconfig.json**
@@ -721,12 +833,11 @@ npm install -D rollup typescript tslib @types/node ts-node @rollup/plugin-typesc
     "paths": {
       "@/*": ["./src/*"]
     },
-    // 在dist目录生成.d.ts文件
-    "outDir": "dist",
+    // 在types目录生成.d.ts文件
     "declaration": true,
-    "declarationDir": "."
+    "declarationDir": "./types"
   },
-  "include": ["src", "./roullup.config.ts"],
+  "include": ["src"],
   "exclude": ["node_modules", "build", "dist"]
 }
 
@@ -736,7 +847,7 @@ npm install -D rollup typescript tslib @types/node ts-node @rollup/plugin-typesc
 
 ```ts
 import { RollupOptions } from 'rollup'
-import typescript from '@rollup/plugin-typescript'
+import typescript from 'rollup-plugin-typescript2'
 
 const options: RollupOptions = {
   input: 'src/index.ts',
@@ -750,7 +861,12 @@ const options: RollupOptions = {
       format: 'esm',
     },
   ],
-  plugins: [typescript()],
+  plugins: [
+    typescript({
+      // 默认为false，输出声明文件的路径为output.file或output.dir的路径
+      // useTsconfigDeclarationDir: true, // 使用tsconfig.json的declarationDir，同时declaration要为true。
+    })
+  ],
 }
 
 export default options
@@ -784,7 +900,7 @@ npm i -D @rollup/plugin-node-resolve @rollup/plugin-commonjs
 #### babel
 
 ```sh
-npm i -D @babel/core @babel/preset-env core-js@3 @babel/plugin-transform-runtime @babel/runtime-corejs3 @rollup/plugin-babel
+npm i -D @babel/core @babel/preset-env core-js@3 @babel/plugin-transform-runtime @babel/runtime-corejs3 @rollup/plugin-babel @babel/plugin-proposal-decorators @babel/plugin-proposal-class-properties @babel/preset-typescript
 ```
 
 **rollup.config.js**
@@ -796,9 +912,17 @@ npm i -D @babel/core @babel/preset-env core-js@3 @babel/plugin-transform-runtime
 Type: `'bundled' | 'runtime' | 'inline' | 'external'`
 Default: `'bundled'`
 
-**'runtime'** - 如果你要用rollup构建一个js包的时候，使用该配置，该配置要结合@babel/plugin-transform-runtime插件使用，使用@babel/plugin-transform-runtime也要安装@babel/runtime 或 @babel/runtime-corejs2/3 插件。同时设置 `external: [/@babel\/runtime/]`。
+**'runtime'** - 如果你要用rollup构建一个js库的时候，使用该配置，该配置要结合@babel/plugin-transform-runtime插件使用，使用@babel/plugin-transform-runtime也要安装@babel/runtime 或 @babel/runtime-corejs2/3 插件。同时设置 `external: [/@babel\/runtime/]`，但被其他项目引入该库时，要确保已安装@babel/runtime 或 @babel/runtime-corejs2/3，即需要在package.json的dependencies或peerDependencies中添加依赖。
 
-**'bundled'** - 如果用rollup构建一个项目应该用此参数。如果希望输出的文件包含helpers函数（最多复制一份），应该用此参数。
+> 编译后的代码，会使用require('@babel/runtime')替换helper函数 ，例如编译promise：
+>
+> ```
+> var _Promise = require('@babel/runtime-corejs3/core-js/promise');
+> ```
+
+**'bundled'** - 如果用rollup构建一个项目应该用此参数。如果希望输出的文件包含helpers函数（最多复制一份），应该用此参数。此时babel不能使用替换helper的插件，例如 `@babel/plugin-transform-runtime`。
+
+> 编译后的代码值会直接包含helper函数，不会包含运行时代码，即不会使用require('@babel/runtime')替换helper函数
 
 **'external'**  要结合@babel/plugin-external-helpers插件使用，它会把helpers 收集到一个全局的共享模块。
 
@@ -808,6 +932,7 @@ Default: `'bundled'`
 import resolve from '@rollup/plugin-node-resolve'
 import commonjs from '@rollup/plugin-commonjs'
 import babel from 'rollup-plugin-babel'
+import { DEFAULT_EXTENSIONS } from '@babel/core'; // .js,.jsx,.es6,.es,.mjs
 
 export default {
   input: 'src/main.js',
@@ -823,22 +948,16 @@ export default {
       include: 'src/**/*',
       exclude: '**/node_modules/**', 
       babelHelpers:'runtime', // 构建库时使用
+      extensions: [...DEFAULT_EXTENSIONS, 'ts'],
     })
   ]
 };
 ```
 
-**src/babel.config.js**
-
-我们将 `babel.config.js` 文件放在 `src` 中（File-relative configuration），而不是根目录下（Project-wide configuration）。 这允许我们对于不同的任务有不同的 babel 配置。
-
-https://babeljs.io/docs/en/config-files#project-wide-configuration
-
-File-relative configurations are also [merged](https://babeljs.io/docs/en/options#merging) over top of project-wide config values, making them potentially useful for specific overrides, though that can also be accomplished through ["overrides"](https://babeljs.io/docs/en/options#overrides).
+根目录**babel.config.js**
 
 ```js
 module.exports = {
-  // 由于@babel/polyfill在7.4.0中被弃用，我们建议直接添加core js并通过corejs选项设置版本
 	presets: [
 		[
 			"@babel/preset-env",
@@ -848,7 +967,7 @@ module.exports = {
 				modules: false, 
 				targets: { browsers: ["> 1%", "last 2 versions", "not ie <= 8"] },
         // when using useBuiltIns: "usage", set the proposals option to true. This will enable polyfilling of every proposal supported by core-js@xxx
-        // 按需加载，将 useBuiltIns 改为 "usage"，babel 就可以按需加载 polyfill，并且不需要手动引入 @babel/polyfill，不过@babel/polyfill已被废弃，请使用安装core-js，并使用corejs选项
+        // 按需加载，将 useBuiltIns 改为 "usage"，babel 就可以按需加载 polyfill，并且不需要手动引入 @babel/polyfill，不过@babel/polyfill在7.4.0中被弃用，请使用安装core-js（polyfill类库），并使用corejs选项
 				useBuiltIns: "usage", 
 				corejs: { 
           version: 3, // 需安装 core-js3.x的版本
@@ -856,6 +975,7 @@ module.exports = {
         }
 			}
 		],
+    '@babel/preset-typescript',
 	],
 	plugins: [
 		["@babel/plugin-transform-runtime", { 
@@ -863,12 +983,87 @@ module.exports = {
       	version: 3, // 需安装 @babel/runtime-corejs3
         proposals: true 
       }
-    }], // 用于babel的编译(必须)，将重复的辅助函数自动替换，节省大量体积
+    }],
+    ['@babel/plugin-proposal-decorators', { legacy: true }], // 需要放在@babel/plugin-proposal-class-propertie之前
+    ['@babel/plugin-proposal-class-properties', { loose: true }], // 用于解析class语法
+    // @babel/plugin-proposal-private-methods 和 @babel/plugin-proposal-private-property-in-object内置于preset-env,且他们的loose值必须与@babel/plugin-proposal-class-properties的一致
+    ['@babel/plugin-proposal-private-methods', { 'loose': true }],
+    ['@babel/plugin-proposal-private-property-in-object', { loose: true }],
 	]
 }
 ```
 
+因为我们可以使用`rollup-plugin-typescript2`编译ts文件，如果使用 babel ，则
 
+```sh
+npm i -D 
+```
+
+```js
+// rollup.config.js
+import babel from 'rollup-plugin-babel'
+
+
+export default {
+  input: 'src/main.js',
+  output: {
+    file: 'bundle.js',
+    format: 'cjs'
+  },
+  external: [/@babel\/runtime/], //  babelHelpers:'runtime' 使用
+  plugins: [
+    babel({
+      include: 'src/**/*',
+      exclude: '**/node_modules/**', 
+      babelHelpers:'runtime', // 构建库时使用
+      extensions: [...DEFAULT_EXTENSIONS, 'ts','tsx'],
+    })
+  ]
+};
+```
+
+```js
+module.exports = {
+	presets: [
+    '@babel/preset-typescript',
+	],
+}
+```
+
+#### terser
+
+uglify-js只能翻译es5语法。如果要转译es6+语法，请改用terser。
+
+```sh
+npm i -D rollup-plugin-terser
+```
+
+默认会保留含有"@license", "@copyright", "@preserve" 或 `!`开头的注释。
+
+**roullup.config.js**
+
+```js
+import {terser} from 'rollup-plugin-terser';
+
+const isProd = process.env.NODE_ENV === 'production'
+
+export default {
+  input: 'src/main.js',
+  output: {
+    file: 'bundle.js',
+    format: 'cjs'
+  },
+  plugins: [
+    isProd &&
+        terser({
+          compress: {
+            // 默认会去掉debugger
+            drop_console: true, // 去掉console
+          },
+        }),
+  ]
+};
+```
 
 #### 开启本地服务器
 
@@ -937,30 +1132,196 @@ export default {
 }
 ```
 
-#### terser
 
-uglify-js只能翻译es5语法。如果要转译es6+语法，请改用terser。
 
-```sh
-npm i -D rollup-plugin-terser
-```
-
-**roullup.config.js**
+#### 路径别名
 
 ```js
-import {terser} from 'rollup-plugin-terser';
+// rollup.config.js
+import alias from '@rollup/plugin-alias';
+import path from 'path';
 
-const isProd = process.env.NODE_ENV === 'production'
+const srcPath = path.resolve(__dirname,'src');
 
-export default {
-  input: 'src/main.js',
-  output: {
-    file: 'bundle.js',
-    format: 'cjs'
+const options = [
+  {
+    input: 'src/index.ts',
+    output: [
+      {
+        file: 'dist/index.js',
+        format: 'cjs',
+      }
+    ],
+    plugins: [
+     	alias({
+     		entries:{
+     			'@': srcPath,
+     		}
+     	})
+    ],
   },
-  plugins: [
-   isProd && terser()
+];
+
+export default options;
+```
+
+如果采用了TypeScript编写文件，且 tsconfig.json 文件中设置了别名 `compilerOptions.paths:{ "@/*": ["./src/*"],}`，则无需该插件。
+
+
+
+#### 分析、进程、清除文件夹
+
+```sh
+npm i -D rollup-plugin-clear rollup-plugin-progress rollup-plugin-visualizer
+```
+
+
+
+```js
+import { RollupOptions } from 'rollup';
+import typescript from 'rollup-plugin-typescript2';
+import babel from '@rollup/plugin-babel';
+import resolve from '@rollup/plugin-node-resolve';
+import commonjs from '@rollup/plugin-commonjs';
+import { terser } from 'rollup-plugin-terser';
+import clear from 'rollup-plugin-clear';
+import progress from 'rollup-plugin-progress';
+import { visualizer } from 'rollup-plugin-visualizer';
+
+const isProd = process.env.NODE_ENV === 'production';
+
+const options: RollupOptions[] = [
+  {
+    input: 'src/index.ts',
+    output: [
+      {
+        file: 'dist/index.js',
+        format: 'cjs',
+      }
+    ],
+    plugins: [
+      clear({
+        // required, point out which directories should be clear.
+        targets: ['some directory'],
+        // optional, whether clear the directores when rollup recompile on --watch mode.
+        watch: true, // default: false
+      }),
+      progress({
+        clearLine: false // default: true
+      }),
+      // put it the last one
+      isProd &&
+        visualizer({
+          filename: './out/report.html',
+          open: true,
+          gzipSize: true,
+        }),
+    ],
+    external: [/@babel\/runtime/], //  babelHelpers:'runtime' 使用
+  },
+];
+
+export default options;
+```
+
+#### CSS
+
+##### rollup-plugin-postcss
+
+处理css需要用到的插件是`rollup-plugin-postcss`。它支持css文件的加载、css加前缀、css压缩、对scss/less的支持等等。
+
+```js
+import postcss from 'rollup-plugin-postcss'
+export default {
+  input: ...,
+  output: ...,
+  plugins:[
+    postcss()
   ]
-};
+}
+```
+
+##### css加前缀
+
+借助`autoprefixer`插件来给css3的一些属性加前缀。
+
+```js
+import postcss from 'rollup-plugin-postcss'
+import autoprefixer from 'autoprefixer'
+export default {
+  input: ...,
+  output: ...,
+  plugins:[
+    postcss({
+      plugins: [  
+        autoprefixer()  
+      ]
+    })
+  ]
+}
+```
+
+使用`autoprefixer`除了以上配置，还需要配置browserslist，有2种方式，一种是建立.browserslistrc文件，另一种是直接在package.json里面配置，我们在package.json中，添加"browserslist"字段。
+
+```json
+"browserslist": [
+  "defaults",
+  "not ie < 8",
+  "last 2 versions",
+  "> 1%",
+  "iOS 7",
+  "last 3 iOS versions"
+]
+```
+
+##### css压缩
+
+cssnano对打包后的css进行压缩。使用方式也很简单，和autoprefixer一样，安装`cssnano`，然后配置。
+
+```js
+plugins:[
+  postcss({
+    plugins: [
+      autoprefixer(),
+      cssnano()
+    ]
+  })
+]
+```
+
+##### 抽离单独的css文件
+
+`rollup-plugin-postcss`可配置是否将css单独分离，默认没有`extract`，css样式生成`style`标签内联到head中，配置了`extract`，就会将css抽离成单独的文件。
+
+```js
+postcss({
+  plugins: [
+    autoprefixer(),
+    cssnano()
+  ],
+  extract: 'css/index.css'  
+})
+```
+
+##### 支持scss/less
+
+实际项目中我们不太可能直接写css，而是用scss或less等预编译器。`rollup-plugin-postcss`默认集成了对scss、less、stylus的支持。
+
+**With Sass/Stylus/Less**
+
+Install corresponding dependency:
+
+- For `Sass` install `sass`: `yarn add sass --dev`
+- For `Stylus` Install `stylus`: `yarn add stylus --dev`
+- For `Less` Install `less`: `yarn add less --dev`
+
+That's it, you can now import `.styl` `.scss` `.sass` `.less` files in your library.
+
+**For Sass/Scss Only.**
+
+Similar to how webpack's [sass-loader](https://github.com/webpack-contrib/sass-loader#imports) works, you can prepend the path with `~` to tell this plugin to resolve in `node_modules`:
+
+```css
+@import "~bootstrap/dist/css/bootstrap";
 ```
 
