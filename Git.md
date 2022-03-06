@@ -15,6 +15,9 @@ git add . 将当前目录下的所有文件添加到暂存区
 git add 文件/文件夹相对路径  将指定文件/文件夹添加到暂存区
 ```
 
+- If you are located directly at the *working directory*, then `git add -A` and `git add .` work without the difference.
+- If you are in any subdirectory of the *working directory*, `git add -A` will add all files from the entire *working directory*, and `git add .` will add files from your *current directory*.
+
 ##### commit 将暂存区内容添加到本地仓库中  
 
 ```sh
@@ -27,7 +30,7 @@ git commit -m [message]
 git commit [file1] [file2] ... -m [message]
 ```
 
-**-a** 参数设置修改文件后不需要执行 git add 命令，直接来提交
+**-a** Tell the command to automatically stage files that have been modified and deleted, but new files you have not told git about are not affected.
 
 ```sh
 git commit -a
@@ -39,13 +42,13 @@ git commit -a
 git commit -a
 ```
 
-如果新建了文件，还是需要 
+**如果新建了文件，还是需要** 
 
 ```sh
 git add .
 ```
 
-使用 **git commit -am** 可以省略使用git add 命令将已跟踪文件放到暂存区的功能。
+使用 **git commit -am** 可以省略使用git add 命令将已跟踪文件（不包括新建文件）放到暂存区的功能。
 
 我们先修改 hello.php 文件为以下内容：
 
@@ -111,6 +114,27 @@ git checkout -b [新分支名]
 ```sh
 git checkout [指定分支名]
 ```
+
+##### checkout --orphan 清空commit历史
+
+它会基于当前所在分支新建一个赤裸裸的分支，没有任何的提交历史。
+
+```sh
+# 新分支
+git checkout --orphan branch_name
+# 添加文件
+git add -A
+# 提交commit
+git commit -am "Init commit"
+# 删除原来分支
+git branch -D master
+# 重命名分支
+git branch -m master
+# 提交到远程
+git push -f origin master
+```
+
+
 
 ##### merge 合并指定分支到当前分支  
 
@@ -666,6 +690,8 @@ J = F^2  = B^3^2   = A^^3^2
 
 7、 git stash pop 恢复之前忽略的文件（非常重要的一步）
 
+
+
 #### Github 搜索技巧
 
 Awesome + keyword：关键字 Awesome,帮忙找到优秀的工具列表
@@ -969,6 +995,82 @@ git remote rm 远程仓库主机名
 #### 配置公钥
 
 https://blog.csdn.net/lqlqlq007/article/details/78983879
+
+
+
+#### 修改仓库语言 
+
+项目仓库是根据根目录下的文件类型进行判断，哪种类型多，仓库就在仓库列表界面显示哪种语言类型
+
+1. 添加文件 `.gitattributes`
+
+   > 注意 .gitattributes 中内容的路径都是相对于.gitattributes的路径
+
+2. 输入以下内容（重置识别类型）：
+
+https://github.com/github/linguist/blob/master/docs/overrides.md
+
+| Git attribute            | Defined in                                                   | Effect on file                                               |
+| ------------------------ | ------------------------------------------------------------ | ------------------------------------------------------------ |
+| `linguist-detectable`    | [`languages.yml`](https://github.com/github/linguist/blob/master/lib/linguist/languages.yml) | Included in stats, even if language's type is `data` or `prose` |
+| `linguist-documentation` | [`documentation.yml`](https://github.com/github/linguist/blob/master/lib/linguist/documentation.yml) | Excluded from stats                                          |
+| `linguist-generated`     | [`generated.rb`](https://github.com/github/linguist/blob/master/lib/linguist/generated.rb) | Excluded from stats, hidden in diffs                         |
+| `linguist-language`=name | [`languages.yml`](https://github.com/github/linguist/blob/master/lib/linguist/languages.yml) | Highlighted and classified as name                           |
+| `linguist-vendored`      | [`vendor.yml`](https://github.com/github/linguist/blob/master/lib/linguist/vendor.yml) | Excluded from stats                                          |
+
+除了 linguist-language，其余Git attribute后面可跟 `=false`
+
+##### linguist-detectable 可检索
+
+```sh
+*.js linguist-detectable  
+*.css linguist-detectable=false
+```
+
+**linguist-documentation**
+
+```sh
+# Apply override to all files in the directory
+project-docs/* linguist-documentation
+# Apply override to a specific file
+docs/formatter.rb -linguist-documentation
+# Apply override to all files and directories in the directory
+ano-dir/** linguist-documentation
+```
+
+##### linguist-generated
+
+Use the `linguist-generated` attribute to mark or unmark paths as generated.
+
+Generated files like minified JavaScript and compiled CoffeeScript .
+
+```
+Api.elm linguist-generate
+```
+
+##### linguist-language
+
+```
+*.[扩展名] linguist-language=[将此文件识别为哪种语言]
+
+*.js linguist-language=vue
+*.css linguist-language=vue
+*.html linguist-language=vue
+*.sh linguist-language=vue
+```
+
+##### linguist-vendored
+
+```sh
+# Apply override to all files in the directory
+special-vendored-path/* linguist-vendored
+# Apply override to a specific file
+jquery.js -linguist-vendored
+# Apply override to all files and directories in the directory
+ano-dir/** linguist-vendored
+```
+
+
 
 #### Git Flow
 

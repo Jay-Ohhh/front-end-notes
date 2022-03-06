@@ -63,6 +63,42 @@ URL即图片的url地址，如果引用本仓库中的图片，直接使用**相
 </details>
 ```
 
+##### 键盘标签
+
+> 可以使用 `<kbd>` 标签进行包裹，会使文本看起来像按钮
+
+```
+<kbd>Q</kbd> |  <kbd>W</kbd>  | <kbd>E</kbd> |  <kbd>R</kbd> 
+```
+
+<kbd>Q</kbd> |  <kbd>W</kbd>  | <kbd>E</kbd> |  <kbd>R</kbd> 
+
+
+
+##### 差异可视化
+
+可以使用反引号可视化差异，并`diff`根据需要突出显示红色或绿色的线。
+
+````
+```diff
+- box.onclick = fn.bind(obj, 200);
++ box.onclick = fn.call(obj, 200);
+```
+````
+
+效果如下
+
+```diff
+- box.onclick = fn.bind(obj, 200);
++ box.onclick = fn.call(obj, 200);
+```
+
+##### 较小的文字
+
+在`<sup>`或`<sub>`标记中换行以使其变小。
+
+
+
 #### emoji
 
 https://gitmoji.js.org/
