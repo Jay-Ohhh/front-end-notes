@@ -251,6 +251,76 @@ Default: `"es"`
 
 
 
+
+
+##### output.exports
+
+Type: `string`
+CLI: `--exports <exportMode>`
+Default: `'auto'`
+
+-  `'auto'`  - 自动识别以下的export方式
+
+- `default` – if you are only exporting one thing using `export default ...`; 
+
+- `named` – 如果使用 named export , e.g. 
+
+  ```js
+  export const a = 1;
+  ```
+
+- `none` – if you are not exporting anything (e.g. you are building an app, not a library)
+
+
+
+如果 format 为 cjs
+
+- 入口文件仅使用 default export ，则需要**显式** `output.exports: 'auto' 或 'default'`
+- 入口文件同时使用 named and default export，则需要显式 `output.exports: 'named'`
+
+
+
+ If you use `default`, a CommonJS user could do this, for example:
+
+```js
+// your-lib package entry
+export default 'Hello world';
+
+// a CommonJS consumer
+/* require( "your-lib" ) returns "Hello World" */
+const hello = require('your-lib');
+```
+
+With `named`, a user would do this instead:
+
+```js
+// your-lib package entry
+export const hello = 'Hello world';
+
+// a CommonJS consumer
+/* require( "your-lib" ) returns {hello: "Hello World"} */
+const hello = require('your-lib').hello;
+/* or using destructuring */
+const { hello } = require('your-lib');
+```
+
+If you use `named` exports but *also* have a `default` export, a user would have to do something like this to use the default export:
+
+```js
+// your-lib package entry
+export default 'foo';
+export const bar = 'bar';
+
+// a CommonJS consumer
+/* require( "your-lib" ) returns {default: "foo", bar: "bar"} */
+const foo = require('your-lib').default;
+const bar = require('your-lib').bar;
+/* or using destructuring */
+const { default: foo, bar } = require('your-lib');
+```
+
+
+
 ##### output.name
 
 Type: `string`
@@ -299,7 +369,7 @@ If you are a plugin author, see [output generation hooks](https://rollupjs.org/g
 Type: `{ [id: string]: string } | ((id: string) => string)`
 CLI: `-g`/`--globals <external-id:variableName,another-external-id:anotherVariableName,...>`
 
-`Object` 形式的 `id: name` 键值对，用于`external`文件中`import`的`umd`/`iife`包。例如：
+`Object` 形式的 `moduleId/variableNam` 键值对，用于`external`文件中`import`的`umd`/`iife`包。例如：
 
 ```js
 import $ from 'jquery';
@@ -333,6 +403,21 @@ var MyBundle = (function ($) {
 ```bash
 rollup -i src/main.js ... -g jquery:$,underscore:_
 ```
+
+即使是导入库的某些变量，globals也是这样写
+
+```js
+import { Link } from "react-router-dom";
+```
+
+```js
+// rollup.config.js
+globals: {
+	'react-router-dom': 'ReactRouterDOM'
+}
+```
+
+
 
 ##### output.paths
 
@@ -733,9 +818,9 @@ https://github.com/rollup/awesome
 #### 常用配置
 
 ```ts
-// rollup.config.ts
 import { RollupOptions } from 'rollup';
 import typescript from 'rollup-plugin-typescript2';
+import { DEFAULT_EXTENSIONS } from '@babel/core';
 import babel from '@rollup/plugin-babel';
 import resolve from '@rollup/plugin-node-resolve';
 import commonjs from '@rollup/plugin-commonjs';
@@ -743,6 +828,7 @@ import { terser } from 'rollup-plugin-terser';
 import clear from 'rollup-plugin-clear';
 import progress from 'rollup-plugin-progress';
 import { visualizer } from 'rollup-plugin-visualizer';
+import pkg from './package.json';
 
 const isProd = process.env.NODE_ENV === 'production';
 
@@ -751,31 +837,33 @@ const options: RollupOptions[] = [
     input: 'src/index.ts',
     output: [
       {
-        file: 'dist/index.js',
+        file: pkg.main,
         format: 'cjs',
+        exports: 'auto',
       },
       {
-        file: 'dist/index.esm.js',
+        file: pkg.module,
         format: 'esm',
       },
     ],
     plugins: [
       clear({
         // required, point out which directories should be clear.
-        targets: ['some directory'],
+        targets: ['dist'],
         // optional, whether clear the directores when rollup recompile on --watch mode.
         watch: true, // default: false
       }),
       progress({
         clearLine: false, // default: true
       }),
-      commonjs(),
       resolve(),
+      commonjs(),
       typescript(),
       babel({
         include: 'src/**/*',
         exclude: '**/node_modules/**',
         babelHelpers: 'runtime', // 构建库时使用
+        extensions: [...DEFAULT_EXTENSIONS, '.ts'],
       }),
       isProd &&
         terser({
@@ -792,7 +880,8 @@ const options: RollupOptions[] = [
           gzipSize: true,
         }),
     ],
-    external: [/@babel\/runtime/], //  babelHelpers:'runtime' 使用
+    // @ts-ignore
+    external: [...Object.keys(pkg.peerDependencies || {}), /@babel\/runtime/], //  babelHelpers:'runtime' 使用
   },
 ];
 
@@ -814,34 +903,34 @@ npm install -D rollup typescript tslib @types/node ts-node rollup-plugin-typescr
     "target": "es5",
     "allowSyntheticDefaultImports": true /* 用来指定允许从没有默认导出的模块中默认导入 */,
     "jsx": "react",
-    "lib": [
-      "dom",
-      "dom.iterable",
-      "esnext"
-    ] /* 编译过程中需要引入的库文件的列表 */,
+    "lib": ["dom", "dom.iterable", "esnext"] /* 编译过程中需要引入的库文件的列表 */,
     "strict": true,
     "moduleResolution": "node",
     "experimentalDecorators": true /* 用于指定是否启用实验性的装饰器特性 */,
     "downlevelIteration": true /* 当target为'ES5' or 'ES3'时，为'for-of', spread, and destructuring'中的迭代器提供完全支持 */,
     "allowJs": true,
     "esModuleInterop": true /* 通过为导入内容创建命名空间，实现CommonJS和ES模块之间的互操作性，esModuleInterop选项的作用是支持使用import d from 'cjs'的方式引入commonjs包 */,
+    "resolveJsonModule": true,
     "forceConsistentCasingInFileNames": true /* 	禁止对同一个文件的不一致的引用。 */,
-    "noEmit": true /* 不生成编译文件(js) */,
+    "noEmit": true /* 不生成编译文件 */,
     "noFallthroughCasesInSwitch": true /* 用于检查switch中是否有case没有使用break跳出switch，默认为false */,
     "noImplicitAny": false /* noImplicitAny的值为false时，如果我们没有为一些值设置明确的类型，编译器会默认认为这个值为any，如果noImplicitAny的值为true的话。则没有明确的类型会报错。默认值为false */,
     "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"]
     },
-    // 在types目录生成.d.ts文件
+    // 生成.d.ts文件
     "declaration": true,
     "declarationDir": "./types"
   },
   "include": ["src"],
-  "exclude": ["node_modules", "build", "dist"]
+  "exclude": ["**/node_modules/**", "build", "dist", "out"]
 }
-
 ```
+
+> "emitDeclarationOnly": false /* 默认为false，只生成.d.ts文件，不生成js文件，不能和 noEmit 同时设置为true */,
+>
+> 不能设置为true，否则不会生成js文件，无法打包。
 
 **rollup.config.ts**
 

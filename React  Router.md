@@ -2780,7 +2780,7 @@ const {name,age}=this.props.match.params
 
 **需要服务器配合**
 
-例如，如果你使用带有 `/todos/42` 路由的 React 路由器，开发服务器将正确响应 `localhost:3000/todos/42` ，但是服务于上述生产构建的 Express 不会正确响应。
+**browserHistory模式下**， 例如，如果你使用带有 `/todos/42` 路由的 React 路由器，开发服务器将正确响应 `localhost:3000/todos/42` ，但是服务于上述生产构建的 Express 不会正确响应。
 
 这是因为当 `/todos/42` 有新的页面加载时，服务器会查找文件 `build/todos/42` 并且找不到它。需要配置服务器以通过提供`index.html` 来响应对 `/todos/42` 的请求。例如，我们可以修改上面的 Express 示例，为任何未知路径提供 `index.html` ：
 

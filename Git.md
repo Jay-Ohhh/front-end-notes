@@ -926,6 +926,10 @@ Github提供了自动关联功能，commit提交代码时只需要在注释中�
 - `close #xxx`
 - `closed #xxx`
 
+```sh
+git commit -m "Fix screwup, fixes #12"
+```
+
 **pr之后自动删除 remote 分支**
 
 拥有仓库管理员权限的用户可以配置 PR 合并后自动删除相应的分支。
