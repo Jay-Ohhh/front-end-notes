@@ -73,7 +73,7 @@ https://segmentfault.com/a/1190000016365409
 
 所有node_modules/.bin/目录下的命令，都可以用npm run [命令]的格式运行。在命令行下，键入npm run，然后按tab键，就会显示所有可以使用的命令。
 
-#####  main字段
+##### main字段
 
 `main`字段指定了加载的入口文件，`require`导入的时候就会加载这个文件。这个字段的默认值是模块根目录下面的`index.js`。
 
@@ -89,16 +89,16 @@ https://segmentfault.com/a/1190000016365409
 [This article on Rollup 1.0](https://levelup.gitconnected.com/code-splitting-for-libraries-bundling-for-npm-with-rollup-1-0-2522c7437697#9f6f) says it another way:
 
 > The `main` field makes sure that Node users using `require` will be served the UMD version. 
->
+> 
 > The `module` field is not an official npm feature but a common convention among bundlers to designate how to import an ESM version of our library.
 
-##### typings 
+##### typings
 
 TypeScript 的入口文件
 
 ```json
 {
-	"typings": "dist/index.d.ts",
+    "typings": "dist/index.d.ts",
 }
 ```
 
@@ -189,8 +189,6 @@ MyProject
 
 In npm versions 3 through 6, `peerDependencies` were not automatically installed, and would raise a warning if an invalid version of the peer dependency was found in the tree. As of npm v7, peerDependencies *are* installed by default.
 
-
-
 ##### files
 
 当你发布package时，具体那些文件会发布上去
@@ -206,8 +204,6 @@ In npm versions 3 through 6, `peerDependencies` were not automatically installed
 **sideEffects**
 
 用于webpack，声明该模块是否包含 sideEffects（副作用），从而可以为 tree-shaking 提供更大的优化空间
-
-
 
 ##### unpkg
 
@@ -302,6 +298,11 @@ npm unlink common
 
 nrm 是一个 npm 源管理器,允许你快速地在 npm源间切换
 
+```sh
+nrm ls
+nrm use taobao
+```
+
 ##### nodemon
 
 nodemon实时监听文件的变更，自动重启node服务
@@ -319,35 +320,12 @@ serve folder_name
 
 默认获取 folder_name/index.html
 
-##### tree
+##### dir-parser
 
-```bash
-cd 目标文件夹路径
-```
+[GitHub - CN-Tower/dir-parser: Parse a directory and generate it&#39;s structure tree. 文件夹分析工具，解析文件夹并生成内部文件信息及其文件树。可以使用命令行，也可以在js代码中使用。](https://github.com/CN-Tower/dir-parser)
 
-然后 tree 一下
 
-```undefined
-tree
-```
 
-选项
-
-| 选项       | 含义                                                   |
-| ---------- | ------------------------------------------------------ |
-| -a         | 显示所有文件和目录                                     |
-| -d         | 只显示目录名称，不显示文件                             |
-| -D         | 列出文件或目录的更改时间                               |
-| -L num     | 显示num层目录结构，深度大禹num层的目录和文件将不会显示 |
-| - I        | 过滤文件或文件夹                                       |
-| - e '文件' | 输出到某文件                                           |
-
-tree -I pattern 用于过滤不想要显示的文件或者文件夹。比如要过滤项目中的node_modules文件夹：
-
-```
-tree -I “node_modules”
-```
-
-#### npm scripts hooks
+##### npm scripts hooks
 
 http://www.ruanyifeng.com/blog/2016/10/npm_scripts.html

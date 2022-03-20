@@ -66,7 +66,7 @@ CSS Modules 允许使用`:global(.className)`的语法，声明一个全局规�
 
 ```css
 :global{
-	// 其它css样式
+    // 其它css样式
 }
 ```
 
@@ -108,7 +108,7 @@ CSS Modules 还提供一种显式的局部作用域语法`:local(.className)`，
           color:red;
         }
       }
-		}
+        }
   }
 }
 ```
@@ -155,9 +155,9 @@ module.exports = {
 ```
 
 > Loaders 可以通过传入多个 loaders 以达到链式调用的效果，它们会从右到左被应用（从最后到最先配置）。
->
+> 
 > 支持的模板字符串：
->
+> 
 > - `[name]` 源文件名称
 > - `[path]` 源文件相对于 `compiler.context` 或者 `modules.localIdentContext` 配置项的相对路径。
 > - `[file]` - 文件名和路径。
@@ -165,14 +165,14 @@ module.exports = {
 > - `[hash]` - 字符串的哈希值。基于 `localIdentHashSalt`、`localIdentHashFunction`、`localIdentHashDigest`、`localIdentHashDigestLength`、`localIdentContext`、`resourcePath` 和 `exportName` 生成。
 > - `[<hashFunction>:hash:<hashDigest>:<hashDigestLength>]` - 带有哈希设置的哈希。
 > - `[local]` - 原始类名。
->
+> 
 > 建议：
->
+> 
 > - 开发环境使用 `'[path][name]__[local]'`
 > - 生产环境使用 `'[hash:base64]'`
->
+> 
 > `[local]` 占位符包含原始的类。
->
+> 
 > **注意：**所有保留 (`<>:"/\|?*`) 和控制文件系统字符 (不包括 `[local]` 占位符) 都将转换为 `-`。
 
 ##### Class 的组合
@@ -289,8 +289,8 @@ vertical-align: top; // 设置成顶部对齐，默认是底部对齐
 @normalFontSize: 13px;
 
 .placeholder {
-	font-size: @normalFontSize;
-	color: #999;
+    font-size: @normalFontSize;
+    color: #999;
 }
 
 .input-placeholder{
@@ -313,7 +313,7 @@ vertical-align: top; // 设置成顶部对齐，默认是底部对齐
       /* Internet Explorer 10-11 */
       .placeholder();
     }
-	}
+    }
 }
 
 // 使用
@@ -328,25 +328,25 @@ vertical-align: top; // 设置成顶部对齐，默认是底部对齐
 
 ```less
 .webkitScrollbar(@className) {
-	/*修改滚动条样式*/
-	.@{className}::-webkit-scrollbar {
+    /*修改滚动条样式*/
+    .@{className}::-webkit-scrollbar {
     // 宽高最好设置成一致，否则水平和垂直的滚动条粗细不一样
-		width: 5px;
-		height: 5px;
-	}
-	.@{className}::-webkit-scrollbar-track {
-		border-radius: 10px;
-		background-color: #fff;
-	}
-	.@{className}::-webkit-scrollbar-thumb {
-		background-color: rgba(144, 147, 153, 0.3);
-		border-radius: 10px;
-	}
-	.@{className}::-webkit-scrollbar-thumb:hover {
-		background-color: rgba(110, 110, 111, 0.3);
-	}
-	// @{className}::-webkit-scrollbar-corner {
-	// }
+        width: 5px;
+        height: 5px;
+    }
+    .@{className}::-webkit-scrollbar-track {
+        border-radius: 10px;
+        background-color: #fff;
+    }
+    .@{className}::-webkit-scrollbar-thumb {
+        background-color: rgba(144, 147, 153, 0.3);
+        border-radius: 10px;
+    }
+    .@{className}::-webkit-scrollbar-thumb:hover {
+        background-color: rgba(110, 110, 111, 0.3);
+    }
+    // @{className}::-webkit-scrollbar-corner {
+    // }
 }
 参数说明
 ::-webkit-scrollbar 滚动条整体部分
@@ -365,14 +365,14 @@ vertical-align: top; // 设置成顶部对齐，默认是底部对齐
 }
 ```
 
-| 滚动条伪元素                    | 作用的位置                                              |
-| ------------------------------- | ------------------------------------------------------- |
-| ::-webkit-scrollbar             | 整个滚动条                                              |
-| ::-webkit-scrollbar-button      | 滚动条上的按钮 (上下箭头)                               |
-| ::-webkit-scrollbar-thumb       | 滚动条上的滚动滑块                                      |
-| ::-webkit-scrollbar-track       | 滚动条轨道                                              |
-| ::-webkit-scrollbar-track-piece | 滚动条没有滑块的轨道部分                                |
-| ::-webkit-scrollbar-corner      | 当同时有垂直滚动条和水平滚动条时交汇的部分              |
+| 滚动条伪元素                          | 作用的位置                                |
+| ------------------------------- | ------------------------------------ |
+| ::-webkit-scrollbar             | 整个滚动条                                |
+| ::-webkit-scrollbar-button      | 滚动条上的按钮 (上下箭头)                       |
+| ::-webkit-scrollbar-thumb       | 滚动条上的滚动滑块                            |
+| ::-webkit-scrollbar-track       | 滚动条轨道                                |
+| ::-webkit-scrollbar-track-piece | 滚动条没有滑块的轨道部分                         |
+| ::-webkit-scrollbar-corner      | 当同时有垂直滚动条和水平滚动条时交汇的部分                |
 | ::-webkit-resizer               | 某些元素的corner部分的部分样式(例:textarea的可拖动按钮) |
 
 ##### 移动端避免使用100vh
@@ -384,20 +384,19 @@ vertical-align: top; // 设置成顶部对齐，默认是底部对齐
 解决方案：
 
 - 将高度设置为window.innerHeight
-
+  
   iOS Safari解决：
 
 - ```css
   body{
-  	height:100vh;
+      height:100vh;
   }
   @supports (-webkit-touch-callout:none){
-  	body{
-  		height:-webkit-fill-available;
-  	}
+      body{
+          height:-webkit-fill-available;
+      }
   }
   ```
-
 
 #### :last-child无效
 
@@ -432,4 +431,3 @@ vertical-align: top; // 设置成顶部对齐，默认是底部对齐
       <div class="last"></div>
  </div>
 ```
-

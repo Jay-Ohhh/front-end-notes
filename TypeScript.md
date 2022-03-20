@@ -1,6 +1,9 @@
 ## TypeScript
+
 ### 简介
+
 #### 什么是TypeScript
+
 TypeScript 是 JavaScript 的类型的超集，它可以编译成纯 JavaScript。编译出来的 JavaScript 可以运行在任何浏览器上。TypeScript 编译工具可以运行在任何服务器和任何系统上。TypeScript 是结构类型系统，其最关键的功能是静态类型检查 (Type Guard) .
 
 **TypeScript 增加了代码的可读性和可维护性**
@@ -18,7 +21,6 @@ TypeScript 是 JavaScript 的类型的超集，它可以编译成纯 JavaScript�
 - 兼容第三方库，即使第三方库不是用 TypeScript 写的，也可以编写单独的类型文件供 TypeScript 读取
 
 #### [搜索声明文件](https://microsoft.github.io/TypeSearch/)
-
 
 ### 基础
 
@@ -47,8 +49,6 @@ let isDone: boolean = Boolean();
 
  `new Boolean()`返回的是一个 `Boolean` 对象 ，不是布尔值
  `Boolean()`返回的是布尔值
-
-
 
 **数值**
 
@@ -81,8 +81,6 @@ var infinityNumber = Infinity
 
  其中 `0b1010` 和 `0o744` 是 [ES6 中的二进制和八进制表示法](http://es6.ruanyifeng.com/#docs/number#二进制和八进制表示法)，它们会被编译为十进制数字。 
 
-
-
 **字符串**
 
 使用 `string` 定义字符串类型：
@@ -92,8 +90,6 @@ let myName: string = 'Tom';
 ```
 
 也可以用 ` 定义 ES6 中的模板字符串，${expr} 用来在模板字符串中嵌入表达式。
-
-
 
 **空值**
 
@@ -111,8 +107,6 @@ function alertName(): void {
 let unusable: void = undefined;
 ```
 
-
-
 **Null 和 Undefined**
 
 在 TypeScript 中，可以使用 `null` 和 `undefined` 来定义这两个原始数据类型：
@@ -129,10 +123,10 @@ let n: null = null;
   `any` 类型，则允许被赋值为任意类型，同时可以将 any 类型的变量赋值给任意类型的变量。
 
 - **任意值的属性和方法**
-
- 在任意值上可以添加或访问任何属性和方法。
-
- 声明一个变量为任意值之后，对它的任何操作，返回的内容的类型都是任意值。 
+  
+  在任意值上可以添加或访问任何属性和方法。
+  
+  声明一个变量为任意值之后，对它的任何操作，返回的内容的类型都是任意值。 
 
 - **未声明类型的变量**
 
@@ -149,6 +143,7 @@ let n: null = null;
 - 在有明确never返回类型注解的函数中，所有return语句（如果有的话）必须有never类型的表达式并且函数的终点必须是不可执行的。
 
 #### [unkonwn类型](https://blog.csdn.net/weixin_33716557/article/details/93177689)
+
 **unknown 和 any 的区别**
 
 unknown 类型会更加严格：在对 unknown 类型的值执行大多数操作之前，我们必须进行某种形式的检查。
@@ -191,7 +186,7 @@ function stringifyForLogging(value: unknown): string {
     const functionName = value.name || "(anonymous)";
     return `[function ${functionName}]`;
   }
- 
+
   if (value instanceof Date) {
     // Within this branch, `value` has type `Date`,
     // so we can call the `toISOString` method
@@ -203,7 +198,6 @@ function stringifyForLogging(value: unknown): string {
 使用自定义类型保护函数缩小 `unknown` 类型范围：
 
 ```ts
-
 /**
  * A custom type guard function that determines whether
  * `value` is an array that only contains numbers.
@@ -214,9 +208,9 @@ function isNumberArray(value: unknown): value is number[] {
     value.every(element => typeof element === "number")
   );
 }
- 
+
 const unknownValue: unknown = [15, 23, 8, 4, 42, 16];
- 
+
 if (isNumberArray(unknownValue)) {
   // Within this branch, `unknownValue` has type `number[]`,
   // so we can spread the numbers as arguments to `Math.max`
@@ -240,6 +234,7 @@ const otherString = someString.toUpperCase();  // "HELLO WORLD"
 **联合类型中的 unkonwn**
 
 在联合类型中，类型会表示为范围更大的类型
+
 ```ts
 type UnionType1 = unknown | null; // unknown
 type UnionType2 = unknown | undefined; // unknown
@@ -247,9 +242,11 @@ type UnionType3 = unknown | string; // unknown
 type UnionType4 = unknown | number[]; // unknown
 type UnionType5 = unknown | any; // any
 ```
+
 **交叉类型中的 unkonwn**
 
 任何类型都可以吸收 `unknown` 类型。任何类型与 unknown 相交不会改变结果类型：
+
 ```ts
 type IntersectionType1 = unknown & null; // null
 type IntersectionType2 = unknown & undefined; // undefined
@@ -263,6 +260,7 @@ type IntersectionType5 = unknown & any; // any
 unknown 类型的值不能用作大多数运算符的操作数。这是因为如果我们不知道我们正在使用的值的类型，大多数运算符不太可能产生有意义的结果。
 
 你可以在类型为 unknown 的值上使用的运算符只有相等和不等运算符：
+
 - ===
 - ==
 - !==
@@ -295,6 +293,7 @@ myFavoriteNumber = 7;
 ```
 
 #### Object vs object vs { }
+
 **object类型**
 
 TypeScript 2.2 引入了被称为 object 类型的新类型，它用于表示非原始类型。在 JavaScript 中以下类型被视为原始类型：`string`、`boolean`、`number`、`bigint`、`symbol`、`null` 和 `undefined`。 
@@ -306,6 +305,7 @@ object 类型表示除上述原始类型以外的非原始类型， 使用这种
 **Object 类型**
 
 TypeScript 定义了另一个与新的 object 类型几乎同名的类型，那就是 Object 类型。该类型是所有 Object 类的实例的类型。它由以下两个接口来定义：
+
 - Object 接口定义了其原型对象 Object.prototype 的属性；
 - ObjectConstructor 接口定义了 Object 构造器（类）的属性。
 
@@ -418,8 +418,8 @@ obj.toString();
 这里的 `let myFavoriteNumber: string | number` 的含义是，允许 `myFavoriteNumber` 的类型是 `string` 或者 `number`，但是不能是其他类型。
 
 - **访问联合类型的属性或方法**
-
- 当 TypeScript 不确定一个联合类型的变量到底是哪个类型的时候，我们**只能访问此联合类型的所有类型里共有的属性或方法**： 
+  
+  当 TypeScript 不确定一个联合类型的变量到底是哪个类型的时候，我们**只能访问此联合类型的所有类型里共有的属性或方法**： 
 
 ```ts
 function getLength(something: string | number): number {
@@ -444,9 +444,8 @@ function getString(something: string | number): string {
 
  属性名不能是联合类型。
 
-
-
 #### 交叉类型
+
 TypeScript 交叉类型是将多个类型合并为一个类型。这让我们可以把现有的多种类型叠加到一起成为一种类型，它包含了所需的所有类型的特性。
 
 **交叉类型一般用于交叉接口类型**
@@ -468,6 +467,7 @@ const staff: IStaff = {
 ```
 
 在上面示例中，我们首先为 IPerson 和 IWorker 类型定义了不同的成员，然后通过 & 运算符定义了 IStaff 交叉类型，所以该类型同时拥有 IPerson 和 IWorker 这两种类型的成员。那么现在问题来了，假设在合并多个类型的过程中，刚好出现某些类型存在相同的成员，但对应的类型又不一致，比如：
+
 ```ts
 interface X {
     c: string;
@@ -482,6 +482,7 @@ type YX = Y & X;
 let p: XY;
 let q: YX;
 ```
+
 在上面的代码中，接口 X 和接口 Y 都含有一个相同的成员 c，但它们的类型不一致。对于这种情况，此时 XY 类型或 YX 类型中成员 c 的类型是不是可以是 string 或 number 类型呢？答案：不是。
 
 接口 X 和接口 Y 混入后，成员 c 的类型会变成 `never`。
@@ -493,6 +494,7 @@ let q: YX;
 **任何类型与any交叉后，结果为any**
 
 接口 X 和接口 Y 中内部相同成员 c 的类型都是非基本数据类型：
+
 ```ts
 interface D { 
     d: boolean;
@@ -503,12 +505,12 @@ interface F {
     f: number; 
 }
 interface A { 
-  	// D是非数据类型
+      // D是非数据类型
     x: D; 
 }
 interface B { 
     // E是非数据类型
-		x: E;
+        x: E;
 }
 interface C {
     // F是非数据类型
@@ -524,6 +526,7 @@ let abc: ABC = {
 };
 console.log('abc:', abc);
 ```
+
 ```ts
 interface A {
   a: { s: 1 }
@@ -547,8 +550,6 @@ let ab: AB = {
 **基本数据类型不能和引用类型合并。**
 
 通过交叉类型，可以让我们更好地将抽取类型的公共部分，进行代码复用，并方便地实现把多种类型组合到一起，成为不同的类型。
-
-
 
 #### 对象的类型—接口
 
@@ -591,8 +592,8 @@ let tom: Person = {
 ```
 
 - **可选属性和可选方法**
-
- 可选属性的含义是该属性可以不存在。 
+  
+  可选属性的含义是该属性可以不存在。 
 
 有时我们希望不要完全匹配一个形状，那么可以用可选属性：
 
@@ -672,7 +673,7 @@ let tom: Person = {
 ```
 
 - **只读属性**
-
+  
   有时候我们希望对象中的一些字段只能在创建的时候被赋值，那么可以用 `readonly` 定义只读属性：
 
 ```ts
@@ -695,7 +696,7 @@ interface Person {
 }
 
 let tom: Person = {
-  
+
 };
 
 tom.id = 89757; 
@@ -736,7 +737,6 @@ const a: A = {
   a: '1',
   b: [],
 }
-
 ```
 
 **在对象内给属性值声明类型**
@@ -746,8 +746,6 @@ const a = {
   b: <number | string>1,
 }
 ```
-
-
 
 #### 对象的类型—类型别名
 
@@ -781,11 +779,11 @@ function f1(x: { prop: number }) {}
 
 function f2(x: ObjectInterface) {} 
 interface ObjectInterface {  
-	prop: number;
+    prop: number;
 }
 ```
 
-#### **type与interface的区别**
+#### type与interface的区别
 
 1. type可以声明 基本类型，联合类型，交叉类型的别名，interface不行
 
@@ -793,16 +791,17 @@ interface ObjectInterface {
 
 3. interface能够声明合并，type不能
 
-4. 类型别名不能被 `extends`和 `implements` 
-
+4. 类型别名不能被 `extends` 
+   
    因此，公共或基础类型应该用 interface 声明，方便被extends。不过也可以用 type 声明，用交叉类型来扩展。
 
 5. type不能用于多态this类型
 
 多态 this 类型仅适用于接口：
+
 ```ts
 interface AddsStrings {
-	add(str: string): this;
+    add(str: string): this;
 };
 class StringBuilder implements AddsStrings {
   result = '';
@@ -1096,7 +1095,7 @@ function push(array, ...items) {
 
 ```ts
 function push(array: any[], ...items: any[]) {
-    
+
 }
 ```
 
@@ -1175,8 +1174,6 @@ function f1(normal: number, abnormal?: string): number | string {
 }
 const f: fun = f1
 ```
-
-
 
 #### 类型断言
 
@@ -1275,8 +1272,6 @@ Uncaught TypeError: animal.swim is not a function`
 
 可是 `swim` 函数接受的参数是 `Cat | Fish`，一旦传入的参数是 `Cat` 类型的变量，由于 `Cat` 上没有 `swim` 方法，就会导致运行时错误了。
 
-
-
 **2. 将一个父类断言为更加具体的子类**
 
 当类之间有继承关系时，类型断言也是很常见的：
@@ -1369,8 +1364,6 @@ window.foo = 1;
 
  上面的例子中，我们也可以通过 扩展 window 的类型 解决这个错误，不过如果只是临时的增加 `foo` 属性，`as any` 会更加方便。 
 
-
-
 **4. 将 any 断言为一个具体的类型**
 
 在日常的开发中，我们不可避免的需要处理 `any` 类型的变量，它们可能是由于第三方库未能定义好自己的类型，也有可能是历史遗留的或其他人编写的烂代码，还可能是受到 TypeScript 类型系统的限制而无法精确定义类型的场景。
@@ -1378,8 +1371,6 @@ window.foo = 1;
 遇到 `any` 类型的变量时，我们可以选择无视它，任由它滋生更多的 `any`。
 
 我们也可以选择改进它，通过类型断言及时的把 `any` 断言为精确的类型，亡羊补牢，使我们的代码向着高可维护性的目标发展。
-
-
 
 **类型断言的限制**
 
@@ -1437,8 +1428,6 @@ interface Cat extends Animal {
 - 允许 `animal as Cat` 是因为「父类可以被断言为子类」，TypeScript 设计就是这样的。
 - 允许 `cat as Animal` 是因为既然子类拥有父类的属性和方法，那么被断言为父类，获取父类的属性、调用父类的方法，就不会有任何问题，故「子类可以被断言为父类」。
 
-
-
 **双重断言**
 
 既然：
@@ -1468,8 +1457,6 @@ function testCat(cat: Cat) {
 若你使用了这种双重断言，那么十有八九是非常错误的，它很可能会导致运行时错误。
 
 **除非迫不得已，千万别用双重断言。**
-
-
 
 **类型断言 vs 类型转换**
 
@@ -1593,8 +1580,6 @@ type Flags = {
 }
 ```
 
-
-
 #### 内置对象
 
 JavaScript 中有很多[内置对象](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects)，它们可以直接在 TypeScript 中当做定义好了的类型。
@@ -1690,8 +1675,6 @@ Node.js 不是内置对象的一部分，如果想用 TypeScript 写 Node.js，�
 ```bash
 npm install @types/node --save-dev
 ```
-
-
 
 #### 声明文件、模块、第三方库
 
@@ -1815,8 +1798,6 @@ npm install @types/jquery --save-dev
 
 可以在[这个页面](https://microsoft.github.io/TypeSearch/)搜索你需要的声明文件。
 
-
-
 ##### 书写声明文件
 
 当一个第三方库没有提供声明文件时，我们就需要自己书写声明文件了。前面只介绍了最简单的声明文件内容，而真正书写一个声明文件并不是一件简单的事，以下会详细介绍如何书写声明文件。
@@ -1831,8 +1812,6 @@ npm install @types/jquery --save-dev
 - [直接扩展全局变量]()：通过 `<script>` 标签引入后，改变一个全局变量的结构
 - [在 npm 包或 UMD 库中扩展全局变量]()：引用 npm 包或 UMD 库后，改变一个全局变量的结构
 - [模块插件]()：通过 `<script>` 或 `import` 导入后，改变另一个模块的结构
-
-
 
 ##### 全局变量
 
@@ -2346,6 +2325,7 @@ declare enum Directions {
 ```js
 exports = module.exports = {};
 ```
+
 ```ts
 // 兼容CommonJS和AMD的导出
 export = {something1, something2, ..., somethingN};
@@ -2432,7 +2412,7 @@ declare function foo(): string;
 declare namespace foo {
     const bar: number;
 }
-  
+
 // 其余ts文件
 import foo from 'foo';
 ```
@@ -2531,7 +2511,7 @@ moment.foo();
 // 声明新模块'foo'
 declare module 'foo' {
     export interface Foo {
-        
+
     }
 }
 // 声明新模块'bar'
@@ -2717,8 +2697,6 @@ export declare function bar(): string;
 - `declarationDir` 设置生成 `.d.ts` 文件的目录
 - `declarationMap` 对每个 `.d.ts` 文件，都生成对应的 `.d.ts.map`（sourcemap）文件
 - `emitDeclarationOnly` 仅生成 `.d.ts` 文件，不生成 `.js` 文件
-
-
 
 ##### 发布声明文件
 
@@ -3045,6 +3023,7 @@ enum Direction {
 ```ts
 enum Days {Sun = 7, Mon, Tue, Wed, Thu, Fri, Sat = "S"}; 
 ```
+
 含字符串值成员的枚举中不允许使用计算值。 
 
 但字符串值断言为any后（自身变成计算值），可以使用计算值。（其实是欺骗了tsc编译器，让编译器以为枚举中没有字符串值）
@@ -3072,17 +3051,17 @@ enum Days {Sun = 7, Mon, Tue, Wed, Thu, Fri, Sat = true as any }; // 只能断�
 
 如果紧接在字符串值成员或者类型断言后面的是未手动赋值的项，那么它就会因为无法获得初始值而报错。
 
-
-
 **字面量枚举成员**
 
 字面量枚举成员是指不带有初始值的常量枚举成员，或者是值被初始化为
 
 - 任何字符串字面量
-- 任何数字字面量
-- 应用了一元 `-`符号的数字字面量（例如： `-1`, `-100`）
 
- **枚举成员成为了类型， 枚举类型本身变成了每个枚举成员的联合类型** 
+- 任何数字字面量
+
+- 应用了一元 `-`符号的数字字面量（例如： `-1`, `-100`）
+  
+  **枚举成员成为了类型， 枚举类型本身变成了每个枚举成员的联合类型** 
 
 ```ts
 enum ShapeKind {
@@ -3120,14 +3099,14 @@ enum Color {Red = "red".length, Green, Blue};
 每个枚举成员都带有一个值，它可以是**常量**或**计算得到的**。 当满足如下条件时，枚举成员被当作是常量：
 
 - 它是枚举的第一个成员且没有初始化器，这种情况下它被赋予值 `0`：
-
+  
   ```ts
   // E.X is constant:
   enum E { X }
   ```
 
 - 它不带有初始化器且它之前的枚举成员是一个数字常量。 这种情况下，当前枚举成员的值为它上一个枚举成员的值加1。
-
+  
   ```ts
   // All enum members in 'E1' and 'E2' are constant.
   
@@ -3139,13 +3118,13 @@ enum Color {Red = "red".length, Green, Blue};
   ```
 
 - 枚举成员使用 常量枚举表达式 初始化。 常数枚举表达式是TypeScript表达式的子集，它可以在编译阶段求值。 当一个表达式满足下面条件之一时，它就是一个常量枚举表达式：
-
+  
   1. 一个枚举表达式字面量（主要是字符串字面量或数字字面量）
   2. 一个对之前定义的常量枚举成员的引用（可以是在不同的枚举类型中定义的）
   3. 带括号的常量枚举表达式
   4. 一元运算符`+`, `-`, `~`其中之一应用在了常量枚举表达式
   5. 常量枚举表达式做为二元运算符`+`, `-`, `*`, `/`, `%`, `<<`, `>>`, `>>>`, `&`, `|`, `^`的操作对象。
-
+  
   若常量枚举表达式求值后为`NaN`或`Infinity`，则会在编译阶段报错。
 
 所有其它情况的枚举成员被当作是需要计算得出的值。
@@ -3234,7 +3213,7 @@ var directions = [0 /* Up */, 1 /* Down */, 2 /* Left */, 3 /* Right */];
 - 继承（Inheritance）：子类继承父类，子类除了拥有父类的所有特性外，还有一些更具体的特性
 
 - 多态（Polymorphism）：多态性是指一种事物的多种形态，在类中具有不同功能的函数可以使用相同的函数名。类的多态性体现在方法的重载（同一个类中方法同名不同参数）、方法的重写（子类对父类方法的重写，方法同名参数相同，返回值类型与被重写方法的返回值或其派生类型相同）和抽象类抽象方法在子类的实现。
-
+  
   > 由继承抽象类而产生了相关的不同的类，对同一个方法可以有不同的响应。比如 `Cat` 和 `Dog` 都继承自 `Animal`，但是分别实现了自己的 `eat` 方法。此时针对某一个实例，我们无需了解它是 `Cat` 还是 `Dog`，就可以直接调用 `eat` 方法，程序会自动判断出来应该如何执行 `eat`。
 
 - 存取器（setter & getter）：用以改变属性的赋值和读取行为
@@ -3260,8 +3239,6 @@ Child.prototype.constructor = Child
 const c = new Child(1)
 console.log(c.value) // 1
 ```
-
-
 
 ##### ES6中类的用法
 
@@ -3655,7 +3632,7 @@ person.sayName(); // "张三"
 
 ```js
 class Animal {
- 	constructor(name) {
+     constructor(name) {
     this.name = name;
   }
 }
@@ -3923,6 +3900,7 @@ class IncreasingCounter {
   }
 }
 ```
+
 等同于
 
 ```javascript
@@ -4911,8 +4889,6 @@ createArray = function<T>(length: number, value: T): Array<T> {
 createArray(3, 'x'); // ['x', 'x', 'x']
 ```
 
-
-
 ```ts
 // A extends E = {a:1} 先执行A extends E 再执行赋值运算，因此{a:1}是默认值
 // 因此在使用DispatchProp时不需再传入类型。
@@ -5198,7 +5174,6 @@ hc.getData()
 // 旧类
 // 1
 // 1
-
 ```
 
 方式二：
@@ -5285,6 +5260,7 @@ let hc = new HttpClient()
 1. 对于静态成员是类的构造函数，对于实例成员是类的构造函数的原型对象
 
 2. 成员的名字
+
 3. 成员的属性描述符
 
 ```ts
@@ -5344,7 +5320,6 @@ class HttpClient{
 }
 let hc = new HttpClient()
 hc.getData(1,true) // [ '1', 'true' ]
-
 ```
 
 ###### 方法装饰器扩展方法
@@ -5390,6 +5365,7 @@ hc.getData(1,true)
 1. 对于静态成员是类的构造函数，对于实例成员是类的构造函数的原型对象
 
 2. 成员的名字
+
 3. 成员的属性描述符
 
 ```ts
@@ -5612,7 +5588,7 @@ function getElementContent(el: HTMLElement) {
 ```ts
 type Foo = string | number;
 function a(foo: Foo) {  
-	if(typeof foo === "string") {    
+    if(typeof foo === "string") {    
     // 这里 foo 被收窄为 string 类型  
   } else if(typeof foo === "number") {    
     // 这里 foo 被收窄为 number 类型  
@@ -5791,8 +5767,6 @@ type C = A extends B ? A : never
 // C:never
 ```
 
-
-
 ```ts
 interface ILengthwise {
   length: number;
@@ -5880,7 +5854,7 @@ if(a?.b){ }
  a ?? false // 可以用来排除a 是 null 或 undefined
 ```
 
-##### ! 非空断言操作符 
+##### ! 非空断言操作符
 
 在上下文中当类型检查器无法断定类型时，一个新的后缀表达式操作符 `!` 可以用于断言操作对象是非 null 和非undefined 类型。**具体而言，`x!` 将从 x 值域中排除 `null` 和 `undefined` 。**
 
@@ -5926,9 +5900,8 @@ type Required<T> = {
 
 ```ts
 type Readonly<T> = {
-	readonly [P in keyof T]: T[P];
+    readonly [P in keyof T]: T[P];
 };
-
 ```
 
 ##### `Pick<T, K>`
@@ -5938,7 +5911,7 @@ type Readonly<T> = {
 ```ts
 // 利用 extends 关键字约束 K 类型必须为 keyof T 联合类型的子类型
 type Pick<T, K extends keyof T> = {
-	[P in K]: T[P];
+    [P in K]: T[P];
 };
 ```
 
@@ -5960,7 +5933,7 @@ let person: Pick<Person, 'name' | 'age'> = {
 
 ```ts
 type Record<K extends keyof any, T> = {
-	[P in K]: T;
+    [P in K]: T;
 };
 ```
 
@@ -6052,7 +6025,7 @@ type ReturnType<T extends (...args: any[]) => any> = T extends (...args: any[]) 
 
 ```ts
 function a():number{
-	return 1
+    return 1
 }
 type b = ReturnType<typeof a>; // number
 ```
@@ -6129,24 +6102,24 @@ type ConstructorParameters<T extends new (...args: any) => any> = T extends new 
 type A = ConstructorParameters<FunctionConstructor>; // string[]
 ```
 
-
-
 #### Mixins
 
 ### 工具
 
 #### 编译工具
 
+##### ts-node、tsconfig-paths
+
 前提是已经安装好`TypeScript`、`node`
 
-```markdown
+```sh
 npm install ts-node -g
 npm install nodemon -g
 ```
 
 命令行输入 
 
-```
+```sh
 ts-node index.ts
 ```
 
@@ -6154,10 +6127,10 @@ ts-node index.ts
 
 命令行输入
 
-```
-nodemon -x ts-node index.ts
+```sh
+nodemon -x ts-node --files index.ts
 // or
-nodemon --exec ts-node index.ts 
+nodemon --exec ts-node --files index.ts 
 // 语义：nodemon 执行 ts-node index.ts 命令后，监控编译后的js文件
 ```
 
@@ -6165,13 +6138,81 @@ nodemon --exec ts-node index.ts
 
 exec： execute （执行）
 
+###### ts-node cli
+
+```sh
+-p,--project #指定tsconfig.json，默认是最近的tsconfig.json
+--files      #Load files, include and exclude from tsconfig.json on startup
+-r,--require #Require a node module before execution 在执行之前引入指定的模块
+```
+
+这些选项都可以在 `tsconfig.json`中定义
+
+```json
+{
+  // This is an alias to @tsconfig/node12: https://github.com/tsconfig/bases
+  "extends": "ts-node/node12/tsconfig.json",
+
+  // Most ts-node options can be specified here using their programmatic names.
+  "ts-node": {
+    // It is faster to skip typechecking.
+    // Remove if you want ts-node to do typechecking.
+    "transpileOnly": true,
+
+    "files": true,
+
+    "compilerOptions": {
+      // compilerOptions specified here will override those declared below,
+      // but *only* in ts-node.  Useful if you want ts-node and tsc to use
+      // different options with a single tsconfig.json.
+    }
+  },
+  "compilerOptions": {
+    // typescript options here
+  }
+}
+```
+
+###### tsconfig-paths
+
+tsconfig-paths —— 解析**tsconfig.json**中**paths**定义的模块
+
+https://github.com/TypeStrong/ts-node
+
+`ts-node`默认是不会修改自身解析node module的行为，如果要解析**tsconfig.json**中**paths**定义的模块，需要 **tsconfig-paths**这个库去实现。
+
+You can use ts-node together with [tsconfig-paths](https://www.npmjs.com/package/tsconfig-paths) to load modules according to the `paths` section in `tsconfig.json`.
+
+**方式一：**
+
+```json
+{
+  "ts-node": {
+    // Do not forget to `npm i -D tsconfig-paths`
+    "require": ["tsconfig-paths/register"]
+  }
+}
+```
+
+**方式二：**
+
+```sh
+ts-node -r tsconfig-paths/register main.ts
+```
+
+使用 `process.env.TS_NODE_PROJECT` 可以指定 tsconfig.json。
+
+##### tsc
+
+直接运行 `tsc` 命令 `tsconfig.json` 文件才会生效，要是指定文件比如 `tsc dome.ts` ，`tsconfig.json` 文件不会生效。但是 `ts-node` 指定文件是遵循 `tsconfig.json` 文件的。
+
 #### [编译选项](https://www.tslang.cn/docs/handbook/compiler-options.html)
 
 tsconfig.josn需要放在项目的根目录。
 
 编译选项也可以在命令行输入，例如
 
-```
+```shell
 tsc index.ts --allowJs
 ```
 
@@ -6190,7 +6231,7 @@ tsc index.ts --allowJs
     "declaration": true, /* declaration的值为true或false，用来指定是否在编译的时候生成相应的".d.ts"声明文件。如果设为true，编译每个ts文件之后会生成一个js文件和一个声明文件。 */
     "declarationDir":'', /* 生成声明文件的输出路径。 */
     "emitDeclarationOnly": true, /* 默认为false，只生成.d.ts文件，不生成js文件，不能和 noEmit 同时设置为true */
-    "noEmit": true, /* 不输出编译文件(js) */
+    "noEmit": true, /* 不输出编译文件(js)，为false时，allowJs不能设置为true，否则当项目由js文件时会报错 */
     "declarationMap": true, /* 值为true或false，指定是否为声明文件.d.ts生成map文件 */
     "sourceMap": true, /* sourceMap的值为true或false，用来指定编译时是否生成.map文件 */
     "outFile": "./", /* outFile用于指定将输出文件合并为一个文件，它的值为一个文件路径名。比如设置为"./dist/main.js"，则输出的文件为一个main.js文件。但是要注意，只有设置module的值为amd和system模块时才支持这个配置 */
@@ -6203,8 +6244,8 @@ tsc index.ts --allowJs
     "importHelpers": true,  /* importHelpers的值为true或false，指定是否引入tslib里的辅助工具函数，默认为false */
     "downlevelIteration": true, /* 当target为'ES5' or 'ES3'时，为'for-of', spread, and destructuring'中的迭代器提供完全支持 */
     "isolatedModules": true,  /* isolatedModules的值为true或false，指定是否将每个文件作为单独的模块，默认为true，它不可以和declaration同时设定 */
-		"skipLibCheck":true,  /* 忽略所有的声明文件（ *.d.ts）的类型检查 */
-    
+        "skipLibCheck":true,  /* 忽略所有的声明文件（ *.d.ts）的类型检查 */
+
     /* Strict Type-Checking Options */
     "strict": true /* strict的值为true或false，用于指定是否启动所有类型检查，如果设为true则会同时开启下面这几个严格类型检查，默认为false */,
     "noImplicitAny": true,   /* noImplicitAny的值为false时，如果我们没有为一些值设置明确的类型，编译器会默认认为这个值为any，如果noImplicitAny的值为true的话。则没有明确的类型会报错。默认值为false */
@@ -6228,8 +6269,8 @@ tsc index.ts --allowJs
     "baseUrl": "./",                       /* baseUrl用于设置解析非相对模块名称的基本目录，相对模块不会受baseUrl的影响 */
     "paths": {},                           /* 用于设置模块名称到基于baseUrl的路径映射 */
     "rootDirs": [],                        /* rootDirs可以指定一个路径列表，在构建时编译器会将这个路径列表中的路径的内容都放到一个文件夹中 */
-    "typeRoots": [],                       /* typeRoots用来指定声明文件或文件夹的路径列表，如果指定了此项，则只有在这里列出的声明文件才会被加载 */
-    "types": [],                           /* types用来指定需要包含的模块，只有在这里列出的模块的声明文件才会被加载进来，即不用手动import模块类型，可以直接在ts文件中使用 */
+    "typeRoots": [],                       /* typeRoots用来指定声明文件或文件夹的路径列表，如果指定了此项，则只有在这里列出的声明文件才会被加载。在默认情况下，所有 node_modules/@types 中的任何包都被认为是可见的。如果手动指定了 typeRoots ，则仅会从指定的目录里查找类型文件。 */
+    "types": [],                           /* 指定要包括但不在源文件中引用的类型包名称，即自动引入声明文件。 */
     "allowSyntheticDefaultImports": true,  /* 用来指定允许从没有默认导出的模块中默认导入 */
     "esModuleInterop": true, /* 通过为导入内容创建命名空间，实现CommonJS和ES模块之间的互操作性，esModuleInterop选项的作用是支持使用import d from 'cjs'的方式引入commonjs包。 */
     "preserveSymlinks": true,              /* 不把符号链接解析为其真实路径，具体可以了解下webpack和nodejs的symlink相关知识 */
@@ -6243,18 +6284,17 @@ tsc index.ts --allowJs
     /* Experimental Options */
     "experimentalDecorators": true, /* 用于指定是否启用实验性的装饰器特性 */
     "emitDecoratorMetadata": true,         /* 用于指定是否为装饰器提供元数据支持，关于元数据，也是ES6的新标准，可以通过Reflect提供的静态方法获取元数据，如果需要使用Reflect的一些方法，需要引入ES2015.Reflect这个库 */
-    
+
     /* format */
     "pretty": true, /* 默认true，颜色、格式化输出  */
   },
   "files": [], // files可以配置一个数组列表，里面包含指定文件的相对或绝对路径，编译器在编译的时候只会编译包含在files中列出的文件，如果不指定，则取决于有没有设置include选项，如果没有include选项，则默认会编译根目录以及所有子目录中的文件。这里列出的路径必须是指定文件，而不是某个文件夹，而且不能使用* ? **/ 等通配符
   "include": [],  // include也可以指定要编译的路径列表，但是和files的区别在于，这里的路径可以是文件夹，也可以是文件，可以使用相对和绝对路径，而且可以使用通配符，比如"./src"即表示要编译src文件夹下的所有文件以及子文件夹的文件
   "exclude": [],  // exclude表示要排除的、不编译的文件，它也可以指定一个列表，规则和include一样，可以是文件或文件夹，可以是相对路径或绝对路径，可以使用通配符
-  "extends": "",   // extends可以通过指定一个其他的tsconfig.json文件路径，来继承这个配置文件里的配置，继承来的文件的配置会覆盖当前文件定义的配置。TS在3.2版本开始，支持继承一个来自Node.js包的tsconfig.json配置文件
+  "extends": "",   // extends属性指定一个其他的tsconfig.json文件路径，来继承这个配置文件里的配置，继承来的文件的配置和当前文件属性重复时会覆盖当前文件定义的配置。（因为本文件中的配置最先被加载，之后被extends的文件覆盖同名配置，extends的文件的相对路径是根据其所在的路径，与本文件的路径无关。）如果发现循环引用，则会报错。TS在3.2版本开始，支持继承一个来自Node.js包的tsconfig.json配置文件
   "compileOnSave": true,  // compileOnSave的值是true或false，如果设为true，在我们编辑了项目中的文件保存的时候，编辑器会根据tsconfig.json中的配置重新生成文件，不过这个要编辑器支持
   "references": [],  // 一个对象数组，指定要引用的项目
 }
-
 ```
 
 ##### 常用选项
@@ -6274,7 +6314,7 @@ tsc index.ts --allowJs
     "allowJs": true,
     "esModuleInterop": true, /* 通过为导入内容创建命名空间，实现CommonJS和ES模块之间的互操作性，esModuleInterop选项的作用是支持使用import d from 'cjs'的方式引入commonjs包 */
     "resolveJsonModule": true, // 允许引入json
-    "forceConsistentCasingInFileNames": true, /* 	禁止对同一个文件的不一致的引用。 */
+    "forceConsistentCasingInFileNames": true, /*     禁止对同一个文件的不一致的引用。 */
     "noEmit": true, /* 不输出编译文件（js） */
     "noFallthroughCasesInSwitch": true, /* 用于检查switch中是否有case没有使用break跳出switch，默认为false */
     "noImplicitAny": false,   /* noImplicitAny的值为false时，如果我们没有为一些值设置明确的类型，编译器会默认认为这个值为any，如果noImplicitAny的值为true的话。则没有明确的类型会报错。默认值为false */
@@ -6290,7 +6330,13 @@ tsc index.ts --allowJs
     }
   },
   "include": ["src"],
-  "exclude": ["node_modules", "build"]
+  "exclude": ["node_modules", "build"],
+  "ts-node": { // 需安装 ts-node
+    "require": ["tsconfig-paths/register"], // 需安装 tsconfig-paths
+    "compilerOptions": {
+      "module": "commonjs"
+    }
+  }
 }
 ```
 

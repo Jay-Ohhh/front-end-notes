@@ -2,13 +2,13 @@
 
 #### git常用命令
 
-##### clone 克隆仓库  
+##### clone 克隆仓库
 
 ```sh
 git clone [url]
 ```
 
-##### add 添加到暂存区  
+##### add 添加到暂存区
 
 ```sh
 git add . 将当前目录下的所有文件添加到暂存区
@@ -18,7 +18,7 @@ git add 文件/文件夹相对路径  将指定文件/文件夹添加到暂存�
 - If you are located directly at the *working directory*, then `git add -A` and `git add .` work without the difference.
 - If you are in any subdirectory of the *working directory*, `git add -A` will add all files from the entire *working directory*, and `git add .` will add files from your *current directory*.
 
-##### commit 将暂存区内容添加到本地仓库中  
+##### commit 将暂存区内容添加到本地仓库中
 
 ```sh
 git commit -m [message]
@@ -67,7 +67,7 @@ git commit -am '修改 hello.php 文件'
  1 file changed, 1 insertion(+)
 ```
 
-##### push 将本地的分支版本上传到远程仓库  
+##### push 将本地的分支版本上传到远程仓库
 
 ```sh
 git push <远程主机名> <本地分支名>:<远程分支名>
@@ -103,13 +103,13 @@ git push -u origin master
 
 上面命令将本地的master分支推送到origin主机，同时指定origin为默认主机。
 
-##### checkout 新建分支并切换到该分支  
+##### checkout 新建分支并切换到该分支
 
 ```sh
 git checkout -b [新分支名]
 ```
 
-##### checkout 切换到指定分支  
+##### checkout 切换到指定分支
 
 ```sh
 git checkout [指定分支名]
@@ -134,9 +134,7 @@ git branch -m master
 git push -f origin master
 ```
 
-
-
-##### merge 合并指定分支到当前分支  
+##### merge 合并指定分支到当前分支
 
 在 Git 中整合来自不同分支的修改主要有两种方法：`merge` 以及 `rebase`。 
 
@@ -152,7 +150,7 @@ git merge [指定分支名]
 
 https://www.cnblogs.com/phpper/p/8034480.html
 
-##### rebase 变基 
+##### rebase 变基
 
 优点
 
@@ -163,8 +161,6 @@ https://www.cnblogs.com/phpper/p/8034480.html
 
 - 安全性，`如果你在公共分支上使用rebase`，重写项目历史可能会给你的协作工作流带来灾难性的影响。不要在master等公共分支使用rebase。
 - 可跟踪性，`rebase会更改历史记录`，rebase 不会有合并提交中附带的信息——你看不到 feature 分支中并入了上游的哪些更改，即丢失了一部分提交操作历史。
-
-
 
 https://www.jianshu.com/p/4a8f4af4e803
 
@@ -272,13 +268,13 @@ git merge dev
 
 ![rebase](http://jay_ohhh.gitee.io/imagehosting/Git/rebase.jpg)
 
-##### branch 删除本地分支  
+##### branch 删除本地分支
 
 ```sh
 git branch -d 分支名 // 在其它分支才能删除该分支
 ```
 
-##### branch 删除远程分支  
+##### branch 删除远程分支
 
 ```sh
 git push origin --delete 分支名
@@ -297,13 +293,13 @@ git push --delete origin 远程分支名 // 删除远程分支名
 git push -u origin 新分支名
 ```
 
-##### fetch 从远程获取代码库  
+##### fetch 从远程获取代码库
 
 ```shell
 git fetch <远程主机名> <远程分支名>:<本地分支名> // 注意空格，本地分支名选项是可选项
 ```
 
-##### pull 从远程获取代码并合并本地的版本  
+##### pull 从远程获取代码并合并本地的版本
 
 取回远程主机的远程分支，与本地分支合并
 
@@ -318,9 +314,9 @@ git pull = git fetch + git merge
 常见问题
 
 - refusing to merge unrelated histories，通常出现于两个远程仓库拉pull到本地仓库的情况
-
+  
   出现这个问题的最主要原因还是在于本地仓库和远程仓库实际上是独立的两个仓库。
-
+  
   解决：在git pull 或 git merge 命令后加上--allow-unrelated-histories
 
 ##### 查看本地工作区、暂存区中文件的修改状态
@@ -351,39 +347,101 @@ git log --graph // 分支合并图
 
 ##### Tag
 
-**创建本地标签**
+tag 对应某次commit, 是一个点，是不可移动的。  
+branch 对应一系列commit，是很多点连成的一根线，有一个HEAD 指针，是可以依靠 HEAD 指针移动的。  
+所以，两者的区别决定了使用方式，改动代码用 branch ,不改动只查看用 tag。  
+tag 和 branch 的相互配合使用，有时候起到非常方便的效果，例如：已经发布了 v1.0 v2.0 v3.0 三个版本，这个时候，我突然想不改现有代码的前提下，在 v2.0 的基础上加个新功能，作为 v4.0 发布。就可以检出 v2.0 的代码作为一个 branch ，然后作为开发分支。
+
+###### tag_name
+
+```
+v<major>.<minor>.<patch>
+```
+
+- major：重大修改或向后不兼容
+- minor: 以向后兼容的方式添加新功能
+- patch: 以向后兼容的方式修复bug
+
+###### tag类型
+
+一共有两种`tag`类型：
+
+- 附注标签（Annonated）
+- 轻量标签（Lightweight）
+
+**附注标签**
+
+附注标签存储一个额外的信息，比如作者、发行说明、tag 信息存储为Git仓库中完整的数据，这些数据对于一个公开的项目是非常重要的
+
+`-a`表示该tag是附注标签
 
 ```sh
-git tag -a [tagname] -m [msg]
+git tag -a [tag_name] -m [msg]
 git tag -a [tag_name] [commit_id] -m [msg]
 ```
 
-**创建远程标签**
+**轻量标签**
+
+轻量标签时最简单的打tag的方式，它只存储tag name和关联的commit的hash值，不包含额外的信息，就类似于一个书签
 
 ```sh
-git push origin [tag_name]
+git tag v2.1-lw
 ```
 
-**显示标签**
+###### 显示标签
 
 ```sh
+git tag
 git tag --list
 git show [tag_name]
 ```
 
-**删除本地标签**
+使用`-l`或者`--list`选项利用正则表达式进行过滤
 
 ```
+git tag -l "1.0*"
+```
+
+###### 创建远程标签
+
+```sh
+git push [主机名] [branch] [tag_name]
+
+// 推送全部tags
+git push [主机名] [branch] --tags
+```
+
+###### 删除本地标签
+
+```shell
 git tag -d [tag_name]
 ```
 
-**删除远程标签**
+###### 删除远程标签
 
 ```sh
-git tag push origin :refs/tags/[tag_name]
+git tag push [主机名] [branch] :refs/tags/[tag_name]
+
+git push [主机名] [branch] --delete <tag_name>
 ```
 
-##### reset 回退版本 
+###### 拉取远程标签
+
+```shell
+git pull [主机名] [branch] --tags
+```
+
+###### 检出tag
+
+```shell
+git checkout -b <new_branch> <tag_name>
+```
+
+##### releases
+
+**tag是 Git 中的概念，而 releases 则是 Github、码云等源码托管商所提供的更高层的概念。Git 本身是没有 releases 这个概念，只有 tag。两者之间的关系则是，release 基于 tag，为 tag 添加更丰富的信息，一般是编译好的文件。**
+
+##### reset 回退版本
 
 有时候，进行了错误的提交，但是还没有push到远程分支，想要撤销本次提交，可以使用命令：
 
@@ -405,15 +463,11 @@ git reset 分为三种：软 --soft，中 ---mixed，硬 --hard 对应着三种�
 
 > commit-id 就是 commit 的哈希值
 
-
-
 ##### revert 反做版本
 
 https://blog.csdn.net/yxlshk/article/details/79944535
 
-
-
-##### git cherry-pick 
+##### git cherry-pick
 
 将某一个分支的单个或多个提交，并作为一个新的提交引入到当前分支上。
 
@@ -587,8 +641,6 @@ git push --delete origin 旧分支名 // 简写:  git push -d origin 旧分支�
 git push -u origin 新分支名
 ```
 
-
-
 #### git删除中间某次提交
 
 git log获取commit信息
@@ -628,9 +680,7 @@ git rebase -i 7753f40
 
 4、此已经删除了指定的commit，可以使用git log查看下
 
-
-
-#### **HEAD 说明**
+#### HEAD 说明
 
 - HEAD 表示当前版本
 
@@ -640,11 +690,12 @@ git rebase -i 7753f40
 
 - 以此类推...
 
-  
-
 - HEAD~0 表示当前版本
+
 - HEAD~1 前一次提交
+
 - HEAD~2 前两次提交
+
 - 以此类推...
 
 ```
@@ -689,8 +740,6 @@ J = F^2  = B^3^2   = A^^3^2
 6、git push 推送到远程仓库
 
 7、 git stash pop 恢复之前忽略的文件（非常重要的一步）
-
-
 
 #### Github 搜索技巧
 
@@ -750,13 +799,9 @@ location:China
 
 jack in:fullname
 
-
-
 #### Gitee搜索技巧
 
 用户可以通过组合「关键字」+「开发语言类型」+「项目收藏数(Watch)」+「项目克隆数(Fork)」+「项目更新时间」等筛选条件，查找用户需要的项目。
-
-
 
 #### 入职公司拉取代码
 
@@ -769,7 +814,7 @@ git clone 项目的地址
 2、拉取你要开发的初始版本，比如develop分支的最新代码
 
 > 也有可能是这样的顺序：
->
+> 
 > ```
 > git clone 项目的地址
 > git branch -a 查看所有分支，分支命名规范，远程主机名
@@ -829,8 +874,6 @@ gitlab -> merge request
 github -> pull request
 ```
 
-
-
 如果是直接在拉取下来的 devlop 分支上进行开发，则
 
 1、先拉取代码
@@ -851,8 +894,6 @@ git checkout -b devlop
 git pull origin devlop 
 ```
 
-
-
 #### 覆盖分支
 
 1.我想将test分支上的代码完全覆盖dev分支，首先切换到dev分支
@@ -871,27 +912,6 @@ git reset --hard origin/test
 
 ```sh
 git push -f
-```
-
-
-
-#### git远程仓库地址更换，本地如何修改
-
-方法一：
-
-直接在本地修改远程仓库地址即可：
-
-```sh
-git remote set-url origin 远程仓库地址
-```
-
-方法二：
-
-先删除，然后添加地址：
-
-```sh
-git remote rm origin
-git remote add origin 远程仓库地址
 ```
 
 #### 解决冲突
@@ -930,7 +950,7 @@ https://zhuanlan.zhihu.com/p/87603185
   `git checkout -b test`
 
 - 推送到远程仓库
-
+  
   `git push -u origin test`
 
 - 修改提交代码
@@ -984,39 +1004,54 @@ git remote add 远程仓库主机名 远程仓库地址
 
 > 远程仓库主机名是自定义
 
+##### 更换远程仓库地址
+
+方法一：
+
+直接在本地修改远程仓库地址即可：
+
+```git
+git remote set-url origin 远程仓库地址
+```
+
+方法二：
+
+先删除，然后添加地址：
+
+```git
+git remote rm origin
+git remote add origin 远程仓库地址
+```
+
 ##### 删除远程仓库
 
 ```sh
 git remote rm 远程仓库主机名
 ```
 
-
-
 #### 配置公钥
 
 https://blog.csdn.net/lqlqlq007/article/details/78983879
 
-
-
-#### 修改仓库语言 
+#### 修改仓库语言
 
 项目仓库是根据根目录下的文件类型进行判断，哪种类型多，仓库就在仓库列表界面显示哪种语言类型
 
 1. 添加文件 `.gitattributes`
-
+   
    > 注意 .gitattributes 中内容的路径都是相对于.gitattributes的路径
 
 2. 输入以下内容（重置识别类型）：
 
 https://github.com/github/linguist/blob/master/docs/overrides.md
 
-| Git attribute            | Defined in                                                   | Effect on file                                               |
-| ------------------------ | ------------------------------------------------------------ | ------------------------------------------------------------ |
-| `linguist-detectable`    | [`languages.yml`](https://github.com/github/linguist/blob/master/lib/linguist/languages.yml) | Included in stats, even if language's type is `data` or `prose` |
-| `linguist-documentation` | [`documentation.yml`](https://github.com/github/linguist/blob/master/lib/linguist/documentation.yml) | Excluded from stats                                          |
-| `linguist-generated`     | [`generated.rb`](https://github.com/github/linguist/blob/master/lib/linguist/generated.rb) | Excluded from stats, hidden in diffs                         |
-| `linguist-language`=name | [`languages.yml`](https://github.com/github/linguist/blob/master/lib/linguist/languages.yml) | Highlighted and classified as name                           |
-| `linguist-vendored`      | [`vendor.yml`](https://github.com/github/linguist/blob/master/lib/linguist/vendor.yml) | Excluded from stats                                          |
+| Git attribute            | Defined in                                                                                           | Effect on file                                                  |
+| ------------------------ | ---------------------------------------------------------------------------------------------------- | --------------------------------------------------------------- |
+| `linguist-detectable`    | [`languages.yml`](https://github.com/github/linguist/blob/master/lib/linguist/languages.yml)         | Included in stats, even if language's type is `data` or `prose` |
+| `linguist-documentation` | [`documentation.yml`](https://github.com/github/linguist/blob/master/lib/linguist/documentation.yml) | Excluded from stats                                             |
+| `linguist-generated`     | [`generated.rb`](https://github.com/github/linguist/blob/master/lib/linguist/generated.rb)           | Excluded from stats, hidden in diffs                            |
+| `linguist-language`=name | [`languages.yml`](https://github.com/github/linguist/blob/master/lib/linguist/languages.yml)         | Highlighted and classified as name                              |
+| `linguist-vendored`      | [`vendor.yml`](https://github.com/github/linguist/blob/master/lib/linguist/vendor.yml)               | Excluded from stats                                             |
 
 除了 linguist-language，其余Git attribute后面可跟 `=false`
 
@@ -1070,8 +1105,6 @@ jquery.js -linguist-vendored
 ano-dir/** linguist-vendored
 ```
 
-
-
 #### Git Flow
 
 https://blog.csdn.net/Z_kenshou/article/details/103407521
@@ -1102,13 +1135,13 @@ https://www.cnblogs.com/busigulang/articles/11224401.html
 
 在 Gitee 平台，仓库成员权限可以以下几种：
 
-| 成员角色         | 权限                                                         |
-| ---------------- | ------------------------------------------------------------ |
-| 访客（登录用户） | 对于公有仓库：创建 Issue、评论、Clone 和 Pull 仓库、打包下载代码、Fork 仓库、 Fork 仓库提交 Pull Request、下载附件 |
-| 报告者           | 继承访客的权限。 私有仓库：不能查看代码、不能下载代码、不能 Push 、不能 Fork 、 不能提交 Pull Request、可下载附件，不能上传附件，不能删除附件 |
-| 观察者           | 继承报告者权限 私有仓库：创建 Wiki、可以 Clone 下载代码、可以 Pull、不能 Fork |
-| 开发者           | 创建 Issue、评论、Clone 和 Pull 仓库、Fork 仓库、打包下载代码、创建 Pull Request、 创建分支、推送分支、删除分支、创建标签（里程碑）、 创建 Wiki、可上传附件，可删除自己上传的附件，不能删除他人上传的附件、 |
-| 管理员           | 创建 Issue、评论、Clone 和 Pull 仓库、打包下载代码、创建 Pull Request、 创建分支、推送分支、删除分支、创建标签（里程碑）、创建 Wiki、 添加仓库成员、强制推送分支、编辑仓库属性、可上传附件，可删除自己或他人上传的附件、 不能转移/清空/删除仓库 |
+| 成员角色     | 权限                                                                                                                                           |
+| -------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
+| 访客（登录用户） | 对于公有仓库：创建 Issue、评论、Clone 和 Pull 仓库、打包下载代码、Fork 仓库、 Fork 仓库提交 Pull Request、下载附件                                                               |
+| 报告者      | 继承访客的权限。 私有仓库：不能查看代码、不能下载代码、不能 Push 、不能 Fork 、 不能提交 Pull Request、可下载附件，不能上传附件，不能删除附件                                                         |
+| 观察者      | 继承报告者权限 私有仓库：创建 Wiki、可以 Clone 下载代码、可以 Pull、不能 Fork                                                                                           |
+| 开发者      | 创建 Issue、评论、Clone 和 Pull 仓库、Fork 仓库、打包下载代码、创建 Pull Request、 创建分支、推送分支、删除分支、创建标签（里程碑）、 创建 Wiki、可上传附件，可删除自己上传的附件，不能删除他人上传的附件、                  |
+| 管理员      | 创建 Issue、评论、Clone 和 Pull 仓库、打包下载代码、创建 Pull Request、 创建分支、推送分支、删除分支、创建标签（里程碑）、创建 Wiki、 添加仓库成员、强制推送分支、编辑仓库属性、可上传附件，可删除自己或他人上传的附件、 不能转移/清空/删除仓库 |
 
 #### 将某个文件夹下的文件上传到远程仓库
 
@@ -1133,18 +1166,13 @@ https://www.cnblogs.com/feiquan/p/11538433.html
 
 3. 目标:提交公司任务到gitLab 上,自己写的代码提交到github上
 
- 
-
 介绍配置过程:
 
 1. 检查是否设置了全局user.name ，user.email ，如果设置了就取消，取消步骤:
-
 - git config -- global --unset user.name
 
 - git config --global --unset user.email
-
 2. 配置两个不同邮箱下的ssh
-
 - 生成key命令  ssh-keygen - t rsa -C "your_email"
 
 - 会提示你输入文件名,可以输入对应的网址的名称，比如id_rsa_gitlab
@@ -1241,6 +1269,12 @@ ssh -T 地址 // 测试是否连上
 
 > 如果仓库是公司内网的话，需要通过公司提供的VPN连上内网，ssh-add和 ssh -T 才能添加成功
 
+#### github 在线 IDE
+
+仓库地址前缀加上 https://stackblitz.com/
+
+例如：`https://stackblitz.com/github/Jay-Ohhh/rolib-cli`
+
 #### 使用 Travis CI 自动更新
 
 https://cli.vuejs.org/zh/guide/deployment.html#github-pages
@@ -1269,16 +1303,16 @@ See info on the fields below.
 
 Must be one of the following:
 
-| Type         | Description                                                  |
-| ------------ | ------------------------------------------------------------ |
-| **feat**     | A new feature                                                |
-| **fix**      | A bug fix                                                    |
-| **docs**     | Documentation only changes                                   |
+| Type         | Description                                                                                            |
+| ------------ | ------------------------------------------------------------------------------------------------------ |
+| **feat**     | A new feature                                                                                          |
+| **fix**      | A bug fix                                                                                              |
+| **docs**     | Documentation only changes                                                                             |
 | **style**:   | Changes that do not affect the meaning of the code (white-space, formatting, missing semi-colons, etc) |
-| **refactor** | A code change that neither fixes a bug nor adds a feature    |
-| **perf**     | A code change that improves performance                      |
-| **test**     | Adding missing or correcting existing tests                  |
-| **chore**    | Changes to the build process or auxiliary tools and libraries such as documentation generation |
+| **refactor** | A code change that neither fixes a bug nor adds a feature                                              |
+| **perf**     | A code change that improves performance                                                                |
+| **test**     | Adding missing or correcting existing tests                                                            |
+| **chore**    | Changes to the build process or auxiliary tools and libraries such as documentation generation         |
 
 **Scope**
 
@@ -1327,4 +1361,3 @@ A detailed explanation can be found in this [document](https://docs.google.com/d
 - 先把本地的 yarn.lock 剪切到项目以外的目录（相当于删除了该文件），然后提交到远程仓库
 - 其他协作者 git pull，也会删除掉 yarn.lock
 - 然后把 yarn.lock 拷贝回本项目
-

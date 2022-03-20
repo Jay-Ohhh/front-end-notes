@@ -411,8 +411,6 @@ s3: |-
 > [ 'Steve', 'Clark', 'Brian', 'Oren', 'Steve' ]
 > ```
 
-
-
 #### JS-YAML
 
 ##### 函数和正则表达式的转换
@@ -448,8 +446,8 @@ s3: |-
 > var fs   = require('fs');
 > 
 > var obj = {
->   	fn: function () { return 1 },
->   	reg: /test/
+>       fn: function () { return 1 },
+>       reg: /test/
 > };
 > 
 > try {
@@ -459,6 +457,6 @@ s3: |-
 >      'utf8'
 >   );
 > } catch (e) {
->   	console.log(e);
+>       console.log(e);
 > }
 > ```

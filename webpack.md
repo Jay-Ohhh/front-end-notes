@@ -519,9 +519,37 @@ module.exports = {
 
 - `webpack.DefinePlugin`：这是一个简单的字符串替换插件，将我们所有经过 webpack 打包的 js 文件中代码对应的变量都替换为我们在这个插件中指定的其他值或表达式。DefinePlugin 允许创建一个在编译时可以配置的全局常量。
 
-- `terser-webpack-plugin`：该插件使用 [terser](https://github.com/terser-js/terser) 来压缩 JavaScript，另外可以去除注释、console、debugger。
+- `terser-webpack-plugin`：该插件使用 [terser](https://github.com/terser-js/terser) 来压缩 JavaScript，支持压缩 ES6，另外可以去除注释、console、debugger。
 
   webpack v5 开箱即带有最新版本的 `terser-webpack-plugin`。如果你使用的是 webpack v5 或更高版本，同时希望自定义配置，那么仍需要安装 `terser-webpack-plugin`。如果使用 webpack v4，则必须安装 `terser-webpack-plugin` v4 的版本。
+
+  ```js
+  module.exports = {
+    optimization: {
+      minimize: true,
+      minimizer: [
+        new TerserPlugin({
+          terserOptions: {
+            compress: {
+              parallel: true,
+              extractComments: true, // 剥离注释,
+              terserOptions: {
+                compress: {
+                 	// https://github.com/terser/terser
+                  // 默认会去掉debugger
+                  drop_console: true, // 去掉console
+                  // pure_funcs:['console.log'] // 如果只想去除console.log，而不想去除console.info
+                },
+  					},
+            },
+          },
+        }),
+      ],
+    },
+  };
+  ```
+
+  
 
 - `webpack.BannerPlugin`：为每个 chunk 文件头部添加 banner。
 
@@ -904,12 +932,6 @@ module.exports = {
 
 https://webpack.docschina.org/configuration/configuration-languages/#typescript
 
-```sh
-npm install --save-dev typescript ts-node @types/node @types/webpack
-# 如果使用版本低于 v4.7.0 的 webpack-dev-server，还需要安装以下依赖
-npm install --save-dev @types/webpack-dev-server
-```
-
 要使用 [Typescript](https://www.typescriptlang.org/) 来编写 webpack 配置，你需要先安装必要的依赖，比如 Typescript 以及其相应的类型声明，类型声明可以从 [DefinitelyTyped](https://definitelytyped.org/) 项目中获取，依赖安装如下所示：
 
 ```bash
@@ -1012,7 +1034,7 @@ ts-node 可以根据 `tsconfig-paths` 提供的环境变量 `process.env.TS_NODE
 
 **package.json**
 
-需安装 typescript 、ts-node
+**需安装 typescript 、ts-node**
 
 ```json
 {
@@ -1202,10 +1224,6 @@ babel 使用过程中的 helper 函数默认会分散在使用到的地方，开
 
 
 
-
-
-
-
 #### webpack、babel编译 ts 、tsx、jsx，搭建react环境
 
 https://juejin.cn/post/7020972849649156110
@@ -1217,15 +1235,30 @@ babel-loader 可以转换 js、jsx、ts、tsx 文件 （推荐）
 这里我们选择使用 babel-loader 
 
 ```shell
-npm i -D @babel/core @babel/preset-env @babel/preset-react @babel/preset-typescript @babel/runtime-corejs3 @babel/plugin-transform-runtime @babel/plugin-proposal-class-properties @babel/plugin-proposal-decorators core-js@3 babel-loader
+npm i -D @babel/core @babel/preset-env @babel/preset-typescript @babel/preset-react @babel/runtime-corejs3 @babel/plugin-transform-runtime @babel/plugin-proposal-class-properties @babel/plugin-proposal-decorators core-js@3 babel-loader
 ```
 
 ```sh
 npm i react react-dom
-npm i -D @types/react @types/react-dom typescript 
+npm i -D @types/react @types/react-dom typescript tslib ts-node
 ```
 
-- @babel/core——babel核心
+- ts-node —— 可选安装，在node.js上执行ts文件，可以方便调试ts文件。
+
+- tslib —— 可选安装，TypeScript的运行库，包含所有TypeScript帮助函数。
+
+  > ```
+  > // tsconfig.json
+  > // importHelpers：Allow importing helper functions from tslib once per project, instead of including them per-file.
+  > // 使用该属性时需安装 tslib 
+  > {
+  >     "compilerOptions": {
+  >         "importHelpers": true
+  >     }
+  > }
+  > ```
+
+在项目根目录配置 **tsconfig.json**
 
 **webpack.config.js**
 

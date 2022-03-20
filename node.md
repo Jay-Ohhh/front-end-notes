@@ -9,8 +9,6 @@
 - `__dirname` 可以用来**动态获取**当前文件所属目录的绝对路径
 - `__filename` 可以用来**动态获取**当前文件的绝对路径
 
-
-
 #### path.resolve
 
 - `...paths` [](http://url.nodejs.cn/9Tw2bK) 路径或路径片段的序列
@@ -27,7 +25,7 @@
 如果没有传入 `path` 片段，则 `path.resolve()` 将返回当前工作目录的绝对路径。
 
 > 绝对路径形式：/a/b
->
+> 
 > 非绝对路径形式：a/b
 
 **对于`/a`**，称为完整路径，例如 /a/b/  ,  `/b`是完整路径
@@ -43,7 +41,7 @@
 生成的路径被规范化，并删除尾部斜杠（除非路径解析为根目录）。
 
 > /a/b/ 和 /a/b 最后一个的**路径名称**是 b
->
+> 
 > 若拼接路径的 `/` 重复，则取一个 `/`，例如：/a//src  =>  /a/src
 
 ```js
@@ -67,8 +65,6 @@ path.resolve('/a','..','src') // /home/src
 
 零长度的 `path` 片段被忽略。 如果连接的路径字符串是零长度字符串，则将返回 `'.'`，表示当前工作目录。
 
-
-
 若字符以 / 开头，则会忽略/，拼接到前面路径；
 
 如果在处理完所有给定的 path 片段之后还未生成绝对路径，**不会在前面加上当前工作目录**。
@@ -81,3 +77,34 @@ path.join('a', '../src') // src
 path.join('/a/b', '..', 'src') // /a/src
 ```
 
+#### 字符串路径
+
+字符串路径被解释为标识绝对或相对文件名的 UTF-8 字符序列。 相对路径将相对于通过调用 `process.cwd()` 确定的当前工作目录进行解析。
+
+在 POSIX 上使用绝对路径的示例：
+
+```js
+import { open } from 'fs/promises';
+
+let fd;
+try {
+  fd = await open('/open/some/file.txt', 'r');
+  // 对文件做一些事情
+} finally {
+  await fd.close();
+}
+```
+
+在 POSIX 上使用相对路径的示例（相对于 `process.cwd()`）:
+
+```js
+import { open } from 'fs/promises';
+
+let fd;
+try {
+  fd = await open('file.txt', 'r');
+  // 对文件做一些事情
+} finally {
+  await fd.close();
+}
+```

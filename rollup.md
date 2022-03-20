@@ -38,7 +38,6 @@ const options: RollupOptions[] = [
 ];
 
 export default options;
-
 ```
 
 ```sh
@@ -136,7 +135,7 @@ export default {
 };
 ```
 
-#### input 
+#### input
 
 Type: `string | string [] | { [entryName: string]: string }`
 CLI: `-i`/`--input <filename>`
@@ -197,7 +196,7 @@ export default [
 ];
 ```
 
-#### Output
+#### output
 
 ##### output.dir
 
@@ -210,8 +209,6 @@ CLI: `-d`/`--dir <dirname>`
 
 - input选项为多入口
 - 动态 import 会进行 code-splitting，而且`UMD and IIFE output formats are not supported for code-splitting builds`。
-
-
 
 ##### output.file
 
@@ -232,8 +229,6 @@ export default {
 };
 ```
 
-
-
 ##### output.format
 
 Type: `string`
@@ -243,15 +238,11 @@ Default: `"es"`
 生成包的格式。 与 webpack `output.library.type` 类似
 
 - `amd` – 异步模块定义，用于像RequireJS这样的模块加载器
-- `cjs` – CommonJS，适用于 Node 和 Browserify/Webpack
-- `esm` – 将软件包保存为 ES 模块文件，在现代浏览器中可以通过 `<script type=module>` 标签引入
+- `cjs` – CommonJS，适用于 Node 和 Browserify/Webpack。(alias: `commonjs`)
+- `es` – 将软件包保存为 ES 模块文件，在现代浏览器中可以通过 `<script type=module>` 标签引入。 (alias: `esm`, `module`)
 - `iife` – 一个自动执行的功能，适合作为`<script>`标签。（如果要为应用程序创建一个捆绑包，您可能想要使用它，因为它会使文件大小变小。）
 - `umd` – 通用模块定义，以`amd`，`cjs` 和 `iife` 为一体
-- `system` - SystemJS 加载器格式
-
-
-
-
+- `system` - SystemJS 加载器格式。alias: `systemjs`)
 
 ##### output.exports
 
@@ -259,28 +250,25 @@ Type: `string`
 CLI: `--exports <exportMode>`
 Default: `'auto'`
 
--  `'auto'`  - 自动识别以下的export方式
+- `'auto'`  - 自动识别以下的export方式
 
 - `default` – if you are only exporting one thing using `export default ...`; 
 
 - `named` – 如果使用 named export , e.g. 
-
+  
   ```js
   export const a = 1;
   ```
 
 - `none` – if you are not exporting anything (e.g. you are building an app, not a library)
 
-
-
 如果 format 为 cjs
 
 - 入口文件仅使用 default export ，则需要**显式** `output.exports: 'auto' 或 'default'`
+
 - 入口文件同时使用 named and default export，则需要显式 `output.exports: 'named'`
-
-
-
- If you use `default`, a CommonJS user could do this, for example:
+  
+  If you use `default`, a CommonJS user could do this, for example:
 
 ```js
 // your-lib package entry
@@ -319,8 +307,6 @@ const bar = require('your-lib').bar;
 const { default: foo, bar } = require('your-lib');
 ```
 
-
-
 ##### output.name
 
 Type: `string`
@@ -354,6 +340,18 @@ The pattern to use for chunks created from entry points, or a function that is c
 - `[hash]`: A hash based on the content of the entry point and the content of all its dependencies.
 - `[name]`: The file name (without extension) of the entry point, unless the object form of input was used to define a different name.
 
+##### output.chunkFileNames
+
+Type: `string | ((chunkInfo: ChunkInfo) => string)`
+CLI: `--chunkFileNames <pattern>`
+Default: `"[name]-[hash].js"`
+
+The pattern to use for naming shared chunks created when code-splitting, or a function that is called per chunk to return such a pattern. Patterns support the following placeholders:
+
+- `[format]`: The rendering format defined in the output options, e.g. `es` or `cjs`.
+- `[hash]`: A hash based on the content of the chunk and the content of all its dependencies.
+- `[name]`: The name of the chunk. This can be explicitly set via the [`output.manualChunks`](https://rollupjs.org/guide/en/#outputmanualchunks) option or when the chunk is created by a plugin via [`this.emitFile`](https://rollupjs.org/guide/en/#thisemitfile). Otherwise, it will be derived from the chunk contents.
+
 ##### output.plugins
 
 Type: `OutputPlugin | (OutputPlugin | void)[]`
@@ -369,10 +367,12 @@ If you are a plugin author, see [output generation hooks](https://rollupjs.org/g
 Type: `{ [id: string]: string } | ((id: string) => string)`
 CLI: `-g`/`--globals <external-id:variableName,another-external-id:anotherVariableName,...>`
 
-`Object` 形式的 `moduleId/variableNam` 键值对，用于`external`文件中`import`的`umd`/`iife`包。例如：
+`Object` 形式的 `moduleId/variableName` 键值对
+
+当你创建 `umd` 或 `iife` 包时，你必须在 `ouput.globals` 设置 `external`中包对应的全局变量名，例如
 
 ```js
-import $ from 'jquery';
+import jq from 'jquery'; 
 ```
 
 ...我们想告诉 Rollup `jquery` 模块的id等同于 `$` 变量:
@@ -386,7 +386,7 @@ export default {
     format: 'iife',
     name: 'MyBundle',
     globals: {
-      jquery: '$'
+      jquery: '$' // jquery 是 moduleId，$ 是 全局变量名variableName
     }
   }
 };
@@ -413,11 +413,9 @@ import { Link } from "react-router-dom";
 ```js
 // rollup.config.js
 globals: {
-	'react-router-dom': 'ReactRouterDOM'
+    'react-router-dom': 'ReactRouterDOM'
 }
 ```
-
-
 
 ##### output.paths
 
@@ -450,8 +448,6 @@ define(['https://d3js.org/d3.v4.min'], function (d3) {
   // ...
 });
 ```
-
-
 
 ##### output.banner/output.footer
 
@@ -493,8 +489,6 @@ export default {
 };
 ```
 
-
-
 ##### output.sourcemap
 
 Type: `boolean | 'inline' | 'hidden'`
@@ -503,8 +497,6 @@ Default: `false`
 
 如果为true，将创建一个单独的sourcemap文件。如果是“inline”，则sourcemap将作为 data URI 附加到结果输出文件中。“hidden”与true类似，只是打包文件中相应的sourcemap注释被抑制。
 
-
-
 ##### output.sourcemapExcludeSources
 
 Type: `boolean`
@@ -512,8 +504,6 @@ CLI: `--sourcemapExcludeSources`/`--no-sourcemapExcludeSources`
 Default: `false`
 
 如果为true，源代码的实际代码将不会添加到sourcemaps中，从而使它们变得更小。
-
-
 
 ##### output.sourcemapFile
 
@@ -524,10 +514,12 @@ CLI: `--sourcemapFile <file-name-with-path>`
 
 如果指定了output，则ourcemapFile不是必需的，在这种情况下，会在打包输出文件的目录下生成`.map`文件。
 
-#### external 
+#### external
 
 Type: `(string | RegExp)[] | RegExp | string | (id: string, parentId: string, isResolved: boolean) => boolean`
 CLI: `-e`/`--external <external-id,another-external-id,...>`
+
+external 声明外部依赖，可以不被打包
 
  `Array` 应该保留在bundle的外部引用的模块ID。ID应该是：
 
@@ -553,7 +545,26 @@ export default {
 rollup -i src/main.js ... -e foo,bar,baz
 ```
 
+当你创建 `umd` 或 `iife` 包时，你必须在 `ouput.globals` 设置 `external`中包对应的全局变量名，而例如
 
+```js
+{
+    input: 'src/index.ts',
+  output: [
+      {
+          file: pkg.module,
+          format: 'umd',
+          name: "xxx",
+          globals:{
+              react: "React",
+        "react-dom": "ReactDOM",
+              jquery: "$",
+          }
+      },
+  ],
+  external:['react', 'react-dom', 'jquery']
+}
+```
 
 #### external、output.globals、output.paths、peerDependencies
 
@@ -567,11 +578,9 @@ peerDependencies的包通常可以通过 external 从打包中剔除。
 import pkg from './package.json';
 
 export default {
-	external: Object.keys(pkg.peerDependencies || {})
+    external: Object.keys(pkg.peerDependencies || {})
 }
 ```
-
-
 
 #### plugins
 
@@ -779,48 +788,51 @@ rollup --config rollup.config.prod.js
 
 https://github.com/rollup/awesome
 
-| 插件名                                                       | 描述                                                         |
-| ------------------------------------------------------------ | ------------------------------------------------------------ |
-| [alias](https://github.com/rollup/plugins/blob/master/packages/alias) | Define and resolve aliases for bundle dependencies 路径起别名 |
-| [auto-install](https://github.com/rollup/plugins/blob/master/packages/auto-install) | Automatically install dependencies that are imported by a bundle |
-| [babel](https://github.com/rollup/plugins/blob/master/packages/babel) | Compile your files with Babel                                |
-| [beep](https://github.com/rollup/plugins/blob/master/packages/beep) | System beeps on errors and warnings                          |
-| [buble](https://github.com/rollup/plugins/blob/master/packages/buble) | Compile ES2015 with buble                                    |
-| [commonjs](https://github.com/rollup/plugins/blob/master/packages/commonjs) | 将 CommonJS 转换成 ESM                                       |
-| [clear](https://github.com/DongShelton/rollup-plugin-clear)  | Clear an output directory before a build.                    |
-| [copy](https://github.com/meuter/rollup-plugin-copy)         | Copy files during a build.                                   |
-| [data-uri](https://github.com/rollup/plugins/blob/master/packages/data-uri) | Import modules from Data URIs                                |
-| [dsv](https://github.com/rollup/plugins/blob/master/packages/dsv) | Convert .csv and .tsv files into JavaScript modules with d3-dsv |
-| [dynamic-import-vars](https://github.com/rollup/plugins/blob/master/packages/dynamic-import-vars) | Resolving dynamic imports that contain variables.            |
-| [eslint](https://github.com/rollup/plugins/blob/master/packages/eslint) | Verify entry point and all imported files with ESLint        |
-| [graphql](https://github.com/rollup/plugins/blob/master/packages/graphql) | Convert .gql/.graphql files to ES6 modules                   |
-| [html](https://github.com/rollup/plugins/blob/master/packages/html) | Create HTML files to serve Rollup bundles                    |
-| [image](https://github.com/rollup/plugins/blob/master/packages/image) | Import JPG, PNG, GIF, SVG, and WebP files                    |
-| [inject](https://github.com/rollup/plugins/blob/master/packages/inject) | Scan modules for global variables and injects `import` statements where necessary |
-| [json](https://github.com/rollup/plugins/blob/master/packages/json) | Convert .json files to ES6 modules                           |
-| [legacy](https://github.com/rollup/plugins/blob/master/packages/legacy) | Add `export` declarations to legacy non-module scripts       |
-| [multi-entry](https://github.com/rollup/plugins/blob/master/packages/multi-entry) | Use multiple entry points for a bundle                       |
-| [node-resolve](https://github.com/rollup/plugins/blob/master/packages/node-resolve) | 从node_modules中查找并打包第三方库                           |
-| [replace](https://github.com/rollup/plugins/blob/master/packages/replace) | Replace strings in files while bundling  替换字符串，与webpack.DefinePlugin相同 |
-| [run](https://github.com/rollup/plugins/blob/master/packages/run) | Run your bundles in Node once they're built                  |
-| [strip](https://github.com/rollup/plugins/blob/master/packages/strip) | Remove debugger statements and functions like assert.equal and console.log from your code |
-| [sucrase](https://github.com/rollup/plugins/blob/master/packages/sucrase) | Compile TypeScript, Flow, JSX, etc with Sucrase              |
-| [terser](https://github.com/TrySound/rollup-plugin-terser)   | Minify a bundle using Terser                                 |
-| [typescript](https://github.com/rollup/plugins/blob/master/packages/typescript) | Integration between Rollup and Typescript                    |
-| [url](https://github.com/rollup/plugins/blob/master/packages/url) | Import files as data-URIs or ES Modules                      |
-| [virtual](https://github.com/rollup/plugins/blob/master/packages/virtual) | Load virtual modules from memory                             |
-| [wasm](https://github.com/rollup/plugins/blob/master/packages/wasm) | Import WebAssembly code with Rollup                          |
-| [yaml](https://github.com/rollup/plugins/blob/master/packages/yaml) | Convert YAML files to ES6 modules                            |
-| [progress](https://github.com/jkuri/rollup-plugin-progress)  | Show build progress in the console.                          |
+| 插件名                                                                                               | 描述                                                                                        |
+| ------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------- |
+| [alias](https://github.com/rollup/plugins/blob/master/packages/alias)                             | Define and resolve aliases for bundle dependencies 路径起别名                                  |
+| [auto-install](https://github.com/rollup/plugins/blob/master/packages/auto-install)               | Automatically install dependencies that are imported by a bundle                          |
+| [babel](https://github.com/rollup/plugins/blob/master/packages/babel)                             | Compile your files with Babel                                                             |
+| [beep](https://github.com/rollup/plugins/blob/master/packages/beep)                               | System beeps on errors and warnings                                                       |
+| [buble](https://github.com/rollup/plugins/blob/master/packages/buble)                             | Compile ES2015 with buble                                                                 |
+| [commonjs](https://github.com/rollup/plugins/blob/master/packages/commonjs)                       | 将 CommonJS 转换成 ESM                                                                        |
+| [clear](https://github.com/DongShelton/rollup-plugin-clear)                                       | Clear an output directory before a build.                                                 |
+| [copy](https://github.com/meuter/rollup-plugin-copy)                                              | Copy files during a build.                                                                |
+| [data-uri](https://github.com/rollup/plugins/blob/master/packages/data-uri)                       | Import modules from Data URIs                                                             |
+| [dsv](https://github.com/rollup/plugins/blob/master/packages/dsv)                                 | Convert .csv and .tsv files into JavaScript modules with d3-dsv                           |
+| [dynamic-import-vars](https://github.com/rollup/plugins/blob/master/packages/dynamic-import-vars) | Resolving dynamic imports that contain variables.                                         |
+| [eslint](https://github.com/rollup/plugins/blob/master/packages/eslint)                           | Verify entry point and all imported files with ESLint                                     |
+| [graphql](https://github.com/rollup/plugins/blob/master/packages/graphql)                         | Convert .gql/.graphql files to ES6 modules                                                |
+| [html](https://github.com/rollup/plugins/blob/master/packages/html)                               | Create HTML files to serve Rollup bundles                                                 |
+| [image](https://github.com/rollup/plugins/blob/master/packages/image)                             | Import JPG, PNG, GIF, SVG, and WebP files                                                 |
+| [inject](https://github.com/rollup/plugins/blob/master/packages/inject)                           | Scan modules for global variables and injects `import` statements where necessary         |
+| [json](https://github.com/rollup/plugins/blob/master/packages/json)                               | Convert .json files to ES6 modules                                                        |
+| [legacy](https://github.com/rollup/plugins/blob/master/packages/legacy)                           | Add `export` declarations to legacy non-module scripts                                    |
+| [multi-entry](https://github.com/rollup/plugins/blob/master/packages/multi-entry)                 | Use multiple entry points for a bundle                                                    |
+| [node-resolve](https://github.com/rollup/plugins/blob/master/packages/node-resolve)               | 从node_modules中查找并打包第三方库                                                                   |
+| [replace](https://github.com/rollup/plugins/blob/master/packages/replace)                         | Replace strings in files while bundling  替换字符串，与webpack.DefinePlugin相同                    |
+| [run](https://github.com/rollup/plugins/blob/master/packages/run)                                 | Run your bundles in Node once they're built                                               |
+| [strip](https://github.com/rollup/plugins/blob/master/packages/strip)                             | Remove debugger statements and functions like assert.equal and console.log from your code |
+| [sucrase](https://github.com/rollup/plugins/blob/master/packages/sucrase)                         | Compile TypeScript, Flow, JSX, etc with Sucrase                                           |
+| [terser](https://github.com/TrySound/rollup-plugin-terser)                                        | Minify a bundle using Terser                                                              |
+| [typescript](https://github.com/rollup/plugins/blob/master/packages/typescript)                   | Integration between Rollup and Typescript                                                 |
+| [url](https://github.com/rollup/plugins/blob/master/packages/url)                                 | Import files as data-URIs or ES Modules                                                   |
+| [virtual](https://github.com/rollup/plugins/blob/master/packages/virtual)                         | Load virtual modules from memory                                                          |
+| [wasm](https://github.com/rollup/plugins/blob/master/packages/wasm)                               | Import WebAssembly code with Rollup                                                       |
+| [yaml](https://github.com/rollup/plugins/blob/master/packages/yaml)                               | Convert YAML files to ES6 modules                                                         |
+| [progress](https://github.com/jkuri/rollup-plugin-progress)                                       | Show build progress in the console.                                                       |
 
 ### 常用插件
 
 #### 常用配置
 
+```shell
+npm i -D rollup rollup-plugin-typescript2 @rollup/plugin-babel @rollup/plugin-node-resolve @rollup/plugin-commonjs rollup-plugin-terser rollup-plugin-clear rollup-plugin-progress rollup-plugin-visualizer rollup-plugin-copy cross-env
+```
+
 ```ts
 import { RollupOptions } from 'rollup';
 import typescript from 'rollup-plugin-typescript2';
-import { DEFAULT_EXTENSIONS } from '@babel/core';
 import babel from '@rollup/plugin-babel';
 import resolve from '@rollup/plugin-node-resolve';
 import commonjs from '@rollup/plugin-commonjs';
@@ -828,6 +840,9 @@ import { terser } from 'rollup-plugin-terser';
 import clear from 'rollup-plugin-clear';
 import progress from 'rollup-plugin-progress';
 import { visualizer } from 'rollup-plugin-visualizer';
+import copy from 'rollup-plugin-copy';
+import json from '@rollup/plugin-json';
+import { DEFAULT_EXTENSIONS } from '@babel/core';
 import pkg from './package.json';
 
 const isProd = process.env.NODE_ENV === 'production';
@@ -840,48 +855,76 @@ const options: RollupOptions[] = [
         file: pkg.main,
         format: 'cjs',
         exports: 'auto',
+        plugins: [
+          // put it the last one
+          isProd &&
+            visualizer({
+              filename: './out/report-cjs.html',
+              open: true,
+              gzipSize: true,
+            }),
+        ],
       },
       {
         file: pkg.module,
-        format: 'esm',
+        format: 'es',
+        plugins: [
+          // put it the last one
+          isProd &&
+            visualizer({
+              filename: './out/report-esm.html',
+              open: true,
+              gzipSize: true,
+            }),
+        ],
       },
     ],
     plugins: [
       clear({
         // required, point out which directories should be clear.
-        targets: ['dist'],
+        targets: ['dist', 'out'], // 清空 out，否则visualizer会打开之前已存在的html
         // optional, whether clear the directores when rollup recompile on --watch mode.
         watch: true, // default: false
       }),
       progress({
-        clearLine: false, // default: true
+        clearLine: true, // default: true
       }),
-      resolve(),
+      copy({
+        targets: [],
+      }),
+      json(),
+      resolve({
+        // default:true，需要显式设置来避免warning
+        // true: 同名模块优先选择内置模块，例如（fs、path）
+        // false: 同名模块优先选择安装的模块
+        preferBuiltins: true,
+      }),
       commonjs(),
       typescript(),
       babel({
         include: 'src/**/*',
         exclude: '**/node_modules/**',
         babelHelpers: 'runtime', // 构建库时使用
-        extensions: [...DEFAULT_EXTENSIONS, '.ts'],
+        extensions: [...DEFAULT_EXTENSIONS, '.ts', '.tsx'],
       }),
       isProd &&
         terser({
           compress: {
+            // https://github.com/terser/terser
             // 默认会去掉debugger
-            drop_console: true, // 去掉console
+            // drop_console: true, // 去掉console
+            // pure_funcs:['console.log'] // 如果只想去除console.log，而不想去除console.info
           },
         }),
-      // put it the last one
-      isProd &&
-        visualizer({
-          filename: './out/report.html',
-          open: true,
-          gzipSize: true,
-        }),
     ],
-    // @ts-ignore
-    external: [...Object.keys(pkg.peerDependencies || {}), /@babel\/runtime/], //  babelHelpers:'runtime' 使用
+    // 注意 outpput.globals 也要添加对应的值
+    external: [
+      // @ts-ignore
+      ...Object.keys(pkg.dependencies || {}),
+      // @ts-ignore
+      ...Object.keys(pkg.peerDependencies || {}),
+      /@babel\/runtime/,
+    ], //  babelHelpers:'runtime' 使用
   },
 ];
 
@@ -890,9 +933,33 @@ export default options;
 
 #### TypeScript
 
-```sh
-npm install -D rollup typescript tslib @types/node ts-node rollup-plugin-typescript2 cross-env
+```shell
+npm install -D rollup cross-env
 ```
+
+```shell
+npm install -D  typescript tslib @types/node ts-node rollup-plugin-typescript2 nodemon
+```
+
+- ts-node —— 可选安装，在node.js上执行ts文件，可以方便调试ts文件。使用rollup的话，基本上是靠ts-node来调试。
+  
+  ```sh
+  # Execute a script as `node` + `tsc`.
+  ts-node script.ts
+  ```
+
+- tslib —— TypeScript的运行库，包含所有TypeScript帮助函数。rollup-plugin-typescript2 的依赖。
+  
+  > ```
+  > // tsconfig.json
+  > // importHelpers：Allow importing helper functions from tslib once per project, instead of including them per-file.
+  > // 使用该属性时也需安装 tslib 
+  > {
+  >     "compilerOptions": {
+  >         "importHelpers": true
+  >     }
+  > }
+  > ```
 
 **tsconfig.json**
 
@@ -911,7 +978,7 @@ npm install -D rollup typescript tslib @types/node ts-node rollup-plugin-typescr
     "allowJs": true,
     "esModuleInterop": true /* 通过为导入内容创建命名空间，实现CommonJS和ES模块之间的互操作性，esModuleInterop选项的作用是支持使用import d from 'cjs'的方式引入commonjs包 */,
     "resolveJsonModule": true,
-    "forceConsistentCasingInFileNames": true /* 	禁止对同一个文件的不一致的引用。 */,
+    "forceConsistentCasingInFileNames": true /*     禁止对同一个文件的不一致的引用。 */,
     "noEmit": true /* 不生成编译文件 */,
     "noFallthroughCasesInSwitch": true /* 用于检查switch中是否有case没有使用break跳出switch，默认为false */,
     "noImplicitAny": false /* noImplicitAny的值为false时，如果我们没有为一些值设置明确的类型，编译器会默认认为这个值为any，如果noImplicitAny的值为true的话。则没有明确的类型会报错。默认值为false */,
@@ -929,7 +996,7 @@ npm install -D rollup typescript tslib @types/node ts-node rollup-plugin-typescr
 ```
 
 > "emitDeclarationOnly": false /* 默认为false，只生成.d.ts文件，不生成js文件，不能和 noEmit 同时设置为true */,
->
+> 
 > 不能设置为true，否则不会生成js文件，无法打包。
 
 **rollup.config.ts**
@@ -983,13 +1050,13 @@ npm i -D @rollup/plugin-node-resolve @rollup/plugin-commonjs
 - `@rollup/plugin-node-resolve`：从node_modules中查找并打包第三方库
 
 - `@rollup/plugin-commonjs`：将 CommonJS 转换成 ESM
-
+  
   > 当commonjs() 必须放在 babel() 前面
 
 #### babel
 
 ```sh
-npm i -D @babel/core @babel/preset-env core-js@3 @babel/plugin-transform-runtime @babel/runtime-corejs3 @rollup/plugin-babel @babel/plugin-proposal-decorators @babel/plugin-proposal-class-properties @babel/preset-typescript
+npm i -D @babel/core @babel/preset-env @babel/preset-typescript @babel/preset-react core-js@3 @babel/plugin-transform-runtime @babel/runtime-corejs3 @babel/plugin-proposal-decorators @babel/plugin-proposal-class-properties @rollup/plugin-babel
 ```
 
 **rollup.config.js**
@@ -1004,7 +1071,7 @@ Default: `'bundled'`
 **'runtime'** - 如果你要用rollup构建一个js库的时候，使用该配置，该配置要结合@babel/plugin-transform-runtime插件使用，使用@babel/plugin-transform-runtime也要安装@babel/runtime 或 @babel/runtime-corejs2/3 插件。同时设置 `external: [/@babel\/runtime/]`，但被其他项目引入该库时，要确保已安装@babel/runtime 或 @babel/runtime-corejs2/3，即需要在package.json的dependencies或peerDependencies中添加依赖。
 
 > 编译后的代码，会使用require('@babel/runtime')替换helper函数 ，例如编译promise：
->
+> 
 > ```
 > var _Promise = require('@babel/runtime-corejs3/core-js/promise');
 > ```
@@ -1047,29 +1114,30 @@ export default {
 
 ```js
 module.exports = {
-	presets: [
-		[
-			"@babel/preset-env",
-			{
+    presets: [
+        [
+            "@babel/preset-env",
+            {
         // esm转换成其他模块语法，cjs、amd、umd等
         // Tree Shaking需要设置为false
-				modules: false, 
-				targets: { browsers: ["> 1%", "last 2 versions", "not ie <= 8"] },
+                modules: false, 
+                targets: { browsers: ["> 1%", "last 2 versions", "not ie <= 8"] },
         // when using useBuiltIns: "usage", set the proposals option to true. This will enable polyfilling of every proposal supported by core-js@xxx
         // 按需加载，将 useBuiltIns 改为 "usage"，babel 就可以按需加载 polyfill，并且不需要手动引入 @babel/polyfill，不过@babel/polyfill在7.4.0中被弃用，请使用安装core-js（polyfill类库），并使用corejs选项
-				useBuiltIns: "usage", 
-				corejs: { 
+                useBuiltIns: "usage", 
+                corejs: { 
           version: 3, // 需安装 core-js3.x的版本
           proposals: true, // 支持js提案语法
         }
-			}
-		],
+            }
+        ],
+    "@babel/preset-react", 
     '@babel/preset-typescript',
-	],
-	plugins: [
-		["@babel/plugin-transform-runtime", { 
+    ],
+    plugins: [
+        ["@babel/plugin-transform-runtime", { 
       corejs: { 
-      	version: 3, // 需安装 @babel/runtime-corejs3
+          version: 3, // 需安装 @babel/runtime-corejs3
         proposals: true 
       }
     }],
@@ -1078,7 +1146,7 @@ module.exports = {
     // @babel/plugin-proposal-private-methods 和 @babel/plugin-proposal-private-property-in-object内置于preset-env,且他们的loose值必须与@babel/plugin-proposal-class-properties的一致
     ['@babel/plugin-proposal-private-methods', { 'loose': true }],
     ['@babel/plugin-proposal-private-property-in-object', { loose: true }],
-	]
+    ]
 }
 ```
 
@@ -1113,9 +1181,9 @@ export default {
 
 ```js
 module.exports = {
-	presets: [
+    presets: [
     '@babel/preset-typescript',
-	],
+    ],
 }
 ```
 
@@ -1179,7 +1247,7 @@ export default {
   },
   plugins: [
    !isProd && dev({
-   		dirs: ['dist'],
+           dirs: ['dist'],
       port: 8888,
    })
   ]
@@ -1199,7 +1267,7 @@ import livereload from 'rollup-plugin-livereload'
 const isProd = process.env.NODE_ENV === 'production'
 
 export default {
-	plugins:[
+    plugins:[
     !isProd && dev('dist'),
     !isProd && livereload('dist')
 
@@ -1221,8 +1289,6 @@ export default {
 }
 ```
 
-
-
 #### 路径别名
 
 ```js
@@ -1242,11 +1308,11 @@ const options = [
       }
     ],
     plugins: [
-     	alias({
-     		entries:{
-     			'@': srcPath,
-     		}
-     	})
+         alias({
+             entries:{
+                 '@': srcPath,
+             }
+         })
     ],
   },
 ];
@@ -1256,15 +1322,11 @@ export default options;
 
 如果采用了TypeScript编写文件，且 tsconfig.json 文件中设置了别名 `compilerOptions.paths:{ "@/*": ["./src/*"],}`，则无需该插件。
 
-
-
 #### 分析、进程、清除文件夹
 
 ```sh
 npm i -D rollup-plugin-clear rollup-plugin-progress rollup-plugin-visualizer
 ```
-
-
 
 ```js
 import { RollupOptions } from 'rollup';
@@ -1413,4 +1475,3 @@ Similar to how webpack's [sass-loader](https://github.com/webpack-contrib/sass-l
 ```css
 @import "~bootstrap/dist/css/bootstrap";
 ```
-
