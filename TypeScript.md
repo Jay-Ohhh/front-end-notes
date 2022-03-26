@@ -3649,9 +3649,9 @@ ES5的继承，实质是先创造子类的实例对象，然后再将父类属�
 
 class的继承， 实质是先创造父类的实例对象，然后再将子类属性添加到实例对象上面。必须先通过父类的构造函数完成塑造，然后再对其加工，加上子类自身的属性。如果不调用super方法，子类就得不到父类的实例对象。
 
-###### 其他
 
-**1. 注意点**
+
+###### 注意点
 
 **（1）严格模式**
 
@@ -3787,7 +3787,7 @@ function selfish (target) {
 const logger = selfish(new Logger());
 ```
 
-**2. 静态成员**
+###### 静态成员
 
 **（1）静态方法**
 
@@ -3872,7 +3872,7 @@ Foo.prop // 1
 
 上面的写法为`Foo`类定义了一个静态属性`prop`。
 
-目前，只有这种写法可行，因为 ES6 明确规定，Class 定义时内部只有静态方法，没有静态属性。现在[ES7提案](https://github.com/tc39/proposal-class-fields)提供了类的静态属性，写法是在实例属性的前面，加上`static`关键字。
+目前，只有这种写法可行，因为 **ES6 明确规定，Class 定义时内部只有静态方法，没有静态属性**。现在[ES7提案](https://github.com/tc39/proposal-class-fields)提供了类的静态属性，写法是在实例属性的前面，加上`static`关键字。
 
 这个新写法大大方便了静态属性的表达。
 
@@ -4082,11 +4082,11 @@ TypeScript中类的属性必须要在构造函数外声明。
 
 ###### public private 和 protected
 
-TypeScript 可以使用三种访问修饰符（Access Modifiers），分别是 `public`、`private` 和 `protected`。
+TypeScript 可以使用三种访问修饰符（Access Modifiers，分别是 `public`、`private` 和 `protected`。
 
-- `public` 修饰的属性或方法是公有的，可以在任何地方被访问到，默认所有的属性和方法都是 `public` 的，因此可省略 `public`
-- `private` 修饰的属性或方法是私有的，不能在声明它的类的外部访问。
-- `protected` 修饰的属性或方法是受保护的，它和 `private` 类似，区别是它在子类中也是允许被访问的
+- `public` 修饰的属性或方法是公有的，可以在任何地方被访问到，默认所有的属性和方法都是 `public` 的，因此可省略 `public`。
+- `private` 修饰的属性或方法是私有的，不能在声明它的类的外部访问（实例也不能访问）。
+- `protected` 修饰的属性或方法是受保护的，它和 `private` 类似，区别是它在子类中也是允许被访问的。
 
 下面举一些例子：
 

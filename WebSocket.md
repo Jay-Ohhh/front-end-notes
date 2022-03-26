@@ -1,4 +1,5 @@
 ### WebSocket
+
 [WebSocket-阮一峰](http://www.ruanyifeng.com/blog/2017/05/websocket.html)
 [WebSocket-菜鸟教程](https://www.runoob.com/html/html5-websocket.html)
 [轮询](https://www.cnblogs.com/huchong/p/8595644.html)
@@ -6,6 +7,7 @@
 [短连接轮询、长连接、Websocket 横向对比](https://mp.weixin.qq.com/s/HXF_AO24WeiOoq4Q5G_pBw)
 
 #### 简介
+
 - WebSocket和http都是基于tcp协议的应用层协议，tcp是传输层协议。
   tcp传输层协议：连接建立以后，客户端和服务器端就可以通过 TCP 连接直接交换数据。
 - http和https协议的缺陷：
@@ -30,11 +32,7 @@
 4. 当收到了连接成功的消息后，通过TCP通道进行传输通信。（TCP协议）
 5. 断开连接，TCP四次挥手。
 
-
-
 WebSocket 协议属于应用层协议，它依赖于传输层的 TCP 协议。WebSocket 通过 HTTP/1.1 协议的 **101** 状态码（切换协议）进行握手。为了创建 WebSocket 连接，需要通过浏览器发出请求，之后服务器进行回应，这个过程通常称为 “握手”（Handshaking）。
-
-
 
 #### WebSocket API
 
@@ -57,57 +55,65 @@ ws.onclose = function(evt) {
   console.log("Connection closed.")
  }
 ```
+
 ##### 构造函数
+
 构造函数 WebSocket 用于新建 WebSocket 实例 ws
+
 ```JavaScript
 var ws = new WebSocket('ws://localhost:8080');
 ```
+
 - 静态成员
-CONNECTING：值为0，表示正在连接。
-OPEN：值为1，表示连接成功，可以通信了。
-CLOSING：值为2，表示连接正在关闭。
-CLOSED：值为3，表示连接已经关闭，或者打开连接失败。
-
-
+  CONNECTING：值为0，表示正在连接。
+  OPEN：值为1，表示连接成功，可以通信了。
+  CLOSING：值为2，表示连接正在关闭。
+  CLOSED：值为3，表示连接已经关闭，或者打开连接失败。
 
 ##### 属性
+
 - ws.readyState
-返回实例对象的当前状态
-0 - 表示连接尚未建立。
-1 - 表示连接已建立，可以进行通信。
-2 - 表示连接正在进行关闭。
-3 - 表示连接已经关闭或者连接不能打开。
+  返回实例对象的当前状态
+  0 - 表示连接尚未建立。
+  1 - 表示连接已建立，可以进行通信。
+  2 - 表示连接正在进行关闭。
+  3 - 表示连接已经关闭或者连接不能打开。
 
 - ws.bufferedAmount
   是一个只读属性，用于返回已经被send()方法放入队列中但还没有被发送到网络中的数据的字节数。一旦队列中的所有数据被发送至网络，则该属性值将被重置为0。但是，若在发送过程中连接被关闭，则属性值不会重置为0。如果你不断地调用send()，则该属性值会持续增长。
-
+  
   有时候需要检查传输数据的大小，尤其是客户端传输大量数据的时候。虽然send()方法会马上执行，但数据并不是马上传输。浏览器会缓存应用流出的数据，你可以使用bufferedAmount属性检查已经进入队列但还未被传输的数据大小，也可以用来判断发送是否结束。这个值不包含协议框架、操作系统缓存和网络软件的开销。
 
-  
-
 ##### 事件
+
 - open  用于指定连接成功后的回调函数
-```JavaScript
-ws.onopen = function (event) {
+  
+  ```JavaScript
+  ws.onopen = function (event) {
   ws.send('Hello Server!')
-}
-```
+  }
+  ```
+
 - close  用于指定连接关闭或连接失败的回调函数
-```JavaScript
-ws.onclose = function(event) {
+  
+  ```JavaScript
+  ws.onclose = function(event) {
   var code = event.code;
   var reason = event.reason;
   var wasClean = event.wasClean;
   // handle close event
-};
-```
+  };
+  ```
+
 - message 
-用于指定收到服务器数据后的回调函数，WebSocket消息机制只支持字符串（String）和二进制(blob和ArrayBuffer)
-```JavaScript
-ws.onmessage = function(event) {
+  用于指定收到服务器数据后的回调函数，WebSocket消息机制只支持字符串（String）和二进制(blob和ArrayBuffer)
+  
+  ```JavaScript
+  ws.onmessage = function(event) {
   var data = event.data;
   // 处理数据
-};
+  };
+  ```
 
 ws.onmessage = function(event){
   if(typeof event.data === String) {
@@ -118,6 +124,7 @@ ws.onmessage = function(event){
     var buffer = event.data;
     console.log("Received arraybuffer");
   }}
+
 ```
 除了动态判断收到的数据类型，也可以使用binaryType属性，显式指定收到的二进制数据类型。
 ```JavaScript
@@ -132,24 +139,29 @@ ws.onmessage = function(e) {
 ```
 
 - error
-用于指定连接失败后的回调函数 
-```JavaScript
-ws.onerror = function(event) {
+  用于指定连接失败后的回调函数 
+  
+  ```JavaScript
+  ws.onerror = function(event) {
   // handle error event
-};
-```
-> 如果要指定多个回调函数，可以使用addEventListener方法
+  };
+  ```
+  
+  > 如果要指定多个回调函数，可以使用addEventListener方法
 
 ##### 方法
+
 - send()
-向服务器发送数据
+  向服务器发送数据
 
 发送文本
+
 ```JavaScript
 ws.send('your message')
 ```
 
 发送Blob对象
+
 ```JavaScript
 var file = document
   .querySelector('input[type="file"]')
@@ -158,6 +170,7 @@ ws.send(file);
 ```
 
 发送 ArrayBuffer 对象
+
 ```JavaScript
 // Sending canvas ImageData as ArrayBuffer
 var img = canvas_context.getImageData(0, 0, 400, 320);
@@ -281,6 +294,145 @@ class SocketService {
 export default SocketService;
 ```
 
+##### 心跳
+
+实现心跳检测的思路是：每隔一段固定的时间，向服务器端发送一个`ping`数据，如果在正常的情况下，服务器会返回一个`pong`给客户端，如果客户端通过`onMessage`事件能监听到的话，说明请求正常，数据为pong时，清除心跳定时器重新定时发送一个心跳信息；如果是网络断开的情况下，在指定的时间内服务器端并没有返回心跳响应消息，因此服务器端断开了，因此这个时通过`onClose`事件监听到。因此在`onClose`事件内，我们可以调用`reconnect`事件进行重连操作。
+
+```javascript
+interface MySocketProps {
+	url: string;
+	onMessage?: (data: object) => void;
+	onError?: (data: object) => void;
+	heartCheckTimeout?: number;
+	reconnectTimeout?: number;
+	serverTimeout?: number;
+}
+
+class MySocket {
+	protected socket: WebSocket | null;
+	protected url: string;
+	protected heartCheckTimer: NodeJS.Timeout | null; // 心跳检测定时器
+	protected serverTimer: NodeJS.Timeout | null;
+	protected reconnectTimer: NodeJS.Timeout | null; // 重连定时器
+	protected lockReconnect: boolean; // 重连锁，避免多个重连
+	protected heartCheckTimeout: number; // 心跳检测间隔
+	protected reconnectTimeout: number; // 心跳检测间隔
+	protected serverTimeout: number; // 判断服务器没连上的时间
+	protected onMessage: ((data: object) => void) | undefined;
+	protected onError: ((data: object) => void) | undefined;
+	protected reconnectCount: number; // 重连次数
+
+	constructor(props: MySocketProps) {
+		this.socket = null;
+		this.url = props.url;
+		this.heartCheckTimer = null;
+		this.serverTimer = null;
+		this.reconnectTimer = null;
+		this.lockReconnect = false;
+		this.heartCheckTimeout = props.heartCheckTimeout || 5 * 1000;
+		this.reconnectTimeout = props.heartCheckTimeout || 3 * 1000;
+		this.serverTimeout = props.serverTimeout || 4 * 1000;
+		this.onMessage = props.onMessage;
+		this.onError = props.onError;
+		this.reconnectCount = 0;
+	}
+
+	init() {
+		try {
+			if ('WebSocket' in window) {
+				this.socket = new WebSocket(this.url);
+				this.socket.onopen = this.websocketOnOpen;
+				this.socket.onerror = this.websocketOnError;
+				this.socket.onmessage = this.websocketOnMessage;
+				this.socket.onclose = this.websocketOnClose;
+			} else {
+				console.log('您的浏览器不支持websocket');
+			}
+		} catch (e) {
+			this.reconnect();
+		}
+	}
+
+	heartCheck() {
+		this.clearAllTimer();
+		this.heartCheckTimer = setTimeout(() => {
+			this.socket?.send('ping');
+
+			this.serverTimer = setTimeout(() => {
+				// 如果超过一定时间还没响应(响应后触发重置)，说明后端断开了
+				this.socket?.close(); // 关闭会触发重连方法，重连有次数限制
+			}, this.serverTimeout);
+		}, this.heartCheckTimeout);
+	}
+
+	clearAllTimer() {
+		this.serverTimer && clearTimeout(this.serverTimer);
+		this.heartCheckTimer && clearTimeout(this.heartCheckTimer);
+		this.reconnectTimer && clearTimeout(this.reconnectTimer);
+	}
+
+	reconnect() {
+		if (this.lockReconnect) {
+			return;
+		}
+		console.log('尝试重连');
+		this.reconnectCount++;
+		if (this.reconnectCount > 20) {
+			this.reconnectCount = 0;
+			this.destroy();
+			return;
+		}
+
+		this.lockReconnect = true;
+		this.reconnectTimer && clearTimeout(this.reconnectTimer);
+		this.reconnectTimer = setTimeout(() => {
+			this.lockReconnect = false;
+			this.init();
+		}, this.reconnectTimeout);
+	}
+
+	websocketOnOpen() {
+		console.log('WebSocket连接成功', this.socket!.readyState);
+		this.heartCheck();
+	}
+
+	websocketOnMessage(e: MessageEvent) {
+		const res = JSON.parse(e.data);
+		this.onMessage?.(res);
+		if (e.data === 'pong') {
+			// 数据体因后端而异
+			// 消息获取成功，重置心跳
+			this.heartCheck();
+		}
+	}
+
+	websocketOnClose(e) {
+		console.log(e);
+		this.reconnect();
+	}
+
+	websocketOnError(e) {
+		console.log('WebSocket连接发生错误', e);
+		this.reconnect();
+	}
+
+	send(data: object) {
+		if (this.socket && this.socket.readyState === WebSocket.OPEN) {
+			this.socket.send(JSON.stringify(data));
+		}
+	}
+
+	destroy() {
+		console.log('destroy!');
+		this.lockReconnect = true;
+		this.socket && this.socket.close();
+		this.clearAllTimer();
+		this.socket = null;
+	}
+}
+
+```
+
 #### WebSocket 服务器端
 
 ```js
@@ -288,7 +440,7 @@ const WebSocket = require('ws')
 const ws = new WebSocket.Server({port: 8080});
 // 对客户端的连接事件进行监听
 ws.on('connection', client => {
-  	// 对客户端的连接对象进行message事件监听
+      // 对客户端的连接对象进行message事件监听
     // msg是客户端发给服务器端的数据
     client.on('message', message => {
         console.log('received: %s', message);
@@ -296,8 +448,6 @@ ws.on('connection', client => {
     client.send('something');
 });
 ```
-
-
 
 ### [长连接和短连接](https://www.cnblogs.com/gotodsp/p/6366163.html)
 
@@ -323,12 +473,12 @@ HTTP的长连接和短连接本质上是TCP长连接和短连接。HTTP属于应
 从HTTP/1.1起，默认使用长连接，用以保持连接特性。使用长连接的HTTP协议，会在响应头加入这行代码：
 `Connection:keep-alive`
 
-
 长连接不会永久保持连接，它有一个保持时间，可以在不同的服务器软件（如Apache）中设定这个时间。实现长连接需要客户端和服务端都支持长连接。
 
 长连接中TCP的保活功能主要为服务器应用提供。如果客户端已经消失而连接未断开，则会使得服务器上保留一个半开放的连接，而服务器又在等待来自客户端的数据，此时服务器将永远等待客户端的数据。保活功能就是试图在服务端器端检测到这种半开放的连接。
 
 如果一个给定的连接在两小时内没有任何动作，服务器就向客户发送一个探测报文段，根据客户端主机响应探测4个客户端状态：
+
 - 客户主机依然正常运行，且服务器可达。此时客户的TCP响应正常，服务器将保活定时器复位。
 - 客户主机已经崩溃，并且关闭或者正在重新启动。上述情况下客户端都不能响应TCP。服务端将无法收到客户端对探测的响应。服务器总共发送10个这样的探测，每个间隔75秒。若服务器没有收到任何一个响应，它就认为客户端已经关闭并终止连接。
 - 客户端崩溃并已经重新启动。服务器将收到一个对其保活探测的响应，这个响应是一个复位，使得服务器终止这个连接。
@@ -338,8 +488,6 @@ HTTP的长连接和短连接本质上是TCP长连接和短连接。HTTP属于应
 
 - 长连接可以省去较多的TCP建立和关闭的操作，减少浪费，节约时间。对于频繁请求资源的客户来说，较适用长连接。不过这里存在一个问题，存活功能的探测周期太长，还有就是它只是探测TCP连接的存活，属于比较斯文的做法，遇到恶意的连接时，保活功能就不够使了。在长连接的应用场景下，client端一般不会主动关闭它们之间的连接，Client与server之间的连接如果一直不关闭的话，会存在一个问题，随着客户端连接越来越多，server早晚有扛不住的时候，这时候server端需要采取一些策略，如关闭一些长时间没有读写事件发生的连接，这样可 以避免一些恶意连接导致server端服务受损；如果条件再允许就可以以客户端机器为颗粒度，限制每个客户端的最大长连接数，这样可以完全避免某个客户端连累后端服务。
 - 短连接对于服务器来说管理较为简单，存在的连接都是有用的连接，不需要额外的控制手段。但如果客户请求频繁，将在TCP的建立和关闭操作上消耗大量的时间和带宽。
-
-
 
 ### 短轮询和长轮询
 
@@ -361,7 +509,9 @@ setInterval(function(){
     xhr.send(); 
 },10000)
 ```
+
 上面的程序存在着一个的缺陷：在网络情况不稳定的情况下，服务器从接收请求、发送请求到客户端接收请求的总时间有可能超过10秒，而请求是以10秒间隔发送的，这样会导致接收的数据到达先后顺序与发送顺序不一致。于是出现了采用`setTimeout`的轮询方式：
+
 ```JavaScript
 function ajax() {
     setTimeout(function() {
@@ -373,6 +523,7 @@ function ajax() {
         xhr.send();
     }, 10000);}
 ```
+
 程序首先设置10s后发起请求，当数据返回后，调用请求函数再隔10s发起第二次请求，以此类推。这样的话虽然无法保证两次请求之间的时间间隔为固定值，但是可以保证到达数据的顺序。
 
 #### 长轮询
@@ -392,5 +543,5 @@ function ajax(){
     xhr.send(); 
 }
 ```
-> 长轮询和短轮询比起来，减少了很多不必要的http请求次数。
 
+> 长轮询和短轮询比起来，减少了很多不必要的http请求次数。

@@ -5674,6 +5674,14 @@ ES6 模块设计思想：尽量的静态化、使得编译时就能确定模块�
   > 
   > 运行：就是将代码跑起来，被装载到内存中去了。
 
+
+
+#### IntersectionObserver
+
+[利用&quot;交叉观察者&quot;这个小宝贝儿，轻松实现懒加载、吸顶、触底 ❗ - 掘金](https://juejin.cn/post/6844903926815277069)
+
+[谈谈IntersectionObserver懒加载 - 简书](https://www.jianshu.com/p/84a86e41eb2b)
+
 #### 术语
 
 ##### polyfill

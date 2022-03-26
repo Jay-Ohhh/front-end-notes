@@ -2221,7 +2221,7 @@ declare module '*.svg' {
 
 ##### 合成事件
 
-###### **概览**
+###### 概览
 
 `SyntheticEvent` 实例将作为参数被传递给你的事件处理函数，它是浏览器的原生事件的跨浏览器包装器。除兼容所有浏览器外，它还拥有和浏览器原生事件相同的接口，包括 `stopPropagation()` 和 `preventDefault()`。
 
@@ -2247,7 +2247,7 @@ number timeStamp
 string type
 ```
 
-###### **事件池**
+###### 事件池
 
 `SyntheticEvent` 是合并而来。这意味着 `SyntheticEvent` 对象可能会被重用，而且在事件回调函数被调用后，所有的属性都会无效。出于性能考虑，你不能通过异步访问事件。
 
@@ -5395,10 +5395,6 @@ function CustomTextInput(props) {
 虽然你可以[向子组件添加 ref](https://react.docschina.org/docs/refs-and-the-dom.html#adding-a-ref-to-a-class-component)，但这不是一个理想的解决方案，因为你只能获取组件实例而不是 DOM 节点。并且，它还在函数组件上无效。
 
 如果你使用 16.3 或更高版本的 React, 这种情况下我们推荐使用 [ref 转发](https://react.docschina.org/docs/forwarding-refs.html)。**Ref 转发使组件可以像暴露自己的 ref 一样暴露子组件的 ref**。
-
-
-
-
 
 **回调 Refs**
 

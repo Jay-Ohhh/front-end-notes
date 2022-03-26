@@ -1056,7 +1056,8 @@ npm i -D @rollup/plugin-node-resolve @rollup/plugin-commonjs
 #### babel
 
 ```sh
-npm i -D @babel/core @babel/preset-env @babel/preset-typescript @babel/preset-react core-js@3 @babel/plugin-transform-runtime @babel/runtime-corejs3 @babel/plugin-proposal-decorators @babel/plugin-proposal-class-properties @rollup/plugin-babel
+npm i -D @babel/core @babel/preset-env @babel/preset-typescript @babel/preset-react @babel/plugin-transform-runtime @babel/plugin-proposal-decorators @babel/plugin-proposal-class-properties @rollup/plugin-babel
+npm i @babel/runtime-corejs3 
 ```
 
 **rollup.config.js**
@@ -1114,39 +1115,34 @@ export default {
 
 ```js
 module.exports = {
-    presets: [
-        [
-            "@babel/preset-env",
-            {
+  // @babel/env === @babel/preset-env  @babel/react === @babel/preset-react ...
+  // 当在presets中使用@babel/env，babel会自动加上preset-
+  presets: [
+    [
+      "@babel/preset-env",
+      {
         // esm转换成其他模块语法，cjs、amd、umd等
         // Tree Shaking需要设置为false
-                modules: false, 
-                targets: { browsers: ["> 1%", "last 2 versions", "not ie <= 8"] },
-        // when using useBuiltIns: "usage", set the proposals option to true. This will enable polyfilling of every proposal supported by core-js@xxx
-        // 按需加载，将 useBuiltIns 改为 "usage"，babel 就可以按需加载 polyfill，并且不需要手动引入 @babel/polyfill，不过@babel/polyfill在7.4.0中被弃用，请使用安装core-js（polyfill类库），并使用corejs选项
-                useBuiltIns: "usage", 
-                corejs: { 
-          version: 3, // 需安装 core-js3.x的版本
-          proposals: true, // 支持js提案语法
-        }
-            }
-        ],
-    "@babel/preset-react", 
-    '@babel/preset-typescript',
+        modules: false,
+        targets: { browsers: ["> 1%", "last 2 versions", "not ie <= 8"] },
+      }
     ],
-    plugins: [
-        ["@babel/plugin-transform-runtime", { 
-      corejs: { 
-          version: 3, // 需安装 @babel/runtime-corejs3
-        proposals: true 
+    "@babel/preset-react",
+    "@babel/preset-typescript",
+  ],
+  plugins: [
+    ["@babel/plugin-transform-runtime", {
+      corejs: {
+        version: 3, // 需安装 @babel/runtime-corejs3
+        proposals: true
       }
     }],
-    ['@babel/plugin-proposal-decorators', { legacy: true }], // 需要放在@babel/plugin-proposal-class-propertie之前
-    ['@babel/plugin-proposal-class-properties', { loose: true }], // 用于解析class语法
+    ["@babel/plugin-proposal-decorators", { legacy: true }], // 需要放在@babel/plugin-proposal-class-propertie之前
+    ["@babel/plugin-proposal-class-properties", { loose: true }], // 用于解析class语法(react必选)
     // @babel/plugin-proposal-private-methods 和 @babel/plugin-proposal-private-property-in-object内置于preset-env,且他们的loose值必须与@babel/plugin-proposal-class-properties的一致
     ['@babel/plugin-proposal-private-methods', { 'loose': true }],
     ['@babel/plugin-proposal-private-property-in-object', { loose: true }],
-    ]
+  ]
 }
 ```
 
@@ -1214,8 +1210,10 @@ export default {
     isProd &&
         terser({
           compress: {
+            // https://github.com/terser/terser
             // 默认会去掉debugger
-            drop_console: true, // 去掉console
+            // drop_console: true, // 去掉console
+            pure_funcs:['console.log'] // 如果只想去除console.log，而不想去除console.info
           },
         }),
   ]

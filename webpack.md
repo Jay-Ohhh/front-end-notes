@@ -34,13 +34,13 @@ filename是主入口的文件名，chunkFilename是非主入口的文件名。
 
 ###### 占位符
 
-| **模板**    | **描述**                                    |
-| ----------- | ------------------------------------------- |
-| [hash]      | 模块标识符(module identifier)的 hash        |
-| [chunkhash] | chunk 内容的 hash                           |
-| [name]      | 模块名称                                    |
-| [id]        | 模块标识符(module identifier)               |
-| [query]     | 模块的 query，例如，文件名 `?` 后面的字符串 |
+| **模板**      | **描述**                         |
+| ----------- | ------------------------------ |
+| [hash]      | 模块标识符(module identifier)的 hash |
+| [chunkhash] | chunk 内容的 hash                 |
+| [name]      | 模块名称                           |
+| [id]        | 模块标识符(module identifier)       |
+| [query]     | 模块的 query，例如，文件名 `?` 后面的字符串    |
 
 ###### publicPath
 
@@ -70,7 +70,7 @@ pakage.json
 
 ```json
 resolve: {
-	alias: { '@':  path.resolve(__dirname, 'src'), },
+    alias: { '@':  path.resolve(__dirname, 'src'), },
 },
 ```
 
@@ -78,13 +78,12 @@ tsconfig.json
 
 ```json
 {
-	"compilerOptions": {
-		"paths": {
-			"@/*": ["./src/*"]
-		}
-	},
+    "compilerOptions": {
+        "paths": {
+            "@/*": ["./src/*"]
+        }
+    },
 }
-
 ```
 
 ###### extensions
@@ -138,9 +137,9 @@ source map模式详细说明：https://blog.csdn.net/zwkkkk1/article/details/887
 - （none）：省略配置devtool（默认），不生成 source map。
 
 - nosources-source-map：创建的 source map 不包含 `sourcesContent(源代码内容)`。它可以用来映射客户端上的堆栈跟踪（暴露代码的行），而无须暴露所有的源代码。
-
+  
   > 这仍然会暴露反编译后的文件名和结构，但它不会暴露原始代码。
-  >
+  > 
   > 不暴露原始代码
 
 > 开发环境 最佳：eval-cheap-module-source-map生产环境 最佳：hidden-source-map
@@ -203,8 +202,6 @@ new HtmlWebpackPlugin({
 })
 ```
 
-
-
 ##### externals 选项（外部扩展）
 
  `string` `object` `function` `RegExp` `[string, object, function, RegExp]`
@@ -227,7 +224,7 @@ module.exports = {
 外部 library 可能是以下任何一种形式：
 
 - **root**：可以通过一个全局变量访问 library（例如，在浏览器环境下通过 script 标签）。
-
+  
   > umd 或 iife 格式的库会暴露一个全局变量以供访问
 
 - **commonjs**：可以将 library 作为一个 CommonJS 模块访问。
@@ -327,8 +324,6 @@ module.exports = {
 };
 ```
 
-
-
 #### loader和plugin
 
 - loader：webpack 只能理解 JavaScript 和 JSON 文件。**loader** 让 webpack 能够去处理其他类型的文件，并将它们转换为有效 [模块](https://webpack.docschina.org/concepts/modules)
@@ -358,7 +353,6 @@ module.exports = {
 函数组合：函数组合是函数式编程中非常重要的思想。
 
 函数组合的两种形式：一种是pipe，另一种是compose。前者从左向右组合函数，后者方向相反。
-
 
 ##### plugin执行顺序
 
@@ -404,36 +398,35 @@ module.exports = {
 
 - mini-css-extract-plugin：把js中import导入的样式文件，单独打包成一个css文件，结合html-webpack-plugin，以link的形式插入到html文件中。
 
-
 ```js
 // 编译less
-				{
-					test: /\.less$/,
-					use: [
-						{
-							// 打包时用MiniCssExtractPlugin.loader替换掉style-loader
-							loader: MiniCssExtractPlugin.loader,
-							options: {
-								publicPath: '../',
-							},
-						},
-						{
-							loader: 'css-loader',
-							options: {
-								// 用于配置 css-loader 总用于 @import 的资源之前有多少个loader，0 => 无 loader(默认)，1=>post-loader，2=>postcss-loader，less-loader
-								importLoaders: 1,
-								modules: {
-									compileType: 'module',
-									auto: /\.module\.\w+$/i,
-									localIdentName: '[path][name]_[local]_[hash:base64:5]',
-									localIdentContext: srcPath,
-								},
-							},
-						},
-						{ loader: 'postcss-loader', options: { postcssOptions: postcssOptions } },
-						{ loader: 'less-loader', options: { sourceMap: false } },
-					],
-				},
+                {
+                    test: /\.less$/,
+                    use: [
+                        {
+                            // 打包时用MiniCssExtractPlugin.loader替换掉style-loader
+                            loader: MiniCssExtractPlugin.loader,
+                            options: {
+                                publicPath: '../',
+                            },
+                        },
+                        {
+                            loader: 'css-loader',
+                            options: {
+                                // 用于配置 css-loader 总用于 @import 的资源之前有多少个loader，0 => 无 loader(默认)，1=>post-loader，2=>postcss-loader，less-loader
+                                importLoaders: 1,
+                                modules: {
+                                    compileType: 'module',
+                                    auto: /\.module\.\w+$/i,
+                                    localIdentName: '[path][name]_[local]_[hash:base64:5]',
+                                    localIdentContext: srcPath,
+                                },
+                            },
+                        },
+                        { loader: 'postcss-loader', options: { postcssOptions: postcssOptions } },
+                        { loader: 'less-loader', options: { sourceMap: false } },
+                    ],
+                },
 ```
 
 ###### 其余
@@ -449,7 +442,7 @@ module.exports = {
 - [`postcss-loader`](https://webpack.docschina.org/loaders/postcss-loader) 使用 [PostCSS](http://postcss.org/) 加载并转换 CSS/SSS 文件
 
 - [`stylus-loader`](https://webpack.docschina.org/loaders/stylus-loader/) 加载并编译 Stylus 文件
-
+  
   对于 Sass 等 CSS 预处理语言的 loader，在使用 Vue、React 的脚手架创建项目时根据你选择的CSS预处理语言已经配置好。
 
 - [cache-loader](https://github.com/webpack-contrib/cache-loader#getting-started) 在一些性能开销较大的 loader 之前添加此 loader，以将结果缓存到磁盘里。请注意，保存和读取这些缓存文件会有一些时间开销，所以请只对性能开销较大的 loader 使用此 loader。
@@ -467,7 +460,7 @@ module.exports = {
 - `file-loader`：把文件输出到一个文件夹中，在代码中通过相对 URL 去引用输出的文件 (处理图片和字体)
 
 - `url-loader`：与 file-loader 类似，区别是用户可以设置一个阈值，大于阈值会交给 file-loader 处理，小于阈值时返回文件 base64 形式编码 (处理图片和字体)
-
+  
   > create react app 已经设置了 导入小于 10,000 字节的图片将返回 [data URI](https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/Data_URIs) 而不是路径，svg除外。
 
 #### loader占位符
@@ -496,7 +489,7 @@ module.exports = {
   ```
 
 - `mini-css-extract-plugin`：将 CSS 提取到单独的文件中，为每个包含 CSS 的 JS 文件创建一个 CSS 文件，并且支持 CSS 和 SourceMaps 的按需加载。
-
+  
   > 抽离 css 样式,防止将样式打包在 js 中文件过大和因为文件大网络请求超时的情况
 
 - `optimize-css-assets-webpack-plugin` ：压缩css   For webpack v5 or above please use [css-minimizer-webpack-plugin](https://github.com/webpack-contrib/css-minimizer-webpack-plugin) instead.
@@ -508,7 +501,7 @@ module.exports = {
 - `compression-webpack-analyzer`：gzip压缩
 
 - `webpack-bundle-analyzer`: 可视化分析包大小 (业务组件、依赖第三方模块)
-
+  
   > vue cli 已经集成了该功能
 
 - `webpackbar`：打包进度条
@@ -520,9 +513,9 @@ module.exports = {
 - `webpack.DefinePlugin`：这是一个简单的字符串替换插件，将我们所有经过 webpack 打包的 js 文件中代码对应的变量都替换为我们在这个插件中指定的其他值或表达式。DefinePlugin 允许创建一个在编译时可以配置的全局常量。
 
 - `terser-webpack-plugin`：该插件使用 [terser](https://github.com/terser-js/terser) 来压缩 JavaScript，支持压缩 ES6，另外可以去除注释、console、debugger。
-
+  
   webpack v5 开箱即带有最新版本的 `terser-webpack-plugin`。如果你使用的是 webpack v5 或更高版本，同时希望自定义配置，那么仍需要安装 `terser-webpack-plugin`。如果使用 webpack v4，则必须安装 `terser-webpack-plugin` v4 的版本。
-
+  
   ```js
   module.exports = {
     optimization: {
@@ -535,12 +528,12 @@ module.exports = {
               extractComments: true, // 剥离注释,
               terserOptions: {
                 compress: {
-                 	// https://github.com/terser/terser
+                     // https://github.com/terser/terser
                   // 默认会去掉debugger
                   drop_console: true, // 去掉console
                   // pure_funcs:['console.log'] // 如果只想去除console.log，而不想去除console.info
                 },
-  					},
+                      },
             },
           },
         }),
@@ -548,8 +541,6 @@ module.exports = {
     },
   };
   ```
-
-  
 
 - `webpack.BannerPlugin`：为每个 chunk 文件头部添加 banner。
 
@@ -705,16 +696,14 @@ excludeChunks: ['index1.js']
 
 一个布尔值，默认值是 false ，如果为 true ,则以兼容 xhtml 的模式引用文件。
 
-
-
 #### 优化打包速度
 
 - thread-loader  多线程打包
 - cache-loader  缓存其之前的loaders的结果到磁盘中。读取和保存缓存文件会有开销，隐藏仅仅需要在一些性能开销较大的 loader 之前（数组index靠前）添加此 loader
--  babel-loader  options: {cacheDirectory :true} 指定的目录将用来缓存 loader 的执行结果。
+- babel-loader  options: {cacheDirectory :true} 指定的目录将用来缓存 loader 的执行结果。
 - TerserWebpackPlugin：{parallel:true}  开启多线程
 
-####  优化打包体积
+#### 优化打包体积
 
 ##### webpack-bundle-analyzer
 
@@ -766,9 +755,9 @@ Tree Shaking是一个术语，通常用于描述移除 JavaScript 上下文中�
 为了利用 *tree shaking* 的优势， 你必须...
 
 - 使用 ES2015 模块语法（即 `import` 和 `export`）。
-
+  
   > 因为在使用 CommonJS 时，会导入整个库(library)对象
-  >
+  > 
   > 但是在使用 ES6 模块时，可以只导入(import)我们所需的对象或函数
 
 - 确保没有编译器将您的 ES2015 模块语法转换为 CommonJS 的（顺带一提，这是现在常用的 @babel/preset-env 的默认行为，详细信息请参阅[文档](https://babeljs.io/docs/en/babel-preset-env#modules)）。
@@ -780,8 +769,6 @@ Tree Shaking是一个术语，通常用于描述移除 JavaScript 上下文中�
 你可以将应用程序想象成一棵树。绿色表示实际用到的 source code(源码) 和 library(库)，是树上活的树叶。灰色表示未引用代码，是秋天树上枯萎的树叶。为了除去死去的树叶，你必须摇动这棵树，使它们落下。
 
 如果你对优化输出很感兴趣，请进入到下个指南，来了解 [生产环境](https://webpack.docschina.org/guides/production) 构建的详细细节。
-
-
 
 但是要想使其生效，生成的代码必须是ES6模块。不能使用其它类型的模块如`CommonJS`之流。如果使用`Babel`的话，这里有一个小问题，因为`Babel`的预案（preset）默认会将任何模块类型都转译成`CommonJS`类型，这样会导致`tree-shaking`失效。修正这个问题也很简单，在`.babelrc`文件或在`webpack.config.js`文件中设置`modules： false`就好了
 
@@ -817,7 +804,6 @@ module: {
         }
     ]
 }
-
 ```
 
 #### Modules
@@ -857,8 +843,6 @@ chunk的修改才改变对应的hash值
 3. webpack 处理好 chunk 文件后，最后会输出 **bundle** 文件，这个 bundle 文件包含了经过加载和编译的最终源文件，所以它可以直接在浏览器中运行。
 
 一般来说一个 chunk 对应一个 bundle，比如上图中的 `utils.js -> chunks 1 -> utils.bundle.js`；但也有例外，比如说上图中，我就用 `MiniCssExtractPlugin` 从 chunks 0 中抽离出了 `index.bundle.css` 文件。
-
- 
 
 **总结：**
 
@@ -925,7 +909,6 @@ module.exports = {
   },
   plugins: [...mpa.htmlPlugins],
 }
-
 ```
 
 #### 采用TS编写webpack配置
@@ -1038,9 +1021,9 @@ ts-node 可以根据 `tsconfig-paths` 提供的环境变量 `process.env.TS_NODE
 
 ```json
 {
-	scripts:{
-		"dev": "cross-env TS_NODE_PROJECT='./build/webpack.tsconfig.json' NODE_ENV=development webpack-dev-server --config build/webpack.conf.ts --color --progress"
-	}
+    scripts:{
+        "dev": "cross-env TS_NODE_PROJECT='./build/webpack.tsconfig.json' NODE_ENV=development webpack-dev-server --config build/webpack.conf.ts --color --progress"
+    }
 }
 ```
 
@@ -1068,10 +1051,9 @@ $ npm install -D webpack webpack-cli webpack-dev-server webpack-merge cross-env
 
 ```json
 "scripts": {
-		"start": "cross-env TS_NODE_PROJECT='./build/webpack.tsconfig.json' NODE_ENV=development webpack-dev-server --config build/webpack.conf.ts --color --progress",
-		"build": "cross-env TS_NODE_PROJECT='./build/webpack.tsconfig.json' NODE_ENV=production webpack --config build/webpack.conf.ts --color --progress",
+        "start": "cross-env TS_NODE_PROJECT='./build/webpack.tsconfig.json' NODE_ENV=development webpack-dev-server --config build/webpack.conf.ts --color --progress",
+        "build": "cross-env TS_NODE_PROJECT='./build/webpack.tsconfig.json' NODE_ENV=production webpack --config build/webpack.conf.ts --color --progress",
 },
-	
 ```
 
 #### babel前置知识
@@ -1134,10 +1116,8 @@ var obj = {};
 2. JavaScript 库和工具可以使用 `@babel/runtime` ，在实际项目中使用这些库和工具，需要该项目本身提供 polyfill。
 
 > @babel/polyfill在7.4.0已被废弃，请使用安装core-js，并使用corejs选项
->
+> 
 > core-js：标准的模块化 JS 库，包含最新的 ESMA 标准和提案，以及相关的 WHATWG/W3C 标准和提案的polyfill。
-
-
 
 ##### babel插件详解
 
@@ -1146,8 +1126,6 @@ https://zhuanlan.zhihu.com/p/394782898 babel插件详解
 ###### `@babel/core` 核心包
 
 首先是 [@babel/core](https://zhuanlan.zhihu.com/p/270936113/@babel/core · Babel)代表 babel 编译器本身，提供了编程方式使用 babel 的 api。
-
-
 
 ###### @babel/preset-env
 
@@ -1187,8 +1165,6 @@ import "core-js/modules/es.string.pad-end";
 
 - usage 当项目中使用对应 feature 时自动引入对应实现
 
-
-
 ###### @babel/plugin-transform-runtime
 
 1. 利用 core-js 选项，在必要情况下利用 core-js 的 helper 函数进行 polyfill
@@ -1222,8 +1198,6 @@ babel 使用过程中的 helper 函数默认会分散在使用到的地方，开
 
 可选值：boolean, defaults to true. 开启后可以不污染全局作用域的转换 generator 函数
 
-
-
 #### webpack、babel编译 ts 、tsx、jsx，搭建react环境
 
 https://juejin.cn/post/7020972849649156110
@@ -1235,7 +1209,8 @@ babel-loader 可以转换 js、jsx、ts、tsx 文件 （推荐）
 这里我们选择使用 babel-loader 
 
 ```shell
-npm i -D @babel/core @babel/preset-env @babel/preset-typescript @babel/preset-react @babel/runtime-corejs3 @babel/plugin-transform-runtime @babel/plugin-proposal-class-properties @babel/plugin-proposal-decorators core-js@3 babel-loader
+npm i -D @babel/core @babel/preset-env @babel/preset-typescript @babel/preset-react @babel/plugin-transform-runtime @babel/plugin-proposal-class-properties @babel/plugin-proposal-decorators babel-loader
+npm i @babel/runtime-corejs3
 ```
 
 ```sh
@@ -1246,7 +1221,7 @@ npm i -D @types/react @types/react-dom typescript tslib ts-node
 - ts-node —— 可选安装，在node.js上执行ts文件，可以方便调试ts文件。
 
 - tslib —— 可选安装，TypeScript的运行库，包含所有TypeScript帮助函数。
-
+  
   > ```
   > // tsconfig.json
   > // importHelpers：Allow importing helper functions from tslib once per project, instead of including them per-file.
@@ -1264,21 +1239,21 @@ npm i -D @types/react @types/react-dom typescript tslib ts-node
 
 ```json
 {
-		module: {
-		rules: [
-			// js、jsx、ts、tsx
-			{
-				test: /\.(j|t)sx?$/,
-				use: [
-					{ loader: 'cache-loader' },
-					{ loader: 'thread-loader', options: { workers: 3 } },
-					{ loader: 'babel-loader', options: { cacheDirectory: true } },
-				],
-				include: [srcPath],
-				exclude: /node_modules/,
-			},
-		],
-	},
+        module: {
+        rules: [
+            // js、jsx、ts、tsx
+            {
+                test: /\.(j|t)sx?$/,
+                use: [
+                    { loader: 'cache-loader' },
+                    { loader: 'thread-loader', options: { workers: 3 } },
+                    { loader: 'babel-loader', options: { cacheDirectory: true } },
+                ],
+                include: [srcPath],
+                exclude: /node_modules/,
+            },
+        ],
+    },
 }
 ```
 
@@ -1286,41 +1261,34 @@ npm i -D @types/react @types/react-dom typescript tslib ts-node
 
 ```json
 module.exports = {
-  // @babel/env===@babel/preset-env  @babel/react === @babel/preset-react ...
-  // 当在presets中使用@babel/env，babel会自动加上preset-
-	presets: [
-		[
-			"@babel/preset-env",
-			{
-        // esm转换成其他模块语法，cjs、amd、umd等
-        // Tree Shaking需要设置为false
-				modules: false, 
-				targets: { browsers: ["> 1%", "last 2 versions", "not ie <= 8"] },
-        // when using useBuiltIns: "usage", set the proposals option to true. This will enable polyfilling of every proposal supported by core-js@xxx
-        // 按需加载，将 useBuiltIns 改为 "usage"，babel 就可以按需加载 polyfill，并且不需要手动引入 @babel/polyfill，不过@babel/polyfill在7.4.0已被废弃，请使用安装core-js（polyfill类库），并使用corejs选项
-				useBuiltIns: "usage", 
-				corejs: { 
-          version: 3, // 需安装 core-js3.x的版本
-          proposals: true, // 支持js提案语法
-        }
-			}
-		],
-		"@babel/preset-react",  
-		"@babel/preset-typescript",
-	],
-	plugins: [
-		["@babel/plugin-transform-runtime", { 
-      corejs: { 
-      	version: 3, // 需安装 @babel/runtime-corejs3
-        proposals: true 
-      }
-    }],
-		["@babel/plugin-proposal-decorators", { legacy: true }], // 需要放在@babel/plugin-proposal-class-propertie之前
-		["@babel/plugin-proposal-class-properties", { loose: true }], // 用于解析class语法(react必选)
-    // @babel/plugin-proposal-private-methods 和 @babel/plugin-proposal-private-property-in-object内置于preset-env,且他们的loose值必须与@babel/plugin-proposal-class-properties的一致
-    ['@babel/plugin-proposal-private-methods', { 'loose': true }],
-    ['@babel/plugin-proposal-private-property-in-object', { loose: true }],
-	]
+    // @babel/env === @babel/preset-env  @babel/react === @babel/preset-react ...
+    // 当在presets中使用@babel/env，babel会自动加上preset-
+    presets: [
+        [
+            "@babel/preset-env",
+            {
+                // esm转换成其他模块语法，cjs、amd、umd等
+                // Tree Shaking需要设置为false
+                modules: false,
+                targets: { browsers: ["> 1%", "last 2 versions", "not ie <= 8"] },
+            }
+        ],
+        "@babel/preset-react",
+        "@babel/preset-typescript",
+    ],
+    plugins: [
+        ["@babel/plugin-transform-runtime", {
+            corejs: {
+                version: 3, // 需安装 @babel/runtime-corejs3
+                proposals: true
+            }
+        }],
+        ["@babel/plugin-proposal-decorators", { legacy: true }], // 需要放在@babel/plugin-proposal-class-propertie之前
+        ["@babel/plugin-proposal-class-properties", { loose: true }], // 用于解析class语法(react必选)
+        // @babel/plugin-proposal-private-methods 和 @babel/plugin-proposal-private-property-in-object内置于preset-env,且他们的loose值必须与@babel/plugin-proposal-class-properties的一致
+        ['@babel/plugin-proposal-private-methods', { 'loose': true }],
+        ['@babel/plugin-proposal-private-property-in-object', { loose: true }],
+    ]
 }
 ```
 
@@ -1374,617 +1342,614 @@ const faviconPath = path.resolve(settings.rootPath, './public/images/favicon.ico
 let copyToClipboard = false;
 
 const copyPluginPatterns = [
-	{ from: publicPath, to: './public' },
-	{ from: `${srcPath}/utils/fastClick.js`, to: './public' },
-	// 开发、生产环境下测试下载地址都需要把下面这样取消注释
-	{ from: `${settings.rootPath}/CLodop_Setup_for_Win32NT.exe`, to: './static/software' },
-	...[
-		// react 相关
-		'/react/umd/react.profiling.min.js',
-		isDevMode ? '/react/umd/react.development.js' : '/react/umd/react.production.min.js',
-		'/react-dom/umd/react-dom.profiling.min.js',
-		isDevMode ? '/react-dom/umd/react-dom.development.js' : '/react-dom/umd/react-dom.production.min.js',
-		isDevMode ? '/react-router-dom/umd/react-router-dom.js' : '/react-router-dom/umd/react-router-dom.min.js',
-		// moment 相关
-		isDevMode ? '/moment/min/moment-with-locales.js' : '/moment/min/moment-with-locales.min.js',
-		// antd 相关
-		// isDevMode ? '/antd/dist/antd.js' : '/antd/dist/antd.min.js',
-		// isDevMode ? '/antd/dist/antd-with-locales.js' : '/antd/dist/antd-with-locales.min.js',
-		// isDevMode ? '/antd/dist/antd.css' : '/antd/dist/antd.min.css',
-		// isDevMode ? '/antd/dist/antd.compact.css' : '/antd/dist/antd.compact.min.css',
-		// isDevMode ? '/antd/dist/antd.dark.css' : '/antd/dist/antd.dark.min.css',
+    { from: publicPath, to: './public' },
+    { from: `${srcPath}/utils/fastClick.js`, to: './public' },
+    // 开发、生产环境下测试下载地址都需要把下面这样取消注释
+    { from: `${settings.rootPath}/CLodop_Setup_for_Win32NT.exe`, to: './static/software' },
+    ...[
+        // react 相关
+        '/react/umd/react.profiling.min.js',
+        isDevMode ? '/react/umd/react.development.js' : '/react/umd/react.production.min.js',
+        '/react-dom/umd/react-dom.profiling.min.js',
+        isDevMode ? '/react-dom/umd/react-dom.development.js' : '/react-dom/umd/react-dom.production.min.js',
+        isDevMode ? '/react-router-dom/umd/react-router-dom.js' : '/react-router-dom/umd/react-router-dom.min.js',
+        // moment 相关
+        isDevMode ? '/moment/min/moment-with-locales.js' : '/moment/min/moment-with-locales.min.js',
+        // antd 相关
+        // isDevMode ? '/antd/dist/antd.js' : '/antd/dist/antd.min.js',
+        // isDevMode ? '/antd/dist/antd-with-locales.js' : '/antd/dist/antd-with-locales.min.js',
+        // isDevMode ? '/antd/dist/antd.css' : '/antd/dist/antd.min.css',
+        // isDevMode ? '/antd/dist/antd.compact.css' : '/antd/dist/antd.compact.min.css',
+        // isDevMode ? '/antd/dist/antd.dark.css' : '/antd/dist/antd.dark.min.css',
 
-		// amis 相关
-		'/fastlion-amis/sdk/',
-		// '/fastlion-amis/sdk/sdk.js',
-		// '/fastlion-amis/sdk/**/*.css',
-		// '/fastlion-amis/sdk/**/*.js',
-		// "/fastlion-amis/sdk/**/*.svg",
-		// '/fastlion-amis/sdk/**/*.eot',
-		// "/fastlion-amis/sdk/**/*.svg",
-		// "/fastlion-amis/sdk/**/*.ttf",
-		// "/fastlion-amis/sdk/**/*.woff",
-		// "/fastlion-amis/sdk/**/*.woff2",
-		// "/fastlion-amis/sdk/**/*.eot",
-		// "/fastlion-amis/sdk/**/*.svg",
-		// "/fastlion-amis/sdk/**/*.ttf",
-		// "/fastlion-amis/sdk/**/*.woff",
-		// "/fastlion-amis/sdk/**/*.woff2",
-		// '/font-awesome/css',
-		// '/font-awesome/fonts',
-	].map((pathItem) => {
-		return {
-			from: `${slash(nodeModulesPath)}${pathItem}`,
-			// 低版本才有这个字段transformPath
-			transformPath: (targetPath: string, absolutePath: string) => {
-				// 去除nodule_modules的路径：slash(absolutePath).substr(slash(nodeModulesPath).length
-				return `./public${slash(absolutePath).substr(slash(nodeModulesPath).length)}`;
-			},
-		};
-	}),
+        // amis 相关
+        '/fastlion-amis/sdk/',
+        // '/fastlion-amis/sdk/sdk.js',
+        // '/fastlion-amis/sdk/**/*.css',
+        // '/fastlion-amis/sdk/**/*.js',
+        // "/fastlion-amis/sdk/**/*.svg",
+        // '/fastlion-amis/sdk/**/*.eot',
+        // "/fastlion-amis/sdk/**/*.svg",
+        // "/fastlion-amis/sdk/**/*.ttf",
+        // "/fastlion-amis/sdk/**/*.woff",
+        // "/fastlion-amis/sdk/**/*.woff2",
+        // "/fastlion-amis/sdk/**/*.eot",
+        // "/fastlion-amis/sdk/**/*.svg",
+        // "/fastlion-amis/sdk/**/*.ttf",
+        // "/fastlion-amis/sdk/**/*.woff",
+        // "/fastlion-amis/sdk/**/*.woff2",
+        // '/font-awesome/css',
+        // '/font-awesome/fonts',
+    ].map((pathItem) => {
+        return {
+            from: `${slash(nodeModulesPath)}${pathItem}`,
+            // 低版本才有这个字段transformPath
+            transformPath: (targetPath: string, absolutePath: string) => {
+                // 去除nodule_modules的路径：slash(absolutePath).substr(slash(nodeModulesPath).length
+                return `./public${slash(absolutePath).substr(slash(nodeModulesPath).length)}`;
+            },
+        };
+    }),
 ];
 
 const config: Configuration = {
-	entry: {
-		schemaApp: `${srcPath}/schema-app`,
-	},
-	module: {
-		// noParse: content => {},
-		rules: [
-			{ test: /\.json$/, use: 'json-loader', type: 'javascript/auto' },
-			/**
-			 * url-loader应该是file-loader上加了一层过滤。小于8k采用base64编码，减少一次http请求，大于8k则采用file-loader处理
-			 */
-			// 图片
-			{
-				test: /\.(png|jpe?g|gif|ico)$/,
-				use: [{ loader: 'url-loader', options: { limit: 8192, name: 'images/[name].[hash:8].[ext]', publicPath: '' } }],
-			},
-			// 字体图标
-			{
-				test: /\.(woff|woff2|svg|eot|ttf)$/,
-				// use: [{ loader: 'file-loader', options: { limit: 8192, name: 'fonts/[name].[ext]?[hash:8]', publicPath: '' } }],
-				use: [{ loader: 'file-loader', options: { limit: 8192, name: 'fonts/[name].[hash:8].[ext]', publicPath: '' } }],
-			},
-			// 音频
-			{
-				test: /\.(wav|mp3|ogg)?$/,
-				use: [{ loader: 'file-loader', options: { limit: 8192, name: 'audios/[name].[ext]?[hash:8]', publicPath: '' } }],
-			},
-			// 视频
-			{
-				test: /\.(ogg|mpeg4|webm)?$/,
-				use: [{ loader: 'file-loader', options: { limit: 8192, name: 'videos/[name].[ext]?[hash:8]', publicPath: '' } }],
-			},
-			// js、jsx
-			// {
-			// 	test: /\.jsx?$/,
-			// 	use: [{ loader: 'cache-loader' }, { loader: 'thread-loader', options: { workers: 3 } }, { loader: 'babel-loader', options: { cacheDirectory: true } }],
-			// 	include: [srcPath],
-			// 	exclude: /node_modules/,
-			// },
-			// js、jsx、ts、tsx
-			{
-				test: /\.(j|t)sx?$/,
-				use: [
-					{ loader: 'cache-loader' },
-					{ loader: 'thread-loader', options: { workers: 3 } },
-					// {loader: "ts-loader", options: {happyPackMode: true, transpileOnly: true}},
-					{
-						loader: 'babel-loader',
-						options: {
-							cacheDirectory: true,
-							// React 快速刷新，会保存状态
-							plugins: [isDevMode && require.resolve('react-refresh/babel')].filter(Boolean),
-						},
-					},
-				],
-				include: [srcPath],
-				exclude: /node_modules/,
-			},
-		],
-	},
-	plugins: [
-		// 这是一个简单的字符串替换插件，将我们所有经过 webpack 打包的 js 文件中代码对应的变量都替换为我们在这个插件中指定的其他值或表达式。
-		// DefinePlugin 允许创建一个在编译时可以配置的全局常量。
-		// 如果值是字符串，则字符串需要被引号包裹，例如 '"a"',或使用JSON.stringify("a")
-		new DefinePlugin({ ...settings.define }),
-		new AntdDayjsWebpackPlugin(),
-	],
-	resolve: {
-		extensions: ['.ts', '.tsx', '.js', '.jsx', '.json'],
-		modules: [srcPath, nodeModulesPath],
-		alias: { '@': srcPath },
-	},
-	// externals 配置选项提供了「从输出的 bundle 中排除依赖」的方法，依赖不会被打包，而是在运行时(runtime)再去从外部获取这些扩展依赖(external dependencies)。
-	// 例如遇到react，会寻找变量window.React
-	externals: {
-		react: 'window.React',
-		'react-dom': 'window.ReactDOM',
-		'react-router-dom': 'window.ReactRouterDOM',
-		'fastlion-amis': { commonjs: 'amisRequire', amd: 'amisRequire', root: 'amisRequire' },
-		// moment: 'moment',
-		// antd: 'antd',
-		// amis: { commonjs: 'amisRequire', amd: 'amisRequire', root: 'amisRequire' },
-		// amis: "amisRequire",
-	},
-	optimization: {
-		noEmitOnErrors: true,
-	},
+    entry: {
+        schemaApp: `${srcPath}/schema-app`,
+    },
+    module: {
+        // noParse: content => {},
+        rules: [
+            { test: /\.json$/, use: 'json-loader', type: 'javascript/auto' },
+            /**
+             * url-loader应该是file-loader上加了一层过滤。小于8k采用base64编码，减少一次http请求，大于8k则采用file-loader处理
+             */
+            // 图片
+            {
+                test: /\.(png|jpe?g|gif|ico)$/,
+                use: [{ loader: 'url-loader', options: { limit: 8192, name: 'images/[name].[hash:8].[ext]', publicPath: '' } }],
+            },
+            // 字体图标
+            {
+                test: /\.(woff|woff2|svg|eot|ttf)$/,
+                // use: [{ loader: 'file-loader', options: { limit: 8192, name: 'fonts/[name].[ext]?[hash:8]', publicPath: '' } }],
+                use: [{ loader: 'file-loader', options: { limit: 8192, name: 'fonts/[name].[hash:8].[ext]', publicPath: '' } }],
+            },
+            // 音频
+            {
+                test: /\.(wav|mp3|ogg)?$/,
+                use: [{ loader: 'file-loader', options: { limit: 8192, name: 'audios/[name].[ext]?[hash:8]', publicPath: '' } }],
+            },
+            // 视频
+            {
+                test: /\.(ogg|mpeg4|webm)?$/,
+                use: [{ loader: 'file-loader', options: { limit: 8192, name: 'videos/[name].[ext]?[hash:8]', publicPath: '' } }],
+            },
+            // js、jsx
+            // {
+            //     test: /\.jsx?$/,
+            //     use: [{ loader: 'cache-loader' }, { loader: 'thread-loader', options: { workers: 3 } }, { loader: 'babel-loader', options: { cacheDirectory: true } }],
+            //     include: [srcPath],
+            //     exclude: /node_modules/,
+            // },
+            // js、jsx、ts、tsx
+            {
+                test: /\.(j|t)sx?$/,
+                use: [
+                    { loader: 'cache-loader' },
+                    { loader: 'thread-loader', options: { workers: 3 } },
+                    // {loader: "ts-loader", options: {happyPackMode: true, transpileOnly: true}},
+                    {
+                        loader: 'babel-loader',
+                        options: {
+                            cacheDirectory: true,
+                            // React 快速刷新，会保存状态
+                            plugins: [isDevMode && require.resolve('react-refresh/babel')].filter(Boolean),
+                        },
+                    },
+                ],
+                include: [srcPath],
+                exclude: /node_modules/,
+            },
+        ],
+    },
+    plugins: [
+        // 这是一个简单的字符串替换插件，将我们所有经过 webpack 打包的 js 文件中代码对应的变量都替换为我们在这个插件中指定的其他值或表达式。
+        // DefinePlugin 允许创建一个在编译时可以配置的全局常量。
+        // 如果值是字符串，则字符串需要被引号包裹，例如 '"a"',或使用JSON.stringify("a")
+        new DefinePlugin({ ...settings.define }),
+        new AntdDayjsWebpackPlugin(),
+    ],
+    resolve: {
+        extensions: ['.ts', '.tsx', '.js', '.jsx', '.json'],
+        modules: [srcPath, nodeModulesPath],
+        alias: { '@': srcPath },
+    },
+    // externals 配置选项提供了「从输出的 bundle 中排除依赖」的方法，依赖不会被打包，而是在运行时(runtime)再去从外部获取这些扩展依赖(external dependencies)。
+    // 例如遇到react，会寻找变量window.React
+    externals: {
+        react: 'window.React',
+        'react-dom': 'window.ReactDOM',
+        'react-router-dom': 'window.ReactRouterDOM',
+        'fastlion-amis': { commonjs: 'amisRequire', amd: 'amisRequire', root: 'amisRequire' },
+        // moment: 'moment',
+        // antd: 'antd',
+        // amis: { commonjs: 'amisRequire', amd: 'amisRequire', root: 'amisRequire' },
+        // amis: "amisRequire",
+    },
+    optimization: {
+        noEmitOnErrors: true,
+    },
 };
 
 // postcss-loader 配置
 const postcssOptions = {
-	plugins: [
-		['postcss-preset-env', {}],
-		['autoprefixer', {}],
-		['postcss-aspect-ratio-mini', {}],
-		['postcss-write-svg', { utf8: false }],
-		// ["postcss-px-to-viewport", {
-		//   // 视窗的宽度，对应的是我们设计稿的宽度，一般是750
-		//   viewportWidth: 750,
-		//   // 视窗的高度，根据750设备的宽度来指定，一般指定1334，也可以不配置
-		//   viewportHeight: 1334,
-		//   // 指定`px`转换为视窗单位值的小数位数（很多时候无法整除）
-		//   unitPrecision: 3,
-		//   // 指定需要转换成的视窗单位，建议使用vw
-		//   viewportUnit: "vw",
-		//   // 指定不转换为视窗单位的类，可以自定义，可以无限添加,建议定义一至两个通用的类名
-		//   selectorBlackList: [".ignore", ".hairlines"],
-		//   // 小于或等于`1px`不转换为视窗单位，你也可以设置为你想要的值
-		//   minPixelValue: 1,
-		//   // 允许在媒体查询中转换`px`
-		//   mediaQuery: false
-		// }],
-	],
+    plugins: [
+        ['postcss-preset-env', {}],
+        ['autoprefixer', {}],
+        ['postcss-aspect-ratio-mini', {}],
+        ['postcss-write-svg', { utf8: false }],
+        // ["postcss-px-to-viewport", {
+        //   // 视窗的宽度，对应的是我们设计稿的宽度，一般是750
+        //   viewportWidth: 750,
+        //   // 视窗的高度，根据750设备的宽度来指定，一般指定1334，也可以不配置
+        //   viewportHeight: 1334,
+        //   // 指定`px`转换为视窗单位值的小数位数（很多时候无法整除）
+        //   unitPrecision: 3,
+        //   // 指定需要转换成的视窗单位，建议使用vw
+        //   viewportUnit: "vw",
+        //   // 指定不转换为视窗单位的类，可以自定义，可以无限添加,建议定义一至两个通用的类名
+        //   selectorBlackList: [".ignore", ".hairlines"],
+        //   // 小于或等于`1px`不转换为视窗单位，你也可以设置为你想要的值
+        //   minPixelValue: 1,
+        //   // 允许在媒体查询中转换`px`
+        //   mediaQuery: false
+        // }],
+    ],
 };
 // 开发模式
 if (isDevMode) {
-	// @ts-ignore
-	// filename是主入口的文件名，chunkFilename是非主入口的文件名。
-	const devConfig: Configuration = {
-		output: {
-			path: distPath,
-			filename: 'js/[name].bundle.js',
-			chunkFilename: 'js/[name].chunk.js',
-			publicPath: '/',
-		},
-		mode: 'development',
-		devtool: 'eval-source-map',
-		module: {
-			rules: [
-				// css
-				{
-					test: /\.css$/,
-					use: [
-						{ loader: 'cache-loader' },
-						{ loader: 'style-loader' },
-						{ loader: 'css-loader', options: {} },
-						{ loader: 'postcss-loader', options: { postcssOptions: postcssOptions } },
-					],
-				},
-				// 编译less
-				{
-					test: /\.less$/,
-					use: [
-						{ loader: 'cache-loader' },
-						{ loader: 'style-loader' },
-						{
-							loader: 'css-loader',
-							options: {
-								importLoaders: 1,
-								// css模块化 https://github.com/webpack-contrib/css-loader#modules
-								modules: {
-									compileType: 'module',
-									// \w表示任意大小写字母或数字或下划线
-									// +号表示1到多个\w，而后面的"$"号，表示限定以\w结尾
-									// i不区分大小写
-									auto: /\.module\.\w+$/i,
-									localIdentName: '[path][name]_[local]',
-									localIdentContext: srcPath,
-								},
-							},
-						},
-						{ loader: 'postcss-loader', options: { postcssOptions: postcssOptions } },
-						{ loader: 'less-loader', options: { sourceMap: true } },
-					],
-				},
-			],
-		},
-		devServer: {
-			host: settings.devServer.host,
-			port: settings.devServer.port,
-			contentBase: `${settings.rootPath}/index.html`,
-			// publicPath: "/",
-			historyApiFallback: true,
-			overlay: true,
-			hot: true,
-			inline: true,
-			noInfo: true,
-			// 跳过域名检查
-			disableHostCheck: false,
-			// 服务端代理配置
-			proxy: settings.devServer.proxy,
-			// open: settings.devServer.needOpenApp && 'chrome',
-		},
-		plugins: [
-			new CopyWebpackPlugin({
-				patterns: [
-					...copyPluginPatterns,
-					// config.json不打包到dist，手动配置再放到服务器上
-					{ from: `${settings.rootPath}/config.json`, to: './' },
-				],
-				options: { concurrency: 64 },
-			}),
-			new WebpackBar({
-				reporter: {
-					// allDone: (context) => {
-					//   if (copyToClipboard) {
-					//     return;
-					//   }
-					//   copyToClipboard = true;
-					//   clipboardy.writeSync(`http://127.0.0.1:${settings.devServer.port}/schema-app.html`);
-					//   const messages = [
-					//     "  App running at:",
-					//     `  - Local:   ${chalk.cyan(`http://127.0.0.1:${settings.devServer.port}/schema-app.html`)} (copied to clipboard)`,
-					//     `  - Network: ${chalk.cyan(`http://${ip.address("public", "ipv4")}:${settings.devServer.port}/schema-app.html`)}`,
-					//   ];
-					//   console.log(messages.join("\n"));
-					// },
-					done: (context) => {
-						if (!copyToClipboard) {
-							copyToClipboard = true;
-							clipboardy.writeSync(`http://localhost:${settings.devServer.port}/schema-app.html`);
-						}
-						const messages = [
-							'  App running at:',
-							`  - Local:   ${chalk.cyan(`http://localhost:${settings.devServer.port}/schema-app.html`)}`,
-							`  - Network: ${chalk.cyan(`http://${ip.address('public', 'ipv4')}:${settings.devServer.port}/schema-app.html`)}`,
-						];
-						console.log(messages.join('\n'));
-					},
-				},
-			}),
-			new HotModuleReplacementPlugin(),
-			new ReactRefreshWebpackPlugin(), // React 快速刷新
-			new OpenBrowserPlugin({ url: 'http://localhost:8001/schema-app.html' }),
-		],
-	};
-	// @ts-ignore
-	config = WebpackMerge(config, devConfig);
+    // @ts-ignore
+    // filename是主入口的文件名，chunkFilename是非主入口的文件名。
+    const devConfig: Configuration = {
+        output: {
+            path: distPath,
+            filename: 'js/[name].bundle.js',
+            chunkFilename: 'js/[name].chunk.js',
+            publicPath: '/',
+        },
+        mode: 'development',
+        devtool: 'eval-source-map',
+        module: {
+            rules: [
+                // css
+                {
+                    test: /\.css$/,
+                    use: [
+                        { loader: 'cache-loader' },
+                        { loader: 'style-loader' },
+                        { loader: 'css-loader', options: {} },
+                        { loader: 'postcss-loader', options: { postcssOptions: postcssOptions } },
+                    ],
+                },
+                // 编译less
+                {
+                    test: /\.less$/,
+                    use: [
+                        { loader: 'cache-loader' },
+                        { loader: 'style-loader' },
+                        {
+                            loader: 'css-loader',
+                            options: {
+                                importLoaders: 1,
+                                // css模块化 https://github.com/webpack-contrib/css-loader#modules
+                                modules: {
+                                    compileType: 'module',
+                                    // \w表示任意大小写字母或数字或下划线
+                                    // +号表示1到多个\w，而后面的"$"号，表示限定以\w结尾
+                                    // i不区分大小写
+                                    auto: /\.module\.\w+$/i,
+                                    localIdentName: '[path][name]_[local]',
+                                    localIdentContext: srcPath,
+                                },
+                            },
+                        },
+                        { loader: 'postcss-loader', options: { postcssOptions: postcssOptions } },
+                        { loader: 'less-loader', options: { sourceMap: true } },
+                    ],
+                },
+            ],
+        },
+        devServer: {
+            host: settings.devServer.host,
+            port: settings.devServer.port,
+            contentBase: `${settings.rootPath}/index.html`,
+            // publicPath: "/",
+            historyApiFallback: true,
+            overlay: true,
+            hot: true,
+            inline: true,
+            noInfo: true,
+            // 跳过域名检查
+            disableHostCheck: false,
+            // 服务端代理配置
+            proxy: settings.devServer.proxy,
+            // open: settings.devServer.needOpenApp && 'chrome',
+        },
+        plugins: [
+            new CopyWebpackPlugin({
+                patterns: [
+                    ...copyPluginPatterns,
+                    // config.json不打包到dist，手动配置再放到服务器上
+                    { from: `${settings.rootPath}/config.json`, to: './' },
+                ],
+                options: { concurrency: 64 },
+            }),
+            new WebpackBar({
+                reporter: {
+                    // allDone: (context) => {
+                    //   if (copyToClipboard) {
+                    //     return;
+                    //   }
+                    //   copyToClipboard = true;
+                    //   clipboardy.writeSync(`http://127.0.0.1:${settings.devServer.port}/schema-app.html`);
+                    //   const messages = [
+                    //     "  App running at:",
+                    //     `  - Local:   ${chalk.cyan(`http://127.0.0.1:${settings.devServer.port}/schema-app.html`)} (copied to clipboard)`,
+                    //     `  - Network: ${chalk.cyan(`http://${ip.address("public", "ipv4")}:${settings.devServer.port}/schema-app.html`)}`,
+                    //   ];
+                    //   console.log(messages.join("\n"));
+                    // },
+                    done: (context) => {
+                        if (!copyToClipboard) {
+                            copyToClipboard = true;
+                            clipboardy.writeSync(`http://localhost:${settings.devServer.port}/schema-app.html`);
+                        }
+                        const messages = [
+                            '  App running at:',
+                            `  - Local:   ${chalk.cyan(`http://localhost:${settings.devServer.port}/schema-app.html`)}`,
+                            `  - Network: ${chalk.cyan(`http://${ip.address('public', 'ipv4')}:${settings.devServer.port}/schema-app.html`)}`,
+                        ];
+                        console.log(messages.join('\n'));
+                    },
+                },
+            }),
+            new HotModuleReplacementPlugin(),
+            new ReactRefreshWebpackPlugin(), // React 快速刷新
+            new OpenBrowserPlugin({ url: 'http://localhost:8001/schema-app.html' }),
+        ],
+    };
+    // @ts-ignore
+    config = WebpackMerge(config, devConfig);
 }
 
 // 生产模式
 if (!isDevMode) {
-	const prodConfig: Configuration = {
-		// filename是主入口的文件名，chunkFilename是非主入口的文件名。
-		output: {
-			path: distPath,
-			filename: 'js/[name].[chunkhash].bundle.js',
-			chunkFilename: 'js/[name].[chunkhash].chunk.js',
-			/**
-				publicPath: 'https://cdn.example.com/assets/', // CDN（总是 HTTPS 协议）
-				publicPath: '//cdn.example.com/assets/', // CDN（协议相同）
-				publicPath: '', // 相对于 HTML 页面（目录相同）
-			 */
-			publicPath: enableCDN ? cdnPublicPath : '',
-		},
-		mode: 'production',
-		module: {
-			rules: [
-				// css
-				{
-					test: /\.css$/,
-					use: [
-						{
-							loader: MiniCssExtractPlugin.loader,
-							/**
-							 * publicPath默认是output.path（构建目录）
-							 * MiniCssExtractPlugin将.css文件打包在构建目录下的CSS目录下
-							 * url-loader和file-loader将图片、字体、视频文件打包在构建目录下的对应目录下
-							 * 例如1.css文件中 background:url('@/assets/images/1.png')，打包后css文件目录为 dist/css/1.css, 图片文件目录为 dist/images/1.png，css文件夹和images文件夹同级
-							 * 打包后的1.css文件中 background:url('../images/1.png')
-							 */
-							options: {
-								publicPath: '../',
-							},
-						},
-						{ loader: 'css-loader', options: {} },
-						{ loader: 'postcss-loader', options: { postcssOptions: postcssOptions } },
-					],
-				},
-				// 编译less
-				{
-					test: /\.less$/,
-					use: [
-						{
-							// 打包时用MiniCssExtractPlugin.loader替换掉style-loader
-							// style-loader：把js中import导入的样式文件打包到js文件中，运行js文件时，将样式自动插入到<style>标签中。
-							// mini-css-extract-plugin：把js中import导入的样式文件，单独打包成一个css文件，结合html-webpack-plugin，以link的形式插入到html文件中。此插件不支持HMR，若修改了样式文件，是不能即时在浏览器中显示出来的，需要手动刷新页面。
-							loader: MiniCssExtractPlugin.loader,
-							options: {
-								publicPath: '../',
-							},
-						},
-						{
-							loader: 'css-loader',
-							options: {
-								// 用于配置 css-loader 总用于 @import 的资源之前有多少个loader，0 => 无 loader(默认)，1=>post-loader，2=>postcss-loader，less-loader
-								importLoaders: 1,
-								modules: {
-									compileType: 'module',
-									auto: /\.module\.\w+$/i,
-									localIdentName: '[path][name]_[local]_[hash:base64:5]',
-									localIdentContext: srcPath,
-								},
-							},
-						},
-						{ loader: 'postcss-loader', options: { postcssOptions: postcssOptions } },
-						{ loader: 'less-loader', options: { sourceMap: false } },
-					],
-				},
-			],
-		},
-		plugins: [
-			new CopyWebpackPlugin({
-				patterns: copyPluginPatterns,
-				options: { concurrency: 64 },
-			}),
-			new HashedModuleIdsPlugin(),
-			new CompressionPlugin({
-				filename: '[path][base].gz',
-				algorithm: 'gzip',
-				test: /\.(js|css|html|svg)$/,
-				// 只处理大于xx字节 的文件，默认：0
-				threshold: 10240,
-				// 示例：一个1024b大小的文件，压缩后大小为768b，minRatio : 0.75
-				minRatio: 0.8, // 默认: 0.8
-				// 是否删除源文件，默认: false
-				deleteOriginalAssets: false,
-			}),
-			// @ts-ignore
-			new MiniCssExtractPlugin({
-				ignoreOrder: true,
-				filename: 'css/[name].[contenthash].css',
-				chunkFilename: 'css/[name].[contenthash].css',
-			}),
-			new CleanWebpackPlugin({}),
-			new WebpackBar({
-				reporter: {
-					allDone: (context) => {
-						const messages = ['build completed'];
-						console.log(messages.join('\n'));
-					},
-				},
-			}),
-			// 压缩
-			new FileManagerPlugin({
-				events: {
-					onEnd: {
-						archive: [{ source: `${settings.rootPath}/dist`, destination: `${settings.rootPath}/dist.zip` }],
-					},
-				},
-			}),
-		],
-		optimization: {
-			moduleIds: 'hashed',
-			// runtimeChunk：将 runtime 代码拆分为一个单独的 chunk。
-			// runtimeChunk：可用来优化持久化缓存的。runtime，以及伴随的 manifest 数据，主要是指：在浏览器运行过程中，webpack 用来连接模块化应用程序所需的所有代码。模块信息清单（runtime 代码、manifest 数据）在每次有模块变更(hash 变更)时都会变更, 所以我们想把这部分代码单独打包出来, 配合后端缓存策略, 这样就不会因为某个模块的变更导致包含模块信息的模块(通常会被包含在最后一个 bundle 中)缓存失效. optimization.runtimeChunk 就是告诉 webpack 是否要把这部分单独打包出来。
-			runtimeChunk: {
-				name: 'manifest',
-			},
-			// 允许你通过提供一个或多个定制过的 TerserPlugin 实例，覆盖默认压缩工具(minimizer)。
-			minimizer: [
-				new TerserPlugin({
-					parallel: true,
-					extractComments: true, // 剥离注释,
-					terserOptions: {
-						compress: {
-							// 默认会去掉debugger
-							drop_console: true, // 去掉console
-						},
-					},
-				}),
-				new OptimizeCSSAssetsPlugin({
-					cssProcessorPluginOptions: {
-						preset: ['default', { discardComments: { removeAll: true } }],
-					},
-				}),
-			],
-			//可以在这里直接设置抽离代码的参数，最后将符合条件的代码打包至一个公共文件
-			splitChunks: {
-				// 设置缓存组用来抽取满足不同规则的chunk，满足这个条件输出为一个chunks
-				cacheGroups: {
-					commons: {
-						chunks: 'all',
-						minChunks: 2, // 最小共用次数
-						name: 'commons',
-						// minSize: 1024 * 1024,
-						priority: 0,
-					},
-					'async-commons': {
-						// 其余异步加载包
-						chunks: 'async',
-						minChunks: 2,
-						name: 'async-commons',
-						priority: 1,
-					},
-					schema: {
-						test: /[\\/]src[\\/]pages[\\/].*\.(schema|react)\.(ts|tsx|js|jsx|json)$/,
-						chunks: 'async',
-						minSize: 1024 * 256,
-						maxSize: 1024 * 1024,
-						// enforce: true,
-						priority: 2,
-					},
-					// 提取 node_modules 中代码
-					// vendor: {
-					// 	name: 'vendor',
-					// 	test: /[\\/]node_modules[\\/](react|react-dom|react-dom-router|babel-polyfill)[\\/]/,
-					// 	chunks: 'all',
-					// 	priority: 10,
-					// },
-					// 'fastlion-amis': {
-					// 	name: 'fastlion-amis',
-					// 	test: /[\\/]node_modules[\\/]fastlion-amis[\\/]/, // 这种写法兼容window、mac平台
-					// 	chunks: 'async',
-					// 	priority: 20,
-					// },
-					// monaco-editor
-					monacoEditor: {
-						name: 'monacoEditor',
-						test: /[\\/]node_modules[\\/]monaco-editor[\\/]/,
-						chunks: 'async',
-						priority: 30,
-					},
-					// tinymce
-					tinymce: {
-						name: 'tinymce',
-						test: /[\\/]node_modules[\\/]tinymce[\\/]/,
-						chunks: 'async',
-						priority: 40,
-					},
-					// echarts
-					echarts: {
-						name: 'echarts',
-						test: /[\\/]node_modules[\\/]echarts[\\/]/,
-						chunks: 'async',
-						priority: 50,
-					},
-					// froalaEditor
-					froalaEditor: {
-						name: 'froalaEditor',
-						test: /[\\/]node_modules[\\/]froala-editor[\\/]/,
-						chunks: 'async',
-						priority: 60,
-					},
-					// flvJs
-					flvJs: {
-						name: 'flvJs',
-						test: /[\\/]node_modules[\\/]flv.js[\\/]/,
-						chunks: 'async',
-						priority: 70,
-					},
-					// hlsJs
-					hlsJs: {
-						name: 'hlsJs',
-						test: /[\\/]node_modules[\\/]hls.js[\\/]/,
-						chunks: 'async',
-						priority: 80,
-					},
-				},
-			},
-		},
-	};
-	// @ts-ignore
-	config = WebpackMerge(config, prodConfig);
+    const prodConfig: Configuration = {
+        // filename是主入口的文件名，chunkFilename是非主入口的文件名。
+        output: {
+            path: distPath,
+            filename: 'js/[name].[chunkhash].bundle.js',
+            chunkFilename: 'js/[name].[chunkhash].chunk.js',
+            /**
+                publicPath: 'https://cdn.example.com/assets/', // CDN（总是 HTTPS 协议）
+                publicPath: '//cdn.example.com/assets/', // CDN（协议相同）
+                publicPath: '', // 相对于 HTML 页面（目录相同）
+             */
+            publicPath: enableCDN ? cdnPublicPath : '',
+        },
+        mode: 'production',
+        module: {
+            rules: [
+                // css
+                {
+                    test: /\.css$/,
+                    use: [
+                        {
+                            loader: MiniCssExtractPlugin.loader,
+                            /**
+                             * publicPath默认是output.path（构建目录）
+                             * MiniCssExtractPlugin将.css文件打包在构建目录下的CSS目录下
+                             * url-loader和file-loader将图片、字体、视频文件打包在构建目录下的对应目录下
+                             * 例如1.css文件中 background:url('@/assets/images/1.png')，打包后css文件目录为 dist/css/1.css, 图片文件目录为 dist/images/1.png，css文件夹和images文件夹同级
+                             * 打包后的1.css文件中 background:url('../images/1.png')
+                             */
+                            options: {
+                                publicPath: '../',
+                            },
+                        },
+                        { loader: 'css-loader', options: {} },
+                        { loader: 'postcss-loader', options: { postcssOptions: postcssOptions } },
+                    ],
+                },
+                // 编译less
+                {
+                    test: /\.less$/,
+                    use: [
+                        {
+                            // 打包时用MiniCssExtractPlugin.loader替换掉style-loader
+                            // style-loader：把js中import导入的样式文件打包到js文件中，运行js文件时，将样式自动插入到<style>标签中。
+                            // mini-css-extract-plugin：把js中import导入的样式文件，单独打包成一个css文件，结合html-webpack-plugin，以link的形式插入到html文件中。此插件不支持HMR，若修改了样式文件，是不能即时在浏览器中显示出来的，需要手动刷新页面。
+                            loader: MiniCssExtractPlugin.loader,
+                            options: {
+                                publicPath: '../',
+                            },
+                        },
+                        {
+                            loader: 'css-loader',
+                            options: {
+                                // 用于配置 css-loader 总用于 @import 的资源之前有多少个loader，0 => 无 loader(默认)，1=>post-loader，2=>postcss-loader，less-loader
+                                importLoaders: 1,
+                                modules: {
+                                    compileType: 'module',
+                                    auto: /\.module\.\w+$/i,
+                                    localIdentName: '[path][name]_[local]_[hash:base64:5]',
+                                    localIdentContext: srcPath,
+                                },
+                            },
+                        },
+                        { loader: 'postcss-loader', options: { postcssOptions: postcssOptions } },
+                        { loader: 'less-loader', options: { sourceMap: false } },
+                    ],
+                },
+            ],
+        },
+        plugins: [
+            new CopyWebpackPlugin({
+                patterns: copyPluginPatterns,
+                options: { concurrency: 64 },
+            }),
+            new HashedModuleIdsPlugin(),
+            new CompressionPlugin({
+                filename: '[path][base].gz',
+                algorithm: 'gzip',
+                test: /\.(js|css|html|svg)$/,
+                // 只处理大于xx字节 的文件，默认：0
+                threshold: 10240,
+                // 示例：一个1024b大小的文件，压缩后大小为768b，minRatio : 0.75
+                minRatio: 0.8, // 默认: 0.8
+                // 是否删除源文件，默认: false
+                deleteOriginalAssets: false,
+            }),
+            // @ts-ignore
+            new MiniCssExtractPlugin({
+                ignoreOrder: true,
+                filename: 'css/[name].[contenthash].css',
+                chunkFilename: 'css/[name].[contenthash].css',
+            }),
+            new CleanWebpackPlugin({}),
+            new WebpackBar({
+                reporter: {
+                    allDone: (context) => {
+                        const messages = ['build completed'];
+                        console.log(messages.join('\n'));
+                    },
+                },
+            }),
+            // 压缩
+            new FileManagerPlugin({
+                events: {
+                    onEnd: {
+                        archive: [{ source: `${settings.rootPath}/dist`, destination: `${settings.rootPath}/dist.zip` }],
+                    },
+                },
+            }),
+        ],
+        optimization: {
+            moduleIds: 'hashed',
+            // runtimeChunk：将 runtime 代码拆分为一个单独的 chunk。
+            // runtimeChunk：可用来优化持久化缓存的。runtime，以及伴随的 manifest 数据，主要是指：在浏览器运行过程中，webpack 用来连接模块化应用程序所需的所有代码。模块信息清单（runtime 代码、manifest 数据）在每次有模块变更(hash 变更)时都会变更, 所以我们想把这部分代码单独打包出来, 配合后端缓存策略, 这样就不会因为某个模块的变更导致包含模块信息的模块(通常会被包含在最后一个 bundle 中)缓存失效. optimization.runtimeChunk 就是告诉 webpack 是否要把这部分单独打包出来。
+            runtimeChunk: {
+                name: 'manifest',
+            },
+            // 允许你通过提供一个或多个定制过的 TerserPlugin 实例，覆盖默认压缩工具(minimizer)。
+            minimizer: [
+                new TerserPlugin({
+                    parallel: true,
+                    extractComments: true, // 剥离注释,
+                    terserOptions: {
+                        compress: {
+                            // 默认会去掉debugger
+                            drop_console: true, // 去掉console
+                        },
+                    },
+                }),
+                new OptimizeCSSAssetsPlugin({
+                    cssProcessorPluginOptions: {
+                        preset: ['default', { discardComments: { removeAll: true } }],
+                    },
+                }),
+            ],
+            //可以在这里直接设置抽离代码的参数，最后将符合条件的代码打包至一个公共文件
+            splitChunks: {
+                // 设置缓存组用来抽取满足不同规则的chunk，满足这个条件输出为一个chunks
+                cacheGroups: {
+                    commons: {
+                        chunks: 'all',
+                        minChunks: 2, // 最小共用次数
+                        name: 'commons',
+                        // minSize: 1024 * 1024,
+                        priority: 0,
+                    },
+                    'async-commons': {
+                        // 其余异步加载包
+                        chunks: 'async',
+                        minChunks: 2,
+                        name: 'async-commons',
+                        priority: 1,
+                    },
+                    schema: {
+                        test: /[\\/]src[\\/]pages[\\/].*\.(schema|react)\.(ts|tsx|js|jsx|json)$/,
+                        chunks: 'async',
+                        minSize: 1024 * 256,
+                        maxSize: 1024 * 1024,
+                        // enforce: true,
+                        priority: 2,
+                    },
+                    // 提取 node_modules 中代码
+                    // vendor: {
+                    //     name: 'vendor',
+                    //     test: /[\\/]node_modules[\\/](react|react-dom|react-dom-router|babel-polyfill)[\\/]/,
+                    //     chunks: 'all',
+                    //     priority: 10,
+                    // },
+                    // 'fastlion-amis': {
+                    //     name: 'fastlion-amis',
+                    //     test: /[\\/]node_modules[\\/]fastlion-amis[\\/]/, // 这种写法兼容window、mac平台
+                    //     chunks: 'async',
+                    //     priority: 20,
+                    // },
+                    // monaco-editor
+                    monacoEditor: {
+                        name: 'monacoEditor',
+                        test: /[\\/]node_modules[\\/]monaco-editor[\\/]/,
+                        chunks: 'async',
+                        priority: 30,
+                    },
+                    // tinymce
+                    tinymce: {
+                        name: 'tinymce',
+                        test: /[\\/]node_modules[\\/]tinymce[\\/]/,
+                        chunks: 'async',
+                        priority: 40,
+                    },
+                    // echarts
+                    echarts: {
+                        name: 'echarts',
+                        test: /[\\/]node_modules[\\/]echarts[\\/]/,
+                        chunks: 'async',
+                        priority: 50,
+                    },
+                    // froalaEditor
+                    froalaEditor: {
+                        name: 'froalaEditor',
+                        test: /[\\/]node_modules[\\/]froala-editor[\\/]/,
+                        chunks: 'async',
+                        priority: 60,
+                    },
+                    // flvJs
+                    flvJs: {
+                        name: 'flvJs',
+                        test: /[\\/]node_modules[\\/]flv.js[\\/]/,
+                        chunks: 'async',
+                        priority: 70,
+                    },
+                    // hlsJs
+                    hlsJs: {
+                        name: 'hlsJs',
+                        test: /[\\/]node_modules[\\/]hls.js[\\/]/,
+                        chunks: 'async',
+                        priority: 80,
+                    },
+                },
+            },
+        },
+    };
+    // @ts-ignore
+    config = WebpackMerge(config, prodConfig);
 }
 
 // 动态扫描入口文件 entry HtmlWebpackPlugin
 const imageHomeBackground = `data:image/png;base64,${fs.readFileSync(path.join(publicPath, './images/home-background.png'), { encoding: 'base64' })}`;
 const imageAmisLogo = `data:image/png;base64,${fs.readFileSync(path.join(publicPath, './images/logo.png'), {
-	encoding: 'base64',
+    encoding: 'base64',
 })}`;
 const imageLogo = `data:image/png;base64,${fs.readFileSync(path.join(publicPath, './images/logo.png'), {
-	encoding: 'base64',
+    encoding: 'base64',
 })}`;
 const base64Images = { imageHomeBackground, imageAmisLogo, imageLogo };
 const chunks: string[] = [];
 if (config.optimization?.splitChunks && config.optimization?.splitChunks?.cacheGroups) {
-	const cacheGroups = (config.optimization!.splitChunks as Options.SplitChunksOptions).cacheGroups as {
-		[key: string]: Options.CacheGroupsOptions;
-	};
-	forEach(cacheGroups, (option) => {
-		chunks.push(option.name as string);
-	});
-	console.log('chunks -> ', JSON.stringify(chunks));
+    const cacheGroups = (config.optimization!.splitChunks as Options.SplitChunksOptions).cacheGroups as {
+        [key: string]: Options.CacheGroupsOptions;
+    };
+    forEach(cacheGroups, (option) => {
+        chunks.push(option.name as string);
+    });
+    console.log('chunks -> ', JSON.stringify(chunks));
 }
 scanJsEntry(config, srcPath, distPath, chunks, faviconPath, base64Images);
 
 // schema-app 支持
 const options: HtmlWebpackPlugin.Options = {
-	template: `${srcPath}/template.ejs`,
-	filename: `${distPath}/schema-app.html`,
-	minify: false,
-	title: settings.defaultHTMLTitle,
-	keywords: settings.metaKeywords,
-	description: settings.metaDescripttion,
-	favicon: faviconPath,
-	appVersion: settings.appVersion,
-	/** chunks 选项的作用主要是针对多入口(entry)文件。当你有多个入口文件的时候，对应就会生成多个编译后的 js 文件。那么 chunks 选项就可以决定是否都使用这些生成的 js 文件。
-	chunks 默认会在生成的 html 文件中引用所有的 js 文件，当然你也可以指定引入哪些特定的文件 */
-	// manifest是 runtimeChunk 分离出来的chunk
-	chunks: ['manifest', ...chunks, 'schemaApp'],
-	//  ''：相对于 HTML 页面（目录同级）
-	urlPrefix: enableCDN ? cdnPublicPath : '',
-	isDevMode,
-	...base64Images,
+    template: `${srcPath}/template.ejs`,
+    filename: `${distPath}/schema-app.html`,
+    minify: false,
+    title: settings.defaultHTMLTitle,
+    keywords: settings.metaKeywords,
+    description: settings.metaDescripttion,
+    favicon: faviconPath,
+    appVersion: settings.appVersion,
+    /** chunks 选项的作用主要是针对多入口(entry)文件。当你有多个入口文件的时候，对应就会生成多个编译后的 js 文件。那么 chunks 选项就可以决定是否都使用这些生成的 js 文件。
+    chunks 默认会在生成的 html 文件中引用所有的 js 文件，当然你也可以指定引入哪些特定的文件 */
+    // manifest是 runtimeChunk 分离出来的chunk
+    chunks: ['manifest', ...chunks, 'schemaApp'],
+    //  ''：相对于 HTML 页面（目录同级）
+    urlPrefix: enableCDN ? cdnPublicPath : '',
+    isDevMode,
+    ...base64Images,
 };
 if (settings.mode === 'production') {
-	options.minify = {
-		removeRedundantAttributes: true,
-		collapseWhitespace: true,
-		removeAttributeQuotes: true,
-		removeComments: true,
-		collapseBooleanAttributes: true,
-	};
+    options.minify = {
+        removeRedundantAttributes: true,
+        collapseWhitespace: true,
+        removeAttributeQuotes: true,
+        removeComments: true,
+        collapseBooleanAttributes: true,
+    };
 }
 config.plugins!.push(new HtmlWebpackPlugin(options));
 
 // 生成代码分析报告
 if (settings.needAnalyzer) {
-	config.plugins!.push(
-		new BundleAnalyzerPlugin({
-			analyzerPort: 9528,
-			analyzerMode: 'static',
-			openAnalyzer: true,
-			reportFilename: `${settings.rootPath}/out/report.html`,
-		})
-	);
+    config.plugins!.push(
+        new BundleAnalyzerPlugin({
+            analyzerPort: 9528,
+            analyzerMode: 'static',
+            openAnalyzer: true,
+            reportFilename: `${settings.rootPath}/out/report.html`,
+        })
+    );
 }
 
 // CDN支持(静态资源上传到阿里OSS)
 if (enableCDN) {
-	const webpackAliyunOss = new WebpackAliyunOss({
-		// test: true,
-		timeout: 1000 * 60 * 10,
-		from: ['./dist/**', '!./dist/*.html', '!./dist/**/*.map', '!./dist/pages/**/*.html'],
-		dist: `${aliOssConf.appPath}/${aliOssConf.appVersion}/`,
-		region: aliOssConf.region,
-		accessKeyId: aliOssConf.accessKeyId,
-		accessKeySecret: aliOssConf.accessKeySecret,
-		bucket: aliOssConf.bucket,
-		// setOssPath(filePath: string) {
-		//   return filePath;
-		// },
-		setHeaders(filePath: string) {
-			return {
-				// 缓存时间
-				'Cache-Control': 'max-age=31536000',
-			};
-		},
-	});
-	config.plugins!.push(webpackAliyunOss);
-	config.plugins!.push(
-		new CopyDistFiles({
-			onBefore: () => fsExtra.rmdirSync('./server/dist', { recursive: true }),
-			patterns: [
-				{
-					from: './dist/**/*.html',
-					transformPath: (targetPath, absolutePath) => {
-						return `./server/dist/${slash(absolutePath).substr(slash(distPath).length)}`;
-					},
-				},
-			],
-		})
-	);
+    const webpackAliyunOss = new WebpackAliyunOss({
+        // test: true,
+        timeout: 1000 * 60 * 10,
+        from: ['./dist/**', '!./dist/*.html', '!./dist/**/*.map', '!./dist/pages/**/*.html'],
+        dist: `${aliOssConf.appPath}/${aliOssConf.appVersion}/`,
+        region: aliOssConf.region,
+        accessKeyId: aliOssConf.accessKeyId,
+        accessKeySecret: aliOssConf.accessKeySecret,
+        bucket: aliOssConf.bucket,
+        // setOssPath(filePath: string) {
+        //   return filePath;
+        // },
+        setHeaders(filePath: string) {
+            return {
+                // 缓存时间
+                'Cache-Control': 'max-age=31536000',
+            };
+        },
+    });
+    config.plugins!.push(webpackAliyunOss);
+    config.plugins!.push(
+        new CopyDistFiles({
+            onBefore: () => fsExtra.rmdirSync('./server/dist', { recursive: true }),
+            patterns: [
+                {
+                    from: './dist/**/*.html',
+                    transformPath: (targetPath, absolutePath) => {
+                        return `./server/dist/${slash(absolutePath).substr(slash(distPath).length)}`;
+                    },
+                },
+            ],
+        })
+    );
 }
 
 export default config;
-
 ```
-
-
 
 #### 搭建脚手架
 

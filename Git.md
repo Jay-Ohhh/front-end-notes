@@ -159,8 +159,9 @@ https://www.cnblogs.com/phpper/p/8034480.html
 
 缺点
 
-- 安全性，`如果你在公共分支上使用rebase`，重写项目历史可能会给你的协作工作流带来灾难性的影响。不要在master等公共分支使用rebase。
-- 可跟踪性，`rebase会更改历史记录`，rebase 不会有合并提交中附带的信息——你看不到 feature 分支中并入了上游的哪些更改，即丢失了一部分提交操作历史。
+- 安全性，`如果你在公共分支上使用rebase`，重写项目历史可能会给你的协作工作流带来灾难性的影响。**不要在master等公共分支使用rebase**。
+  
+  
 
 https://www.jianshu.com/p/4a8f4af4e803
 
@@ -170,7 +171,7 @@ https://www.jianshu.com/p/4a8f4af4e803
 git rebase -i [startpoint] [endpoint]
 ```
 
-其中`-i`的意思是`--interactive`，即弹出交互式的界面让用户编辑完成合并操作，`[startpoint]`  `[endpoint]`则指定了一个编辑区间，如果不指定`[endpoint]`，则该区间的终点默认是当前分支`HEAD`所指向的`commit`(注：该区间指定的是一个前开后闭的区间)。
+其中`-i`的意思是`--interactive`，即弹出交互式的界面让用户编辑完成合并操作，`[startpoint]`  `[endpoint]`则指定了一个编辑区间，如果不指定`[endpoint]`，则该区间的终点默认是当前分支`HEAD`所指向的`commit`(注：该区间指定的是一个前开后开的区间)。
 
 例如 把最后三个提交合并为一个提交：
 
@@ -184,19 +185,32 @@ git rebase -i HEAD~3 // 此处省略了[endpoint]
 pick：保留该commit（缩写:p）
 reword：保留该commit，但我需要修改该commit的注释（缩写:r）
 edit：保留该commit, 但我要停下来修改该提交(不仅仅修改注释)（缩写:e）
-squash：将该commit和前一个commit合并（缩写:s）
-fixup：将该commit和前一个commit合并，但我不要保留该提交的注释信息（缩写:f）
+squash：将该commit和区间第一个commit合并（缩写:s）
+fixup：将该commit和区间第一个commit合并，但我不要保留该提交的注释信息（缩写:f）
 exec：执行shell命令（缩写:x）
 drop：我要丢弃该commit（缩写:d）
 ```
 
+点击**start**开始变基
+
+点击**abort**，退出rebase，处于未rebase之前的状态。
+
+有冲突就解决冲突，然后
+
+```
+git add .
+git rebase --contine
+```
+
+直至解决所有冲突。
+
 ###### 将dev分支多个commit合并到主分支，并形成一个新commit
 
 ```sh
-git rebase [startpoint]  [endpoint] --onto [branchName]
+git rebase [startpoint]  [endpoint] --onto <newbase>
 ```
 
-其中，`[startpoint]` `[endpoint]`仍然和上一个命令一样指定了一个编辑区间(前开后闭)，`--onto`的意思是要将该指定的提交复制到哪个分支上。
+其中，`[startpoint]` `[endpoint]`仍然和上一个命令一样指定了一个编辑区间(前开后开)，`--onto`的意思是以谁为基点。
 
 把dev分支最后三个提交合并到主分支，并形成一个新commit：
 
@@ -252,13 +266,16 @@ while(存在冲突) {
 
 ```sh
 git checkout dev
+// 多个commit之后
 git rebase -i HEAD~3 // 合并提交
-git rebase master //将dev的提交移至（变基）到master---->解决冲突--->git add -u--->git rebase --continue
+git rebase - master //将dev的提交移至（变基）到master---->解决冲突--->git add -u--->git rebase --continue
 git checkout master
 git merge dev
 ```
 
 ###### merge和rebase区别
+
+> merge命令不会保留merge的分支的commit，rebase会保留所有的commit（除非使用 rebase 修改提交）
 
 **merge**
 

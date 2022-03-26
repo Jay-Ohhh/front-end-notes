@@ -218,15 +218,15 @@ function todoApp(state = initialState, action) {
 > ```js
 > Object.assign(target, ...sources)
 > ```
->
+> 
 > target：目标对象
->
+> 
 > source：源对象
->
+> 
 > 返回值是target目标对象
->
+> 
 > 如果目标对象中的属性具有相同的键，则属性将被源对象中的属性覆盖。后面的源对象的属性将类似地覆盖前面的源对象的属性。
->
+> 
 > `Object.assign` 方法只会拷贝源对象自身的并且可枚举的属性到目标对象
 
 ##### 合成reducer
@@ -344,11 +344,11 @@ Store 有以下职责：
 - 通过 [`subscribe(listener)`](https://www.reduxjs.cn/api/store#subscribe) 返回的函数注销监听器；
 
 - 通过 [replaceReducer(nextReduer)]() 替换 store 当前用来计算 state 的 reducer。
-
+  
   > replaceReducer 是一个高级 API。只有在你需要实现代码分隔，而且需要立即加载一些 reducer 的时候才可能会用到它。在实现 Redux 热加载机制的时候也可能会用到。
-  >
+  > 
   > 在大型项目中将代码拆分为多个按需加载的js包，redux中也可以实现动态添加reducer到store
-  >
+  > 
   > https://www.jianshu.com/p/591829e61bdd
 
 #### API
@@ -367,10 +367,12 @@ import { createStore } from 'redux'
 **参数**
 
 1. `reducer` *(Function)*: 接收两个参数，分别是当前的 state 树和要处理的 [action](https://www.reduxjs.cn/glossary#action)，返回新的 [state 树](https://www.reduxjs.cn/glossary#state)。
-2. [`preloadedState`] *(any)*: 初始时的 state。 如果你使用 [`combineReducers`](https://www.reduxjs.cn/api/combinereducers) 创建 `reducer`，该参数必须是一个普通对象，且其keys与 [`combineReducers`](https://www.reduxjs.cn/api/combinereducers) 构造的state对象的keys保持一致。
-3. `enhancer` *(Function)*: Store enhancer 是一个组合 store creator 的高阶函数，返回一个新的强化过的 store creator。与React高阶组件的概念一致。这与 middleware 相似，它也允许你通过复合函数改变 store 接口。
 
- **返回值**
+2. [`preloadedState`] *(any)*: 初始时的 state。 如果你使用 [`combineReducers`](https://www.reduxjs.cn/api/combinereducers) 创建 `reducer`，该参数必须是一个普通对象，且其keys与 [`combineReducers`](https://www.reduxjs.cn/api/combinereducers) 构造的state对象的keys保持一致。
+
+3. `enhancer` *(Function)*: Store enhancer 是一个组合 store creator 的高阶函数，返回一个新的强化过的 store creator。与React高阶组件的概念一致。这与 middleware 相似，它也允许你通过复合函数改变 store 接口。
+   
+   **返回值**
 
 (*`Store`*): 保存了应用所有 state 的对象。改变 state 的惟一方法是 [dispatch](https://www.reduxjs.cn/api/store#dispatch) action。你也可以 [subscribe 监听](https://www.reduxjs.cn/api/store#subscribe) state 的变化，然后更新 UI。
 
@@ -492,13 +494,12 @@ import { bindActionCreators } from 'redux'
  **参数**
 
 1. `actionCreators` (*Function* or *Object*)： 一个 action creator，或者一个 value 是 action creator 的对象。
-2. `dispatch` (*Function*): 一个由 `Store` 实例提供的 `dispatch` 函数。
 
- **返回值**
+2. `dispatch` (*Function*): 一个由 `Store` 实例提供的 `dispatch` 函数。
+   
+   **返回值**
 
 (*Function* or *Object*)：一个与原对象类似的对象，只不过这个对象的key与原 action creator 同名， value 都是会直接 dispatch 原 action creator 返回的action的函数（调用：obj.key(参数)）。如果传入一个单独的函数作为 `actionCreators`，那么返回的结果也是一个单独的函数（调用：fun(参数)）。
-
-
 
 ###### compose(...functions)
 
@@ -547,15 +548,11 @@ const store = createStore(
 import { connect } from 'react-redux'
 ```
 
-
-
 ##### Store
 
 ###### getState()
 
 返回应用当前的 state 树。
-
-
 
 ###### dispatch(action)
 
@@ -578,9 +575,9 @@ Action 是把数据传入 store 的惟一途径，所以任何数据，无论来
 - 在组件外：store.dispatch
 
 - 通过Provider组件传递store，`Provider`内的任何一个组件，如果需要使用store的方法，则必须是「被 connect 过的」组件——使用`connect`方法对「你编写的组件（被包装组件）」进行包装后的容器组件，然后由容器组件传递到被包装组件的props。
-
+  
   例如 Login组件中要使用 props.disptach ，则 Login组件必须被connect生成容器组件，并在 Provider 组件树下。
-
+  
   - 函数组件通过 props.dispatch 调用
   - 类组件通过 this.props.dispatch 调用
 
@@ -611,9 +608,9 @@ Action 是把数据传入 store 的惟一途径，所以任何数据，无论来
 没有返回值。
 
 > replaceReducer 是一个高级 API。只有在你需要实现代码分隔，而且需要立即加载一些 reducer 的时候才可能会用到它。在实现 Redux 热加载机制的时候也可能会用到。
->
+> 
 > 在大型项目中将代码拆分为多个按需加载的js包，redux中也可以实现动态添加reducer到store
->
+> 
 > https://www.jianshu.com/p/591829e61bdd
 
 #### 数据流
@@ -623,19 +620,19 @@ Action 是把数据传入 store 的惟一途径，所以任何数据，无论来
 Redux 应用中数据的生命周期遵循下面 4 个步骤：
 
 1. **调用** [`store.dispatch(action)`](https://www.reduxjs.cn/api/store#dispatch)。
-
+   
    你可以在任何地方调用 [`store.dispatch(action)`](https://www.reduxjs.cn/api/store#dispatch)，包括组件中、XHR 回调中、甚至定时器中。
 
 2. **Redux store 调用传入的 reducer 函数**
-
+   
    注意 reducer 是纯函数。它仅仅用于计算下一个 state。它应该是完全可预测的：多次传入相同的输入必须产生相同的输出。它不应做有副作用的操作，如 API 调用或路由跳转。这些应该在 dispatch action 前发生。
 
 3. **根 reducer 应该把多个子 reducer 输出合并成一个单一的 state 树**
-
+   
    根 reducer 的结构完全由你决定。Redux 原生提供[`combineReducers()`](https://www.reduxjs.cn/api/combinereducers)辅助函数，来把根 reducer 拆分成多个函数，用于分别处理 state 树的一个分支。
 
 4. **Redux store 保存了根 reducer 返回的完整 state 树**
-
+   
    这个新的树就是应用的下一个 state！所有订阅 [`store.subscribe(listener)`](https://www.reduxjs.cn/api/store#subscribe) 的监听器都将被调用；监听器里可以调用 [`store.getState()`](https://www.reduxjs.cn/api/store#getState) 获得当前 state。
 
 #### UI组件和容器组件
@@ -691,7 +688,7 @@ const VisibleTodoList = connect()(TodoList);
 但是，因为没有定义业务逻辑，上面这个容器组件毫无意义，只是 UI 组件的一个单纯的包装层。为了定义业务逻辑，需要给出下面两方面的信息。
 
 > （1）输入逻辑：外部的数据（即`state`对象）如何转换为 UI 组件的参数
->
+> 
 > （2）输出逻辑：用户发出的动作如何变为 Action 对象，从 UI 组件传出去。
 
 因此，`connect`方法的完整 API 如下：
@@ -768,7 +765,7 @@ const getVisibleTodos = (todos, filter) => {
 `mapStateToProps`的第一个参数总是`state`对象，还可以使用第二个参数，代表容器组件的`props`对象。
 
 ```javascript
-// 	容器组件的代码
+//     容器组件的代码
 //  <FilterLink filter="SHOW_ALL">
 //    All
 //  </FilterLink>
@@ -847,8 +844,6 @@ const TodoList = ({ todos, toggleTodo }) => (
 )
 ```
 
-
-
 ##### Provider组件
 
 `connect`方法生成容器组件以后，需要让容器组件拿到`state`对象，才能生成 UI 组件的参数。
@@ -873,19 +868,17 @@ render(
 )
 ```
 
-上面代码中，`Provider`在根组件外面包了一层，这样一来，`App`的所有子组件通过 `props.store` 就可以拿到`store`了。
-
-
+上面代码中，`Provider`在根组件外面包了一层，这样一来，`App`的所有 `connect` 子组件通过 mapStateToProps拿到state。
 
 ##### 总结
 
-|                |          展示组件          |              容器组件              |
-| :------------: | :------------------------: | :--------------------------------: |
-|      作用      | 描述如何展现（骨架、样式） | 描述如何运行（数据获取、状态更新） |
-| 直接使用 Redux |             否             |                 是                 |
-|    数据来源    |           props            |          监听 Redux state          |
-|    数据修改    |   从 props 调用回调函数    |       向 Redux 派发 actions        |
-|    生成方式    |            手动            | 通常由 React-Redux  connect()生成  |
+|            | 展示组件           | 容器组件                         |
+|:----------:|:--------------:|:----------------------------:|
+| 作用         | 描述如何展现（骨架、样式）  | 描述如何运行（数据获取、状态更新）            |
+| 直接使用 Redux | 否              | 是                            |
+| 数据来源       | props          | 监听 Redux state               |
+| 数据修改       | 从 props 调用回调函数 | 向 Redux 派发 actions           |
+| 生成方式       | 手动             | 通常由 React-Redux  connect()生成 |
 
 大部分的组件都应该是展示型的，但一般需要少数的几个容器组件把它们和 Redux store 连接起来。
 
@@ -899,7 +892,7 @@ Redux 和 React 之间没有关系。Redux 支持 React、Angular、Ember、jQue
 
 Redux和React-Redux是两个概念。
 
-#####  传入 Store
+##### 传入 Store
 
  React Redux 组件 <Provider> 来让所有容器组件都可以访问 store，而不必显式地传递它。只需要在渲染根组件时使用即可。
 
@@ -1085,7 +1078,7 @@ import promiseMiddleware from 'redux-promise';
 const fetchPosts = 
   (dispatch, postTitle) => new Promise(function (resolve, reject) {
     // ...
-		});
+        });
 });
 ```
 
@@ -1199,7 +1192,7 @@ redux-saga框架提供了很多创建effect的函数，下面我们就来简单�
 
 ```js
 import {
-	// some Effect Creators
+    // some Effect Creators
 } from 'redux-saga/effects'
 ```
 
@@ -1298,7 +1291,7 @@ redux-saga提供了一些辅助函数，用来在一些特定的action 被发起
 
 ```js
 import {
-	// some Saga 辅助函数
+    // some Saga 辅助函数
 } from 'redux-saga'
 ```
 
@@ -1640,7 +1633,7 @@ import { persistStore, persistReducer } from 'redux-persist'
 import sessionStorage from 'redux-persist/lib/storage/session'
 
 import rootReducer from './reducers'
- 
+
 
 const persistConfig = {
   key: 'root', // 必须有的
@@ -1673,8 +1666,6 @@ const App = () => {
   );
 };
 ```
-
-
 
 #### Redux-DevTools 使用
 
@@ -1723,4 +1714,3 @@ https://www.reduxjs.cn/introduction/examples
 #### 学习资源
 
 https://www.reduxjs.cn/introduction/learning-resources
-

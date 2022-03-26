@@ -121,7 +121,7 @@ console.log(window.location.hash) // '#product'
 
 // 监听hash变化，点击浏览器的前进后退会触发
 window.addEventListener('hashchange', function(){ 
-    
+
 })
 
 // 或者在body上加上onhashchange
@@ -138,7 +138,7 @@ Hash history 不需要服务器任何配置就可以运行，如果你刚刚入�
 
 在 DOM API 中，这些 hash history 通过 `window.location.hash = newHash` 很简单地被用于跳转，且不用存储它们的location state。但我们想全部的 history 都能够使用location state，因此我们要为每一个 location 创建一个唯一的 key，并把它们的状态存储在 session storage 中。当访客点击“后退”和“前进”时，我们就会有一个机制去恢复这些 location state。
 
-##### **createMemoryHistory**
+##### createMemoryHistory
 
 Memory history 不会在地址栏被操作或读取。这就解释了我们是如何实现服务器渲染的。同时它也非常适合测试和其他的渲染环境（像 React Native ）。
 
@@ -199,8 +199,6 @@ https://react.docschina.org/docs/code-splitting.html#import
 https://serverless-stack.com/chapters/code-splitting-in-create-react-app.html
 
 create-react-app文档
-
-
 
 ##### 路由的动态加载模块
 
@@ -341,8 +339,6 @@ package.json
 }
 ```
 
-
-
 - **loadable-components（不建议使用）**
 
 ```js
@@ -384,7 +380,7 @@ const LoadableComponent = Loadable({
   loader: () => import('./my-component'),
   loading: Loading,
 });
- 
+
 export default class App extends React.Component {
   render() {
     return <LoadableComponent/>;
@@ -435,8 +431,6 @@ require.ensure(
 - `errorCallback`：当 webpack 加载依赖失败时会执行此函数。
 - `chunkName`：由 `require.ensure` 创建的 chunk 的名称。通过将相同 `chunkName` 传递给不同的 `require.ensure` 调用，我们可以将其代码合并到一个单独的 chunk 中，从而只产生一个浏览器必须加载的 bundle。
 
-
-
 Route 可以定义 [`getChildRoutes`](http://react-guide.github.io/react-router-cn/docs/guides/advanced/docs/API.md#getchildrouteslocation-callback)，[`getIndexRoute`](http://react-guide.github.io/react-router-cn/docs/guides/advanced/docs/API.md#getindexroutelocation-callback) 和 [`getComponents`](http://react-guide.github.io/react-router-cn/docs/guides/advanced/docs/API.md#getcomponentslocation-callback) 这几个函数。它们都是异步执行，并且只有在需要时才被调用。我们将这种方式称之为 “逐渐匹配”。 React Router 会逐渐的匹配 URL 并只加载该 URL 对应页面所需的路径配置和组件。
 
 如果配合 [webpack](http://webpack.github.io/) 这类的代码分拆工具使用的话，一个原本繁琐的构架就会变得更简洁明了。
@@ -470,8 +464,6 @@ const CourseRoute = {
   }
 }
 ```
-
-
 
 #### API
 
@@ -534,8 +526,6 @@ ReactDOM.render(<Router history={customHistory} />, node);
 ###### onUpdate()
 
 当 URL 改变时，需要更新路由的 state 时会被调用。
-
-
 
 ##### BrowserRouter
 
@@ -662,6 +652,7 @@ Hash history 不支持 `location.key` or `location.state`，但它的兼容性�
 用于window.location.hash的编码类型，有效值为：
 
 - `"slash"` - Creates hashes like `#/` and `#/sunshine/lollipops` ，默认值为 slash
+
 - `"noslash"` - Creates hashes like `#` and `#sunshine/lollipops`
 
 - `"hashbang"` - Creates [“ajax crawlable”](https://developers.google.com/webmasters/ajax-crawling/docs/learn-more) (被谷歌反对) hashes like `#!/` and `#!/sunshine/lollipops`
@@ -671,8 +662,6 @@ Hash history 不支持 `location.key` or `location.state`，但它的兼容性�
 ###### children：node
 
 单个被渲染的子元素。
-
-
 
 ##### MemoryRouter
 
@@ -713,8 +702,6 @@ loaction.key 的长度，默认为6。
 ###### children：node
 
 渲染的子元素。若 React 版本小于16：渲染多个子元素时必须用一个根元素包裹。
-
-
 
 ##### Link
 
@@ -800,8 +787,6 @@ loaction 作为参数，应当返回以字符串形式或对象形式代表的 l
 // 当链接激活时，修改它的样式
 <Link to="/users" style={{color: 'white'}} activeStyle={{color: 'red'}}>Users</Link>
 ```
-
-
 
 ##### NavLink
 
@@ -919,8 +904,6 @@ aria-current属性应用在处于激活状态的链接，有效值为：
 
 在when={true}或when={false}时以相应地阻止（true）或允许（false）导航。
 
-
-
 ##### Redirect
 
 在应用中 `<Redirect>` 可以设置重定向到其他 route 而不改变旧的 URL。
@@ -996,10 +979,10 @@ aria-current属性应用在处于激活状态的链接，有效值为：
 
 当在<Switch>内部渲染<Redirect>时，只能与from结合使用以精确匹配location。
 
-|  path  | location.pathname |  exact  | matches? |
-| :----: | :---------------: | :-----: | :------: |
-| `/one` |    `/one/two`     | `true`  |    no    |
-| `/one` |    `/one/two`     | `false` |   yes    |
+| path   | location.pathname | exact   | matches? |
+|:------:|:-----------------:|:-------:|:--------:|
+| `/one` | `/one/two`        | `true`  | no       |
+| `/one` | `/one/two`        | `false` | yes      |
 
 ###### strict：bool
 
@@ -1011,11 +994,11 @@ aria-current属性应用在处于激活状态的链接，有效值为：
 
 如果为true，则匹配路径是否区分大小写。
 
-|  path  | location.pathname | sensitive | matches? |
-| :----: | :---------------: | :-------: | :------: |
-| `/one` |      `/one`       |  `true`   |   yes    |
-| `/One` |      `/one`       |  `true`   |    no    |
-| `/One` |      `/one`       |  `false`  |   yes    |
+| path   | location.pathname | sensitive | matches? |
+|:------:|:-----------------:|:---------:|:--------:|
+| `/one` | `/one`            | `true`    | yes      |
+| `/One` | `/one`            | `true`    | no       |
+| `/One` | `/one`            | `false`   | yes      |
 
 ###### 其他
 
@@ -1198,10 +1181,10 @@ children函数可以传递路由参数routeProps：match、loaction、history。
 
 如果路由还有子路由，则该路由的 exact 需要设置为false
 
-|  path  | location.pathname |  exact  | matches? |
-| :----: | :---------------: | :-----: | :------: |
-| `/one` |    `/one/two`     | `true`  |    no    |
-| `/one` |    `/one/two`     | `false` |   yes    |
+| path   | location.pathname | exact   | matches? |
+|:------:|:-----------------:|:-------:|:--------:|
+| `/one` | `/one/two`        | `true`  | no       |
+| `/one` | `/one/two`        | `false` | yes      |
 
 ###### strict：bool
 
@@ -1209,11 +1192,11 @@ children函数可以传递路由参数routeProps：match、loaction、history。
 
 当location.pathname中有其他URL段时，strict无效。
 
-|  path   | location.pathname | strict | matches? |
-| :-----: | :---------------: | :----: | -------- |
-| `/one/` |      `/one`       |  true  | no       |
-| `/one/` |      `/one/`      |  true  | yes      |
-| `/one/` |    `/one/two`     |  true  | yes      |
+| path    | location.pathname | strict | matches? |
+|:-------:|:-----------------:|:------:| -------- |
+| `/one/` | `/one`            | true   | no       |
+| `/one/` | `/one/`           | true   | yes      |
+| `/one/` | `/one/two`        | true   | yes      |
 
 strict 可以用来强制 location.pathname 不能有尾部斜杠，但要做到这一点，strict 和 excat 都必须是真的。
 
@@ -1246,20 +1229,20 @@ location 对象包含有关当前 URL 的信息。形式大概就像这样：
 
 区分大小写。
 
-|  path  | location.pathname | sensitive | matches? |
-| :----: | :---------------: | :-------: | :------: |
-| `/one` |      `/one`       |  `true`   |   yes    |
-| `/One` |      `/one`       |  `true`   |    no    |
-| `/One` |      `/one`       |  `false`  |   yes    |
+| path   | location.pathname | sensitive | matches? |
+|:------:|:-----------------:|:---------:|:--------:|
+| `/one` | `/one`            | `true`    | yes      |
+| `/One` | `/one`            | `true`    | no       |
+| `/One` | `/one`            | `false`   | yes      |
 
 ###### getComponent(location, callback)
 
 与`component`属性 相比，它是异步的，能够实现按需加载，对于 code-splitting（代码分割）很有用。
 
-- ###### callback 
-
+- ###### callback
+  
   cb(err, component)
-
+  
   ```jsx
   <Route path="courses/:courseId" getComponent={(location, cb) => {
     // 做一些异步操作去查找组件
@@ -1435,7 +1418,7 @@ generatePath("/user/:id/:entity(posts|comments)", { id: 1 });
 - “hash history” - 传统web浏览器的特定于DOM的实现
 - “memory history” - 缓存history的实现，在测试和非DOM环境（如React Native）中非常有用
 
->本文档中的 `history`是React Router的`history`包，不是 [window.history](https://developer.mozilla.org/zh-CN/docs/Web/API/History)
+> 本文档中的 `history`是React Router的`history`包，不是 [window.history](https://developer.mozilla.org/zh-CN/docs/Web/API/History)
 
  history对象通常具有以下属性和方法：
 
@@ -1769,7 +1752,7 @@ class Container extends React.Component {
 ```jsx
 // 在上面的代码中，根路由只会在精确匹配时才具有activeClassName属性
 <IndexLink to="/" activeClassName="active" onlyActiveOnIndex={true}>
-	Home
+    Home
 </IndexLink>
 ```
 
@@ -1777,7 +1760,7 @@ class Container extends React.Component {
 
 ```jsx
 <Link to="/" activeClassName="active" onlyActiveOnIndex={true}>
-	Home
+    Home
 </Link>
 ```
 
@@ -1833,9 +1816,9 @@ React.render((
 
 现在看起来如下：
 
-| URL  | 组件               |
-| ---- | ------------------ |
-| `/`  | `App -> Dashboard` |
+| URL | 组件                 |
+| --- | ------------------ |
+| `/` | `App -> Dashboard` |
 
 ##### IndexRedirect
 
@@ -1868,7 +1851,7 @@ React.render((
 
 我们现在的 URL 对应关系如下：
 
-| URL             | 组件                      |
+| URL             | 组件                        |
 | --------------- | ------------------------- |
 | `/`             | `App -> Dashboard`        |
 | `/about`        | `App -> About`            |
@@ -1876,8 +1859,6 @@ React.render((
 | `/messages/:id` | `App -> Inbox -> Message` |
 
 **提醒**：绝对路径可能在[动态路由](http://react-guide.github.io/react-router-cn/docs/guides/basics/docs/guides/advanced/DynamicRouting.md)中无法使用。
-
-
 
 ##### RoutingContext
 
@@ -2038,7 +2019,7 @@ export interface IRouteViewProps {
 const RouteView = (props: IRouteViewProps) => {
   return (
     <Switch>
-    	{redirect && <Redirect {...redirect} />}
+        {redirect && <Redirect {...redirect} />}
       <Route
         path={props.path}
         render={routeProps => {
@@ -2051,10 +2032,10 @@ const RouteView = (props: IRouteViewProps) => {
                     <RouteViewContainer {...route} key={index} />
                   ))}
                 </Switch>
-            	 )}
+                 )}
             </props.component>
           ) : null
-      	}}
+          }}
       ></Route>
     <Switch/>
   )
@@ -2104,8 +2085,6 @@ import App from './App';
 
 ReactDOM.render(<App />, document.getElementById('root'));
 ```
-
-
 
 ##### 集中式路由配置（JS对象）
 
@@ -2221,8 +2200,6 @@ let myRoute = {
   }
 }
 ```
-
-
 
 #### Route Components（路由配对时渲染的组件）
 
@@ -2398,8 +2375,6 @@ class Users extends React.Component {
   }
 }
 ```
-
-
 
 #### Mixins和生命周期
 
@@ -2856,20 +2831,21 @@ State参数在url中不可见
 const {state}=this.props.location
 ```
 
->1、BrowserRouter(history)模式下，刷新页面参数**不消失**，参数不会在地址栏显示，因为state保存在history对象中
->2、HashRouter(hash)模式下，刷新页面参数**消失**！！！参数不会在地址栏显示
+> 1、BrowserRouter(history)模式下，刷新页面参数**不消失**，参数不会在地址栏显示，因为state保存在history对象中
+> 2、HashRouter(hash)模式下，刷新页面参数**消失**！！！参数不会在地址栏显示
 
 #### 404
 
 ```jsx
 <Route path="*">
-	<NoMatch />
+    <NoMatch />
 </Route>
 ```
 
 #### 解决路径刷新页面样式丢失问题
+
 1. pub1ic/ index.html 中引入样式时不使用相对路径，使用绝对路径，即将 `./`改为 `/`
-2.  pub1ic/ index.html 中引入样式时不使用相对路径，使用绝对路径，即将 `./`改为 `%PUBLIC_URL%`，只适用于react脚手架， `%PUBLIC_URL%`是 public 文件夹的路径
+2. pub1ic/ index.html 中引入样式时不使用相对路径，使用绝对路径，即将 `./`改为 `%PUBLIC_URL%`，只适用于react脚手架， `%PUBLIC_URL%`是 public 文件夹的路径
 3. 使用 HashRouter
 
 #### TS 手动引入路由组件属性类型
