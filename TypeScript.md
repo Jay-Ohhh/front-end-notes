@@ -785,19 +785,119 @@ interface ObjectInterface {
 
 #### type与interface的区别
 
-1. type可以声明 基本类型，联合类型，交叉类型的别名，interface不行
+##### 相似之处
+
+1. `interface `和` type` 都可以被继承
+
+2. 类可以实现（implements）`interface` 以及 `type`(除联合类型外)
+
+
+
+##### 区别
+
+1. type可以声明 基本类型，联合类型，交叉类型，元组，interface不行
 
 2. type 语句中可以使用 typeof 获取类型实例
 
-3. interface能够声明合并，type不能
+3. `interface` 能够声明合并，`type`不能
 
-4. 类型别名不能被 `extends` 
-   
-   因此，公共或基础类型应该用 interface 声明，方便被extends。不过也可以用 type 声明，用交叉类型来扩展。
+4. type不能用于多态this类型
 
-5. type不能用于多态this类型
+5. type 支持类型映射，interface不支持
 
-多态 this 类型仅适用于接口：
+6. **由于interfac可以进行声明合并**，所以总有可能将新成员添加到同一个interface定义的类型上。**在使用interface去声明变量时，它们在那一刻类型并不是最终的类型**。会导致索引签名问题。
+
+
+
+- **索引签名问题**
+
+```typescript
+interface propType{
+    [key: string] : string
+}
+
+let props: propType
+
+type dataType = {
+    title: string
+}
+interface dataType1 {
+    title: string
+}
+const data: dataType = {title: "订单页面"}
+const data1: dataType1 = {title: "订单页面"}
+props = data
+// Error:类型“dataType1”不可分配给类型“propType”; 类型“dataType1”中缺少索引签名 
+props = data1
+
+```
+
+
+
+- **interface 继承 interface**
+
+```typescript
+interface Person{
+    name:string
+}
+
+interface Student extends Person { stuNo: number }
+```
+
+- **interface 继承 type**
+
+```typescript
+type Person{
+    name:string
+}
+
+interface Student extends Person { stuNo: number }
+```
+
+- **type 继承 type**
+
+```typescipt
+type Person{
+    name:string
+}
+
+type Student = Person & { stuNo: number }
+```
+
+- **type 继承 interface**
+
+```typescript
+interface Person{
+    name:string
+}
+
+type Student = Person & { stuNo: number }
+```
+
+- **声明合并**
+
+```typescript
+interface Person { name: string }
+interface Person { age: number }
+
+let user: Person = {
+    name: "Tolu",
+    age: 0,
+};
+```
+
+这种情况下，如果是`type`的话，重复使用`Person`是会报错的：
+
+```typescript
+type Person { name: string }; 
+
+// Error: 标识符“Person”重复。ts(2300)
+type Person { age: number }
+```
+
+
+
+- 多态 this 类型仅适用于接口：
 
 ```ts
 interface AddsStrings {
@@ -812,7 +912,7 @@ class StringBuilder implements AddsStrings {
 }
 ```
 
-6. type 支持类型映射，interface不支持：
+- type 支持类型映射，interface不支持：
 
 ```ts
 interface Point {  
@@ -822,10 +922,11 @@ interface Point {
 type PointCopy1 = {  
   [Key in keyof Point]: Point[Key];
 };
+
 // Syntax error:
-// interface PointCopy2 {
-//   [Key in keyof Point]: Point[Key];
-// };
+interface PointCopy2 {
+  [Key in keyof Point]: Point[Key];
+};
 ```
 
 #### 类型解构
@@ -3649,8 +3750,6 @@ ES5的继承，实质是先创造子类的实例对象，然后再将父类属�
 
 class的继承， 实质是先创造父类的实例对象，然后再将子类属性添加到实例对象上面。必须先通过父类的构造函数完成塑造，然后再对其加工，加上子类自身的属性。如果不调用super方法，子类就得不到父类的实例对象。
 
-
-
 ###### 注意点
 
 **（1）严格模式**
@@ -6087,7 +6186,11 @@ type Parameters<T extends (...args: any) => any> = T extends (...args: infer P) 
 ```
 
 ```ts
+function a (){}
+
 type A = Parameters<() => void>; // []
+// or
+type A = Parameters<typeof a>; // []
 ```
 
 ##### `ConstructorParameters<T>`

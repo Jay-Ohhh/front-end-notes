@@ -2813,6 +2813,8 @@ State参数在url中不可见
 
 通过`history.push(path, state)`的**state**仅在 browser history 和 memory history中有效。
 
+hash history 不支持 `location.key`或`location.state`
+
 路由链接（携带参数）：
 
 ```jsx
@@ -2832,7 +2834,6 @@ const {state}=this.props.location
 ```
 
 > 1、BrowserRouter(history)模式下，刷新页面参数**不消失**，参数不会在地址栏显示，因为state保存在history对象中
-> 2、HashRouter(hash)模式下，刷新页面参数**消失**！！！参数不会在地址栏显示
 
 #### 404
 

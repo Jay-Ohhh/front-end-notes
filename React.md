@@ -1412,7 +1412,7 @@ class MyComponent extends React.Component {
 
 ###### React.forwardRef
 
-`React.forwardRef` 会创建一个React组件，这个组件能够将其接受的 [ref](https://react.docschina.org/docs/refs-and-the-dom.html) 属性转发到其组件树下的另一个组件中（将子组件的DOM直接暴露给了父组件）。这种技术并不常见，但在以下两种场景中特别有用：
+`React.forwardRef` 会创建一个React组件，这个组件能够将其接受的 [ref](https://react.docschina.org/docs/refs-and-the-dom.html) 属性转发到其组件树下的另一个组件中（将子组件的DOM或方法等直接暴露给了父组件）。这种技术并不常见，但在以下两种场景中特别有用：
 
 - [转发 refs 到 DOM 组件](https://react.docschina.org/docs/forwarding-refs.html#forwarding-refs-to-dom-components)
 - [在高阶组件中转发 refs](https://react.docschina.org/docs/forwarding-refs.html#forwarding-refs-in-higher-order-components)
@@ -1822,7 +1822,9 @@ setState(updater, [callback])
 
 目前，在 React 管理的事件回调和生命周期中，setState 是异步的，而其他时候 setState 都是同步的。这个问题根本原因就是 React 在自己管理的事件回调和生命周期中，对于 setState 是批量更新的，而在其他时候是立即更新的。
 
-> 在setTimeout和原生DOM事件中，setState是同步的
+> 在setTimeout和原生DOM事件中，setState是同步的。
+> 
+> 异步调用中，执行 setState，由于丢失了上下文，无法做合并处理，所以每次 setState 调用都会触发一次 re-render。
 
 `setState()` 并不**总**是立即更新组件。它会批量推迟更新。这使得在调用 `setState()` 后立即读取 `this.state` 成为了隐患。为了消除隐患，请使用 `componentDidUpdate` 或者 `setState` 的回调函数（`setState(updater, callback)`），这两种方式都可以保证在应用更新后触发。如需基于之前的 state 来设置当前的 state，请阅读下述关于参数 `updater` 的内容。
 
@@ -5481,6 +5483,29 @@ class Parent extends React.Component {
 **关于回调 refs 的说明**
 
 如果 `ref` 回调函数是以内联函数的方式定义的，在更新过程中它会被执行两次，第一次传入参数 `null`，然后第二次会传入参数 DOM 元素或 React 组件实例。这是因为在每次渲染时会创建一个新的函数实例，所以 React 清空旧的 ref 并且设置新的。通过将 ref 的回调函数定义成 class 的绑定函数（constructor内绑定）的方式可以避免上述问题，但是大多数情况下它是无关紧要的。
+
+##### How to share ref （将组件内部属性暴露出去）
+
+- React.forwardRef
+
+- ```jsx
+  const MyComponent = () => {
+    const handlers = useSwipeable({ onSwiped: () => console.log('swiped') })
+  
+    // setup ref for your usage
+    const myRef = React.useRef();
+  
+    const refPassthrough = (el) => { // 该函数可以从外部传进来
+      // call useSwipeable ref prop with el
+      handlers.ref(el);
+  
+      // set myRef el so you can access it yourself
+      myRef.current = el;
+    }
+  
+    return (<div {...handlers} ref={refPassthrough} />
+  }
+  ```
 
 ##### Render Prop（共享代码）
 
