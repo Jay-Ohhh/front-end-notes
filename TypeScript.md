@@ -3733,7 +3733,7 @@ person.sayName(); // "张三"
 
 ```js
 class Animal {
-     constructor(name) {
+    constructor(name) {
     this.name = name;
   }
 }
@@ -3888,7 +3888,7 @@ const logger = selfish(new Logger());
 
 ###### 静态成员
 
-**（1）静态方法**
+**1. 静态方法**
 
 类相当于实例的原型，所有在类中定义的方法，都会被实例继承。如果在一个方法前，加上`static`关键字，就表示该方法不会被实例继承，而是直接通过类来调用，这就称为“静态方法”。 静态方法可以与非静态方法重名。 
 
@@ -3957,7 +3957,7 @@ class Bar extends Foo {
 Bar.classMethod() // "hello, too"
 ```
 
-**（2）静态属性**
+**2.  静态属性**
 
 静态属性指的是 Class 本身的属性，即`Class.propName`，而不是定义在实例对象（`this`）上的属性。
 

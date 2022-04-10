@@ -322,6 +322,15 @@ class MySocket {
 	protected onError: ((data: object) => void) | undefined;
 	protected reconnectCount: number; // 重连次数
 
+	// 单例模式
+	static instanceMap = new Map<string, MySocket>();
+	static getInstance(props: MySocketProps) {
+		if (!this.instanceMap.has(props.url)) {
+			this.instanceMap.set(props.url, new MySocket(props));
+		}
+		return this.instanceMap.get(props.url)!;
+	}
+
 	constructor(props: MySocketProps) {
 		this.socket = null;
 		this.url = props.url;
@@ -428,8 +437,21 @@ class MySocket {
 		this.socket && this.socket.close();
 		this.clearAllTimer();
 		this.socket = null;
+		MySocket.instanceMap.delete(this.url);
 	}
 }
+
+// 不要暴露 MyScoket，而是暴露 SingleSocket 给使用者
+export class SingleSocket {
+	instance: MySocket;
+	constructor(props: MySocketProps) {
+		this.instance = MySocket.getInstance(props);
+	}
+}
+
+// 使用
+const socketInstance = new SingleSocket({ url: '123' }).instance;
+socketInstance.init();
 
 ```
 
