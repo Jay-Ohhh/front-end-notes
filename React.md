@@ -8428,7 +8428,11 @@ module.exports = {
 
 如果一个组件的state中的某个数据来自prop，就将该数据称之为派生状态。
 
-#### [性能优化](https://mp.weixin.qq.com/s?__biz=Mzg2NDAzMjE5NQ==&mid=2247488520&idx=1&sn=726952e0144efa93bf60dc9faf7631f6&chksm=ce6ed0a4f91959b22719d6679d2efec24f51cbbfa5d0cf027e2f087b6b686e6834c609e38ee6&mpshare=1&scene=1&srcid=0331U6V7NKeG2nd5DVXIwKVp&sharer_sharetime=1617795727517&sharer_shareid=27dcefb05bb42e9bc0099d713541b753&key=57e1fc72bbd501350975280e1b5bf504d6ec8bcefe7c46df6ee28c16dcc462d3d4e88cec8be61b8bd5028a2ce4a710ff34e5ef2266b635a7b7310050aca9187a6b682594413eb8d26c1d15aa81cdce249d4035f12fcc406aa2027858a80afa418cfd22690beec3bbc99123e76e46101079aa70253de1c1291f1132c5116f93ab&ascene=1&uin=NjMxODk4NDM4&devicetype=Windows+7+x64&version=62090529&lang=zh_CN&exportkey=AU4S22Wf9vC9t8m2TmZ2m64%3D&pass_ticket=qd6n4VfoLUbV%2BmeLBAR6v9m0XmSt6qVoS7gykW3W0rq9g8Jbr2vJ5T7BWLiKD1F8&wx_header=0)
+#### 性能优化
+
+https://mp.weixin.qq.com/s?__biz=Mzk0MDMwMzQyOA==&mid=2247490708&idx=1&sn=9c8d5cb72877c0dd0960bcfdd6af146a&source=41#wechat_redirect
+
+https://zhuanlan.zhihu.com/p/120748634
 
 ##### React工作流
 

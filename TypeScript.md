@@ -302,6 +302,10 @@ object 类型表示除上述原始类型以外的非原始类型， 使用这种
 
 接口类型与 object 类型相比，用接口表示对象的类型会更加具体。
 
+`Record<string, any>` 也可以创建了一个 key 为任意 string，value 为任意类型的索引类型。
+
+
+
 **Object 类型**
 
 TypeScript 定义了另一个与新的 object 类型几乎同名的类型，那就是 Object 类型。该类型是所有 Object 类的实例的类型。它由以下两个接口来定义：
@@ -4173,6 +4177,26 @@ var y = new Rectangle(3, 4);  // 正确
 
 上面代码中，`Shape`类不能被实例化，只能用于继承。
 
+
+
+###### 实例方法是可以指定 this 的类型的
+
+```ts
+class Dong {
+    name: string;
+
+    constructor() {
+        this.name = "dong";
+    }
+
+    hello(this: Dong) {
+        return 'hello, I\'m ' + this.name;
+    }
+}
+```
+
+这样，就只能限定this的指向，当 bind/call/apply 调用的时候，就会报错，并检查出 this 指向的对象是否是对的。
+
 ##### TypeScript中类的用法
 
 当我们在声明 `class Demo` 时，除了会创建一个名为 `Demo` 的类之外，同时也创建了一个名为 `Demo` 的类型（实例类型—对应的接口），详细解释请查看 **接口继承类** 章节。 
@@ -5757,7 +5781,21 @@ TypeScript 通过 keyof 操作符遍历某种类型的属性，并提取其属�
 
 如果**T**是一个类型，那么**keyof T**产生的类型是**T**里面的属性名称字符串字面量类型构成的联合类型。
 
-在 TypeScript 中支持两种索引签名，数字索引和字符串索引。
+
+
+在 TypeScript 中的索引签名支持 string、number、symbol 这三种类型的。
+
+那我知道了，要 K extends string | number | symbol 。
+
+不不不，TypeScript 有个编译选项叫做 keyofStringsOnly，开启了那么就就只会用 string 作为索引，否则才是 string ｜ number | symbol：
+
+```ts
+// 不开启 keyofStringsOnly 时：
+type res = k extends any // string | number | symbol
+// 开启 keyofStringsOnly 时：
+type res = k extends any // string
+// 因此根据keyofStringsOnly对属性类型的需求，用 keyof any 动态获取比写死 string | number | symbol 更好。
+```
 
 ```ts
 // 接口
@@ -5800,6 +5838,8 @@ JavaScript 在执行索引操作时，会先把数值索引先转换为字符串
 
 `in` 用来遍历枚举类型：
 
+in 后跟的是键的联合类型（可keyof用生成）
+
 ```ts
 type Keys = "a" | "b" | "c"
 
@@ -5807,6 +5847,12 @@ type Obj =  {
   [p in Keys]: any
 } // -> { a: any, b: any, c: any }
 ```
+
+##### -
+
+去掉已有的修饰的，用 - 号，减去的意思：
+
+比如 `-?` ， `-readonly`
 
 ##### infer
 
@@ -6036,6 +6082,8 @@ type Record<K extends keyof any, T> = {
 };
 ```
 
+`Record<string, any>` 创建了一个 key 为任意 string，value 为任意类型的索引类型
+
 设置对象的属性（key）或者属性值（value）的类型
 
 ```ts
@@ -6205,6 +6253,34 @@ type ConstructorParameters<T extends new (...args: any) => any> = T extends new 
 type A = ConstructorParameters<FunctionConstructor>; // string[]
 ```
 
+
+
+##### ThisParameterType<T>
+
+用于提取 方法参数中 this 的类型
+
+```ts
+type ThisParameterType<T> = T extends (this: infer U, ...args: any[]) => any ? U : unknown
+```
+
+```ts
+class Dong {
+  name: string;
+
+  constructor() {
+      this.name = "dong";
+  }
+
+  hello(this: Dong) {
+      return 'hello, I\'m ' + this.name;
+  }
+}
+const dong = new Dong()
+type res = ThisParameterType<typeof dong.hello> // Dong
+```
+
+
+
 #### Mixins
 
 ### 工具
@@ -6365,6 +6441,7 @@ tsc index.ts --allowJs
     "noUnusedParameters": true,  /* 用于检查是否有在函数体中没有使用的参数，这个也可以配合eslint来做检查，默认为false */
     "noImplicitReturns": true,   /* 用于检查函数是否有返回值，设为true后，如果函数没有返回值则会提示，默认为false */
     "noFallthroughCasesInSwitch": true,   /* 用于检查switch中是否有case没有使用break跳出switch，默认为false */
+    keyofStringsOnly: false,  /* 开启了那么就就只会用 string 作为索引，否则才是 string ｜ number | symbol */
 
     /* Module Resolution Options */
     "moduleResolution": "node",            /* 用于选择模块解析策略，有'node'和'classic'两种类型' */

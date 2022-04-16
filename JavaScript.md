@@ -1,6 +1,64 @@
-https://wangdoc.com/javascript/index.html
-
 https://wangdoc.com/es6/index.html
+
+#### 数据类型
+
+原始类型：undefined、null、string、number、boolean、symbol（ES6）、bigInt（ES2020）
+
+引用类型（复杂数据类型）：对象(Object)、数组(Array)、函数(Function)等
+
+
+
+##### 判断
+
+###### typeof
+
+可以判断出string、number、boolean、symbol 、bigInt
+
+但判断 typeof(null) 时值为 'object'; 判断数组和对象时值均为 'object'，判断函数为'function'
+
+
+
+###### Object.prototype.toString.call()
+
+```js
+Object.prototype.toString.call('') // '[object String]'
+Object.prototype.toString.call(1) // '[object Number]'
+Object.prototype.toString.call([]) // '[object Array]'
+Object.prototype.toString.call(undefined) //'[object Undefined]'
+Object.prototype.toString.call(null) // '[object Null]'
+```
+
+###### NaN 如何判断
+
+NaN是一个特殊的数字值(typeof *NaN*的结果为number)，是not a number的缩写，表示非数字的值。
+
+利用`NaN`自身永不相等于自身这一特征
+
+```js
+var myIsNaN = function(value) {
+    var n = Number(value);
+    return n !== n;
+};
+```
+
+
+
+#### void 0和undefined的区别
+
+void其实是javascript中的一个函数，接受一个参数，返回值永远是undefined。可以说，使用void目的就是为了得到javascript中的undefined。So `void 0` is a correct and standard way to produce `undefined`.
+
+使用 void 0 的原因
+
+- 使用void 0比使用undefined能够减少3个字节。
+
+  ```js
+  "undefined".length"; //9  
+  "void 0".length"; //6  
+  ```
+
+- undefined并不是javascript中的保留字，我们可以使用undefined作为变量名字，然后给它赋值。这样就会导致不一定会返回undefined，而void 0却永远可以保证。
+
+
 
 #### var、let、const
 
