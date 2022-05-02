@@ -26,7 +26,10 @@ Object.prototype.toString.call(1) // '[object Number]'
 Object.prototype.toString.call([]) // '[object Array]'
 Object.prototype.toString.call(undefined) //'[object Undefined]'
 Object.prototype.toString.call(null) // '[object Null]'
+Object.prototype.toString.call(()=>{}) // '[object Function]'
 ```
+
+
 
 ###### NaN 如何判断
 
@@ -253,7 +256,7 @@ console.log(fn) // 1
 
 #### this指向
 
-> 对象没有this，this是在函数里指向对象的。
+> 对象没有this，this是在函数里指向对象的，this是函数的隐式参数。
 
 1、非严格模式，普通函数的this指向全局对象，普通函数是在全局对象里的函数，调用普通函数，其实就是全局对象在调用。
 
@@ -3408,6 +3411,10 @@ JavaScript 代码运行时，会产生一个全局的上下文环境（context�
 但是Generator函数是例外的：
 
 Generator 函数不是这样，它执行产生的上下文环境，一旦遇到`yield`命令，就会暂时退出堆栈，但是并不消失，里面的所有变量和对象会冻结在当前状态。等到对它执行`next`命令时，这个上下文环境又会重新加入调用栈，冻结的变量和对象恢复执行。
+
+#### Web Worker
+
+https://mp.weixin.qq.com/s/OLUN9mHw3S3oBsfd6SONcw
 
 #### FormData
 

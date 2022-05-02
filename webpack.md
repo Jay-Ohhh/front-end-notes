@@ -1647,11 +1647,14 @@ if (!isDevMode) {
                         {
                             loader: MiniCssExtractPlugin.loader,
                             /**
-                             * publicPath默认是output.path（构建目录）
-                             * MiniCssExtractPlugin将.css文件打包在构建目录下的CSS目录下
+                             * publicPath默认是output.publicPath
+                             * MiniCssExtractPlugin将.css文件打包在构建目录dist的CSS目录下
                              * url-loader和file-loader将图片、字体、视频文件打包在构建目录下的对应目录下
                              * 例如1.css文件中 background:url('@/assets/images/1.png')，打包后css文件目录为 dist/css/1.css, 图片文件目录为 dist/images/1.png，css文件夹和images文件夹同级
                              * 打包后的1.css文件中 background:url('../images/1.png')
+                             *
+                             * 如果dist里面的静态资源放在CDN服务器（不包括dist本身），output.publicPath设置为CDN地址，则无需设置以下的publicPath
+                             * 例如：打包后的1.css文件中 background:url('CDN-URL/images/1.png')
                              */
                             options: {
                                 publicPath: '../',

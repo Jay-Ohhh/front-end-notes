@@ -100,6 +100,11 @@ Yaml 也允许另一种写法，将所有键值对写成一个行内对象。
 对象和数组可以结合使用，形成复合结构。
 
 > ```yaml
+> address:
+>   -a: 北京
+>    b: 海淀区
+>   -a: 深圳
+>    b: 南山区
 > languages:
 >  - Ruby
 >  - Perl
@@ -114,12 +119,19 @@ Yaml 也允许另一种写法，将所有键值对写成一个行内对象。
 转为 JavaScript 如下。
 
 > ```javascript
-> { languages: [ 'Ruby', 'Perl', 'Python' ],
->   websites: 
->    { YAML: 'yaml.org',
->      Ruby: 'ruby-lang.org',
->      Python: 'python.org',
->      Perl: 'use.perl.org' } }
+> { 
+>   address:[
+>     {'a': '北京', 'b': '海淀区' },
+>     {'a': '深圳', 'b': '南山区' }
+>   ],
+>   languages: [ 'Ruby', 'Perl', 'Python' ],
+> 	websites: { 
+>     YAML: 'yaml.org',
+>     Ruby: 'ruby-lang.org',
+>     Python: 'python.org',
+>     Perl: 'use.perl.org' 
+> 	}
+> }
 > ```
 
 #### 纯量

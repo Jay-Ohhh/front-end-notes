@@ -933,6 +933,10 @@ interface PointCopy2 {
 };
 ```
 
+#### import/export  type
+
+仅仅导入/导出声明，不会引入/导出运行时内容。
+
 #### 类型解构
 
 在使用类型时，我们可以进行解构
@@ -1250,6 +1254,7 @@ function reverse(x: number | string): number | string {
 ```ts
 function reverse(x: number): number;
 function reverse(x: string): string;
+// 实现签名 对外不可见，而且以下的函数类型并非签名，上面的两个才是
 function reverse(x: number | string): number | string {
     if (typeof x === 'number') {
         return Number(x.toString().split('').reverse().join(''));
@@ -1537,8 +1542,8 @@ interface Cat extends Animal {
 
 既然：
 
-- 任何类型都可以被断言为 any
-- any 可以被断言为任何类型
+- 任何类型都可以被断言为 any 或 unknown
+- any 或 unknown可以被断言为任何类型
 
 那么我们是不是可以使用双重断言 `as any as Foo` 来将任何一个类型断言为任何另一个类型呢？
 
@@ -1557,11 +1562,35 @@ function testCat(cat: Cat) {
 
 在上面的例子中，若直接使用 `cat as Fish` 肯定会报错，因为 `Cat` 和 `Fish` 互相都不兼容。
 
-但是若使用双重断言，将任何一个类型断言为`any`类型，在断言为任何另一个类型。
+但是若使用双重断言，将任何一个类型断言为 `any` 或 `unknown` 类型，在断言为任何另一个类型。
 
 若你使用了这种双重断言，那么十有八九是非常错误的，它很可能会导致运行时错误。
 
 **除非迫不得已，千万别用双重断言。**
+
+`as any as`  VS  `as unknown as`
+
+相同点：两者都是不安全的
+
+区别：
+
+- Linters prefer `unknown` (with `no-explicit-any` rule)
+- `any` is less characters to type than `unknown`
+
+
+
+**as const**
+
+const 断言，它的作用是让里头的所有东西变成只读
+
+```ts
+function a () {
+  let a,b;
+ 	return [a,b] as const;
+}
+```
+
+
 
 **类型断言 vs 类型转换**
 
@@ -2425,16 +2454,18 @@ declare enum Directions {
 ##### export =
 
 `exports` 和 `module.exports` 的关系：
-`exports`会默认设置为`module.exports`的快捷方式,可以往里面添加属性( exports.test ),但是不可以修改它的指向，修改了他的指向,他就和普通的对象没有啥差别,因为在`common.js`里模块对外输出永远是`module.exports`，如果`exports`改变了指向之后,就会不在生效。
+`exports`指向`module.exports`。在`common.js`里模块对外输出永远是`module.exports`。保险起见，可使用两种方式：
+
+- modules.exports.foo = bar
+
+- export.foo = bar
 
 ```js
+// module.exports和exports必须指向同一个值
 exports = module.exports = {};
-```
 
-```ts
-// 兼容CommonJS和AMD的导出
-export = {something1, something2, ..., somethingN};
-export = something;
+// wrong: exports不再指向module.exports
+exports = {};
 ```
 
 在 commonjs 规范中，我们用以下方式来导出一个模块：
@@ -2445,8 +2476,6 @@ module.exports = foo;
 // 单个导出
 exports.bar = bar;
 ```
-
-> 在ts中，不能用`exports` 和 `module.exports` 
 
 在 ts 中，针对commonjs模块导出，有多种方式可以导入：
 
@@ -2493,9 +2522,9 @@ declare namespace foo {
 
 需要注意的是，上例中使用了 `export =` 之后，就不能再单个导出 `export { bar }` 了。所以我们通过声明合并，使用 `declare namespace foo` 来将 `bar` 合并到 `foo` 里。
 
-准确地讲，`export =` 不仅可以用在声明文件中，也可以用在普通的 ts 文件中。实际上，`import ... require` 和 `export =` 都是 ts 为了兼容 AMD 规范和 commonjs 规范而创立的新语法，由于并不常用也不推荐使用，所以这里就不详细介绍了，感兴趣的可以看[官方文档](https://www.typescriptlang.org/docs/handbook/modules.html#export--and-import--require)。
+准确地讲，`export =` 不仅可以用在声明文件中，也可以用在普通的 ts 文件中。实际上，`import ... require` 和 `export =` 都是 **ts 为了兼容 AMD 规范和 commonjs 规范而创立的新语法**，由于并不常用也不推荐使用，所以这里就不详细介绍了，感兴趣的可以看[官方文档](https://www.typescriptlang.org/docs/handbook/modules.html#export--and-import--require)。
 
-由于很多第三方库是 commonjs 规范的，所以声明文件也就不得不用到 `export =` 这种语法了。但是还是需要再强调下，相比与 `export =`，我们更推荐使用 ES6 标准的 `export default` 和 `export`。 
+由于很多第三方库是 commonjs 规范的，所以声明文件也就不得不用到 `export =` 这种语法了。但是还是需要再强调下，相比于 `export =`，我们更推荐使用 ES6 标准的 `export default` 和 `export`。 
 
 ##### UMD 库
 
@@ -4827,7 +4856,7 @@ function s({ a }: E) {}
 
 - 把类型当作参数传递
 
-泛型可跟在函数名、类名、接口名、类型别名 的后面，数组、对象的前面。
+泛型可跟在函数名、类名、接口名、类型别名 的后面，数组、对象、箭头函数的前面。
 
 **简单的例子**
 
@@ -6257,7 +6286,7 @@ type A = ConstructorParameters<FunctionConstructor>; // string[]
 
 ##### ThisParameterType<T>
 
-用于提取 方法参数中 this 的类型
+用于提取 函数/方法参数中 this 的类型
 
 ```ts
 type ThisParameterType<T> = T extends (this: infer U, ...args: any[]) => any ? U : unknown
@@ -6404,76 +6433,76 @@ tsc index.ts --allowJs
     "target": "es5" /* target用于指定编译后js文件里的语法应该遵循哪个JavaScript的版本的版本目标: 'ES3' (default), 'ES5', 'ES2015', 'ES2016', 'ES2017', 'ES2018', 'ES2019' or 'ESNEXT'. */,
     "module": "commonjs" /* 用来指定编译后的js要使用的模块标准: 'none', 'commonjs', 'amd', 'system', 'umd', 'es2015', or 'ESNext'. */,
     "lib": ["dom", "dom.iterable", "esnext"] /* 编译过程中需要引入的库文件的列表 */,
-    "allowJs": true, /* allowJs设置的值为true或false，用来指定是否允许编译js文件，默认是false，即不编译js文件 */
-    "checkJs": true, /* checkJs的值为true或false，用来指定是否检查和报告js文件中的错误，默认是false */
-    "jsx": "preserve", /* 指定jsx代码用于的开发环境: 'preserve', 'react-native', or 'react'. */
-    "declaration": true, /* declaration的值为true或false，用来指定是否在编译的时候生成相应的".d.ts"声明文件。如果设为true，编译每个ts文件之后会生成一个js文件和一个声明文件。 */
-    "declarationDir":'', /* 生成声明文件的输出路径。 */
-    "emitDeclarationOnly": true, /* 默认为false，只生成.d.ts文件，不生成js文件，不能和 noEmit 同时设置为true */
-    "noEmit": true, /* 不输出编译文件(js)，为false时，allowJs不能设置为true，否则当项目由js文件时会报错 */
-    "declarationMap": true, /* 值为true或false，指定是否为声明文件.d.ts生成map文件 */
-    "sourceMap": true, /* sourceMap的值为true或false，用来指定编译时是否生成.map文件 */
-    "outFile": "./", /* outFile用于指定将输出文件合并为一个文件，它的值为一个文件路径名。比如设置为"./dist/main.js"，则输出的文件为一个main.js文件。但是要注意，只有设置module的值为amd和system模块时才支持这个配置 */
-    "outDir": "./", /* outDir用来指定输出文件夹，值为一个文件夹路径字符串，输出的文件都将放置在这个文件夹 */
-    "rootDir": "./", /* 用来指定编译文件的根目录，编译器会在根目录查找入口文件，如果编译器发现以rootDir的值作为根目录查找入口文件并不会把所有文件加载进去的话会报错，但是不会停止编译 */
-    "composite": true,  /* 是否编译构建引用项目  */
-    "incremental": true, /* Enable incremental compilation */
-    "tsBuildInfoFile": "./", /* Specify file to store incremental compilation information */
-    "removeComments": true, /* removeComments的值为true或false，用于指定是否将编译后的文件中的注释删掉，设为true的话即删掉注释，默认为false */
-    "importHelpers": true,  /* importHelpers的值为true或false，指定是否引入tslib里的辅助工具函数，默认为false */
-    "downlevelIteration": true, /* 当target为'ES5' or 'ES3'时，为'for-of', spread, and destructuring'中的迭代器提供完全支持 */
-    "isolatedModules": true,  /* isolatedModules的值为true或false，指定是否将每个文件作为单独的模块，默认为true，它不可以和declaration同时设定 */
-        "skipLibCheck":true,  /* 忽略所有的声明文件（ *.d.ts）的类型检查 */
+    "allowJs": true /* allowJs设置的值为true或false，用来指定是否允许编译js文件，默认是false，即不编译js文件 */,
+    "checkJs": true /* checkJs的值为true或false，用来指定是否检查和报告js文件中的错误，默认是false */,
+    "jsx": "preserve" /* 指定jsx代码用于的开发环境: 'preserve', 'react-native', or 'react'. */,
+    "declaration": true /* declaration的值为true或false，用来指定是否在编译的时候生成相应的".d.ts"声明文件。如果设为true，编译每个ts文件之后会生成一个js文件和一个声明文件。 */,
+    "declarationDir": "" /* 生成声明文件的输出路径。 */,
+    "emitDeclarationOnly": true /* 默认为false，只生成.d.ts文件，不生成js文件，不能和 noEmit 同时设置为true */,
+    "noEmit": true /* 不输出编译文件(js)，为false时，allowJs不能设置为true，否则当项目有js文件时会报错 */,
+    "declarationMap": true /* 值为true或false，指定是否为声明文件.d.ts生成map文件 */,
+    "sourceMap": true /* sourceMap的值为true或false，用来指定编译时是否生成.map文件 */,
+    "outFile": "./" /* outFile用于指定将输出文件合并为一个文件，它的值为一个文件路径名。比如设置为"./dist/main.js"，则输出的文件为一个main.js文件。但是要注意，只有设置module的值为amd和system模块时才支持这个配置 */,
+    "outDir": "./" /* outDir用来指定输出文件夹，值为一个文件夹路径字符串，输出的文件都将放置在这个文件夹 */,
+    "rootDir": "./" /* 用来指定编译文件的根目录，编译器会在根目录查找入口文件，如果编译器发现以rootDir的值作为根目录查找入口文件并不会把所有文件加载进去的话会报错，但是不会停止编译 */,
+    "composite": true /* 是否编译构建引用项目  */,
+    "incremental": true /* Enable incremental compilation */,
+    "tsBuildInfoFile": "./" /* Specify file to store incremental compilation information */,
+    "removeComments": true /* removeComments的值为true或false，用于指定是否将编译后的文件中的注释删掉，设为true的话即删掉注释，默认为false */,
+    "importHelpers": true /* importHelpers的值为true或false，指定是否引入tslib里的辅助工具函数，默认为false */,
+    "downlevelIteration": true /* 当target为'ES5' or 'ES3'时，为'for-of', spread, and destructuring'中的迭代器提供完全支持 */,
+    "isolatedModules": true /* isolatedModules的值为true或false，指定是否将每个文件作为单独的模块，默认为true，它不可以和declaration同时设定 */,
+    "skipLibCheck": true /* 忽略所有的声明文件（ *.d.ts）的类型检查 */,
 
     /* Strict Type-Checking Options */
     "strict": true /* strict的值为true或false，用于指定是否启动所有类型检查，如果设为true则会同时开启下面这几个严格类型检查，默认为false */,
-    "noImplicitAny": true,   /* noImplicitAny的值为false时，如果我们没有为一些值设置明确的类型，编译器会默认认为这个值为any，如果noImplicitAny的值为true的话。则没有明确的类型会报错。默认值为false */
-    "strictNullChecks": true,   /* strictNullChecks为true时，null和undefined值不能赋给非这两种类型的值，别的类型也不能赋给他们，除了any类型。还有个例外就是undefined可以赋值给void类型 */
-    "strictFunctionTypes": true, /* strictFunctionTypes的值为true或false，用于指定是否使用函数参数双向协变检查 */
-    "strictBindCallApply": true, /* 设为true后会对bind、call和apply绑定的方法的参数的检测是严格检测的 */
-    "strictPropertyInitialization": true,  /* 设为true后会检查类的非undefined属性是否已经在构造函数里初始化，如果要开启这项，需要同时开启strictNullChecks，默认为false */
-    "noImplicitThis": true, /* 当this表达式的值为any类型的时候，生成一个错误 */
-    "alwaysStrict": true,  /* alwaysStrict的值为true或false，指定始终以严格模式检查每个模块，并且在编译之后的js文件中加入"use strict"字符串，用来告诉浏览器该js为严格模式 */
-    "forceConsistentCasingInFileNames": false, /* 禁止对同一个文件的不一致的引用 */
+    "noImplicitAny": true /* noImplicitAny的值为false时，如果我们没有为一些值设置明确的类型，编译器会默认认为这个值为any，如果noImplicitAny的值为true的话。则没有明确的类型会报错。默认值为false */,
+    "strictNullChecks": true /* strictNullChecks为true时，null和undefined值不能赋给非这两种类型的值，别的类型也不能赋给他们，除了any类型。还有个例外就是undefined可以赋值给void类型 */,
+    "strictFunctionTypes": true /* strictFunctionTypes的值为true时，用于指定是否使用函数参数和返回值是子类型兼容的 */,
+    "strictBindCallApply": true /* 设为true后会对bind、call和apply绑定的方法的参数的检测是严格检测的 */,
+    "strictPropertyInitialization": true /* 设为true后会检查类的非undefined属性是否已经在构造函数里初始化，如果要开启这项，需要同时开启strictNullChecks，默认为false */,
+    "noImplicitThis": true /* 当this表达式的值为any类型的时候，生成一个错误 */,
+    "alwaysStrict": true /* alwaysStrict的值为true或false，指定始终以严格模式检查每个模块，并且在编译之后的js文件中加入"use strict"字符串，用来告诉浏览器该js为严格模式 */,
+    "forceConsistentCasingInFileNames": false /* 禁止对同一个文件的不一致的引用 */,
 
     /* Additional Checks */
-    "noUnusedLocals": true,   /* 用于检查是否有定义了但是没有使用的变量，对于这一点的检测，使用eslint可以在你书写代码的时候做提示，你可以配合使用。它的默认值为false */
-    "noUnusedParameters": true,  /* 用于检查是否有在函数体中没有使用的参数，这个也可以配合eslint来做检查，默认为false */
-    "noImplicitReturns": true,   /* 用于检查函数是否有返回值，设为true后，如果函数没有返回值则会提示，默认为false */
-    "noFallthroughCasesInSwitch": true,   /* 用于检查switch中是否有case没有使用break跳出switch，默认为false */
-    keyofStringsOnly: false,  /* 开启了那么就就只会用 string 作为索引，否则才是 string ｜ number | symbol */
+    "noUnusedLocals": true /* 用于检查是否有定义了但是没有使用的变量，对于这一点的检测，使用eslint可以在你书写代码的时候做提示，你可以配合使用。它的默认值为false */,
+    "noUnusedParameters": true /* 用于检查是否有在函数体中没有使用的参数，这个也可以配合eslint来做检查，默认为false */,
+    "noImplicitReturns": true /* 用于检查函数是否有返回值，设为true后，如果函数没有返回值则会提示，默认为false */,
+    "noFallthroughCasesInSwitch": true /* 用于检查switch中是否有case没有使用break跳出switch，默认为false */,
+    "keyofStringsOnly": false /* 开启了那么就就只会用 string 作为索引，否则才是 string ｜ number | symbol */,
 
     /* Module Resolution Options */
-    "moduleResolution": "node",            /* 用于选择模块解析策略，有'node'和'classic'两种类型' */
-    "resolveJsonModule": true,             /* 允许引入json */
-    "baseUrl": "./",                       /* baseUrl用于设置解析非相对模块名称的基本目录，相对模块不会受baseUrl的影响 */
-    "paths": {},                           /* 用于设置模块名称到基于baseUrl的路径映射 */
-    "rootDirs": [],                        /* rootDirs可以指定一个路径列表，在构建时编译器会将这个路径列表中的路径的内容都放到一个文件夹中 */
-    "typeRoots": [],                       /* typeRoots用来指定声明文件或文件夹的路径列表，如果指定了此项，则只有在这里列出的声明文件才会被加载。在默认情况下，所有 node_modules/@types 中的任何包都被认为是可见的。如果手动指定了 typeRoots ，则仅会从指定的目录里查找类型文件。 */
-    "types": [],                           /* 指定要包括但不在源文件中引用的类型包名称，即自动引入声明文件。 */
-    "allowSyntheticDefaultImports": true,  /* 用来指定允许从没有默认导出的模块中默认导入 */
-    "esModuleInterop": true, /* 通过为导入内容创建命名空间，实现CommonJS和ES模块之间的互操作性，esModuleInterop选项的作用是支持使用import d from 'cjs'的方式引入commonjs包。 */
-    "preserveSymlinks": true,              /* 不把符号链接解析为其真实路径，具体可以了解下webpack和nodejs的symlink相关知识 */
+    "moduleResolution": "node" /* 用于选择模块解析策略，有'node'和'classic'两种类型' */,
+    "resolveJsonModule": true /* 允许引入json */,
+    "baseUrl": "./" /* baseUrl用于设置解析非相对模块名称的基本目录，相对模块不会受baseUrl的影响 */,
+    "paths": {} /* 用于设置模块名称到基于baseUrl的路径映射 */,
+    "rootDirs": [] /* rootDirs可以指定一个路径列表，在构建时编译器会将这个路径列表中的路径的内容都放到一个文件夹中 */,
+    "typeRoots": [] /* typeRoots用来指定声明文件或文件夹的路径列表，如果指定了此项，则只有在这里列出的声明文件才会被加载。在默认情况下，所有 node_modules/@types 中的任何包都被认为是可见的。如果手动指定了 typeRoots ，则仅会从指定的目录里查找类型文件。 */,
+    "types": [] /* 指定要包括但未在源文件中引用的类型包名称，即自动引入声明文件。 */,
+    "allowSyntheticDefaultImports": true /* 用来指定允许从没有默认导出的模块中默认导入 */,
+    "esModuleInterop": true /* 通过为导入内容创建命名空间，实现CommonJS和ES模块之间的互操作性，esModuleInterop选项的作用是支持使用import d from 'cjs'的方式引入commonjs包。 */,
+    "preserveSymlinks": true /* 不把符号链接解析为其真实路径，具体可以了解下webpack和nodejs的symlink相关知识 */,
 
     /* Source Map Options */
-    "sourceRoot": "",                      /* sourceRoot用于指定调试器应该找到TypeScript文件而不是源文件位置，这个值会被写进.map文件里 */
-    "mapRoot": "",                         /* mapRoot用于指定调试器找到映射文件而非生成文件的位置，指定map文件的根路径，该选项会影响.map文件中的sources属性 */
-    "inlineSourceMap": true,               /* 指定是否将map文件的内容和js文件编译在同一个js文件中，如果设为true，则map的内容会以//# sourceMappingURL=然后拼接base64字符串的形式插入在js文件底部 */
-    "inlineSources": true,                 /* 用于指定是否进一步将.ts文件的内容也包含到输入文件中 */
+    "sourceRoot": "" /* sourceRoot用于指定调试器应该找到TypeScript文件而不是源文件位置，这个值会被写进.map文件里 */,
+    "mapRoot": "" /* mapRoot用于指定调试器找到映射文件而非生成文件的位置，指定map文件的根路径，该选项会影响.map文件中的sources属性 */,
+    "inlineSourceMap": true /* 指定是否将map文件的内容和js文件编译在同一个js文件中，如果设为true，则map的内容会以//# sourceMappingURL=然后拼接base64字符串的形式插入在js文件底部 */,
+    "inlineSources": true /* 用于指定是否进一步将.ts文件的内容也包含到输入文件中 */,
 
     /* Experimental Options */
-    "experimentalDecorators": true, /* 用于指定是否启用实验性的装饰器特性 */
-    "emitDecoratorMetadata": true,         /* 用于指定是否为装饰器提供元数据支持，关于元数据，也是ES6的新标准，可以通过Reflect提供的静态方法获取元数据，如果需要使用Reflect的一些方法，需要引入ES2015.Reflect这个库 */
+    "experimentalDecorators": true /* 用于指定是否启用实验性的装饰器特性 */,
+    "emitDecoratorMetadata": true /* 用于指定是否为装饰器提供元数据支持，关于元数据，也是ES6的新标准，可以通过Reflect提供的静态方法获取元数据，如果需要使用Reflect的一些方法，需要引入ES2015.Reflect这个库 */,
 
     /* format */
-    "pretty": true, /* 默认true，颜色、格式化输出  */
+    "pretty": true /* 默认true，颜色、格式化输出  */
   },
   "files": [], // files可以配置一个数组列表，里面包含指定文件的相对或绝对路径，编译器在编译的时候只会编译包含在files中列出的文件，如果不指定，则取决于有没有设置include选项，如果没有include选项，则默认会编译根目录以及所有子目录中的文件。这里列出的路径必须是指定文件，而不是某个文件夹，而且不能使用* ? **/ 等通配符
-  "include": [],  // include也可以指定要编译的路径列表，但是和files的区别在于，这里的路径可以是文件夹，也可以是文件，可以使用相对和绝对路径，而且可以使用通配符，比如"./src"即表示要编译src文件夹下的所有文件以及子文件夹的文件
-  "exclude": [],  // exclude表示要排除的、不编译的文件，它也可以指定一个列表，规则和include一样，可以是文件或文件夹，可以是相对路径或绝对路径，可以使用通配符
-  "extends": "",   // extends属性指定一个其他的tsconfig.json文件路径，来继承这个配置文件里的配置，继承来的文件的配置和当前文件属性重复时会覆盖当前文件定义的配置。（因为本文件中的配置最先被加载，之后被extends的文件覆盖同名配置，extends的文件的相对路径是根据其所在的路径，与本文件的路径无关。）如果发现循环引用，则会报错。TS在3.2版本开始，支持继承一个来自Node.js包的tsconfig.json配置文件
-  "compileOnSave": true,  // compileOnSave的值是true或false，如果设为true，在我们编辑了项目中的文件保存的时候，编辑器会根据tsconfig.json中的配置重新生成文件，不过这个要编辑器支持
-  "references": [],  // 一个对象数组，指定要引用的项目
+  "include": [], // include也可以指定要编译的路径列表，但是和files的区别在于，这里的路径可以是文件夹，也可以是文件，可以使用相对和绝对路径，而且可以使用通配符，比如"./src"即表示要编译src文件夹下的所有文件以及子文件夹的文件
+  "exclude": [], // exclude表示要排除的、不编译的文件，它也可以指定一个列表，规则和include一样，可以是文件或文件夹，可以是相对路径或绝对路径，可以使用通配符
+  "extends": "", // extends属性指定一个其他的tsconfig.json文件路径，来继承这个配置文件里的配置，继承来的文件的配置和当前文件属性重复时会覆盖当前文件定义的配置。（因为本文件中的配置最先被加载，之后被extends的文件覆盖同名配置，extends的文件的相对路径是根据其所在的路径，与本文件的路径无关。）如果发现循环引用，则会报错。TS在3.2版本开始，支持继承一个来自Node.js包的tsconfig.json配置文件
+  "compileOnSave": true, // compileOnSave的值是true或false，如果设为true，在我们编辑了项目中的文件保存的时候，编辑器会根据tsconfig.json中的配置重新生成文件，不过这个要编辑器支持
+  "references": [] // 一个对象数组，指定要引用的项目
 }
 ```
 
@@ -6487,7 +6516,6 @@ tsc index.ts --allowJs
     "allowSyntheticDefaultImports": true, /* 用来指定允许从没有默认导出的模块中默认导入 */
     "jsx": "react",
     "lib": ["dom", "dom.iterable", "esnext"], /* 编译过程中需要引入的库文件的列表 */
-    "strict": true,
     "moduleResolution": "node",
     "experimentalDecorators": true, /* 用于指定是否启用实验性的装饰器特性 */
     "downlevelIteration": true, /* 当target为'ES5' or 'ES3'时，为'for-of', spread, and destructuring'中的迭代器提供完全支持 */

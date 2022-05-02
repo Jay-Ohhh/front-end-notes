@@ -1368,7 +1368,7 @@ React.Children.toArray(children)
 
 `React.Fragment` 组件能够在不额外创建 DOM 元素的情况下，让 `render()` 方法中返回多个元素。
 
-```
+```jsx
 render() {
   return (
     <React.Fragment>
@@ -7017,7 +7017,7 @@ function Example() {
 
 我们可以在 effect 中获取到最新的 `count` 值，因为他在函数的作用域内。当 React 渲染组件时，会保存已使用的 effect，并在更新完 DOM 后执行它。这个过程在每次渲染时都会发生，包括首次渲染。
 
-传递给 `useEffect` 的函数在每次渲染中都会有所不同，这是刻意为之的。事实上这正是我们可以在 effect 中获取最新的 `count` 的值，而不用担心其过期的原因。每次我们重新渲染，都会生成*新的* effect，替换掉之前的。某种意义上讲，effect 更像是渲染结果的一部分 —— 每个 effect “属于”一次特定的渲染。
+传递给 `useEffect` 的函数在每次渲染中都会有所不同，这是刻意为之的。事实上这正是我们可以在 effect 中获取最新的 `count` 的值，而不用担心其过期的原因。**每次我们重新渲染，都会生成新的 effect，替换掉之前的。**某种意义上讲，effect 更像是渲染结果的一部分 —— 每个 effect “属于”一次特定的渲染。
 
 > 提示
 > 
@@ -7102,7 +7102,7 @@ function FriendStatus(props) {
 
 **为什么要在 effect 中返回一个函数？** 这是 effect 可选的清除机制。每个 effect 都可以返回一个清除函数。如此可以将添加和移除订阅的逻辑放在一起。它们都属于 effect 的一部分。
 
-**React 何时清除 effect？**  **effect 的清除阶段在每次重新渲染时都会执行，而不是只在卸载组件的时候执行一次。**这就是为什么 React 会在执行当前 effect 之前对上一个 effect 进行清除。我们稍后将讨论[为什么这将助于避免 bug](https://react.docschina.org/docs/hooks-effect.html#explanation-why-effects-run-on-each-update)以及[如何在遇到性能问题时跳过此行为](https://react.docschina.org/docs/hooks-effect.html#tip-optimizing-performance-by-skipping-effects)。
+**React 何时清除 effect？**  **effect 的清除阶段在组件每次重新渲染时执行，并且先执行清除上一个 effect 的副作用**。我们稍后将讨论[为什么这将助于避免 bug](https://react.docschina.org/docs/hooks-effect.html#explanation-why-effects-run-on-each-update)以及[如何在遇到性能问题时跳过此行为](https://react.docschina.org/docs/hooks-effect.html#tip-optimizing-performance-by-skipping-effects)。
 
 > 注意
 > 
@@ -7635,7 +7635,15 @@ function BatchedComponent() {
 
 ```js
 const [state, setState] = useState(fn()); // fn() 每次渲染都会被调用
-const [state, setState] = useState(() => fn()); // fn() 只会被调用一次
+const [state, setState] = useState(() => fn()); // fn() 整个生命周期只会被调用一次
+
+const [state,setState] = useState(value) // value初始化赋值给state在整个生命周期只会被调用一次
+// 例如
+const [stateA,setStateA] = useState(1)
+const [stateB, setStateB] = useState(state1); // stateA变成2之后，stateB 依旧是 1
+useEffect(()=>{
+  setStateA(2)
+},[])
 ```
 
 **跳过 state 更新**
@@ -7660,6 +7668,8 @@ useEffect(didUpdate);
 
 默认情况下，effect 将在每轮渲染结束后执行，但你可以选择让它 [在只有某些值改变的时候](https://react.docschina.org/docs/hooks-reference.html#conditionally-firing-an-effect) 才执行。
 
+`useEffect`和 `useLayoutEffect`在服务端不会执行。
+
 **清除 effect**
 
 通常，组件卸载时需要清除 effect 创建的诸如订阅或计时器 ID 等资源。要实现这一点，`useEffect` 函数需返回一个清除函数。以下就是一个创建订阅的例子：
@@ -7674,7 +7684,7 @@ useEffect(() => {
 });
 ```
 
-为防止内存泄漏，清除函数会在组件卸载前执行。另外，如果组件多次渲染（通常如此），则**在执行下一个 effect 之前，上一个 effect 就已被清除**。在上述示例中，意味着组件的每一次更新都会创建新的订阅。若想避免每次更新都触发 effect 的执行，请参阅下一小节。
+为防止内存泄漏，清除函数会在组件卸载前执行。另外，如果组件多次渲染（通常如此），则**在执行下一个 effect 之前，上一个 effect 就已被清除（执行清除函数）**。在上述示例中，意味着组件的每一次更新都会创建新的订阅。若想避免每次更新都触发 effect 的执行，请参阅下一小节。
 
 **effect 的执行时机**
 
@@ -8099,9 +8109,11 @@ const refContainer = useRef(initialValue);
 
 `useRef` 返回一个可变的 ref 对象，其 `.current` 属性被初始化为传入的参数（`initialValue`）。返回的 ref 对象在组件的整个生命周期内保持不变。而且 useRef 实现了类似 class 中的 `this` 的功能。
 
+**initialValue只会在初始化时（而不是每次渲染）赋值给current属性，因此initialValue只在初始化时有效，即使其是变化的或者useRef在其他hooks中初始化。**
+
 使用场景：useRef( ).current 可以跨越渲染周期存储数据（在current 上增加属性存储对象，current 可以保存任何可变值，当其被赋值给 DOM 元素或组件的 ref 属性，current 会指向 DOM 元素或组件实例），而且对 current 修改也不会引起组件渲染。
 
-> React.createRef 每次渲染都会返回一个新的引用，而 useRef 每次都会返回相同的引用。
+> React.createRef 每次渲染都会返回一个新的引用，而`useRef` 会在每次渲染时返回同一个 ref 对象。
 
 本质上，`useRef` 就像是可以在其 `.current` 属性中保存一个可变值的“盒子”。
 
@@ -8270,6 +8282,19 @@ function useFriendStatus(friendID) {
 useDebugValue(date, date => date.toDateString());
 ```
 
+
+
+##### react-refresh 的简单原理
+
+https://ahooks.js.org/zh-CN/guide/blog/hmr
+
+对于 Class 类组件，react-refresh 会一律重新刷新（remount），已有的 state 会被重置。而对于函数组件，react-refresh 则会保留已有的 state。所以 react-refresh 对函数类组件体验会更好。 本篇文章主要讲解 React Hooks 在 react-refresh 模式下的怪异行为，现在我来看下 react-refresh 对函数组件的工作机制。
+
+- 在热更新时为了保持状态，`useState` 和 `useRef` 的值不会更新。
+- 在热更新时，[为了解决某些问题](https://github.com/facebook/react/issues/21019#issuecomment-800650091)，`useEffect`、`useCallback`、`useMemo` 等会重新执行。
+
+
+
 ##### Hook FAQ
 
 **如何获取上一轮的 props 或 state？**
@@ -8351,6 +8376,103 @@ function Image(props) {
   // ...
 }
 ```
+
+#### Hooks & SSR
+
+##### 问题一：DOM/BOM 缺失
+
+SSR 是在 node 环境下运行 React 代码，而此时 window、document、navigator 等全局属性没有。如果直接使用了这些属性，就会报错 `window is not defined, document is not defined, navigator is not defined` 等。
+
+常见的错误用法是在 Hooks 执行过程中，直接使用了 document 等全局属性。
+
+```js
+import React, { useState } from 'react';
+export default () => {  const [state, setState] = useState(document.visibilityState);  return state;};
+```
+
+**解决方案**
+
+1. 将访问 DOM/BOM 的方法放在 useEffect/useLayoutEffect 中（服务端不会执行），避免服务端执行时报错，例如：
+
+```js
+import React, { useState, useEffect } from 'react';
+export default () => {  
+  const [state, setState] = useState();
+  useEffect(() => {    
+    setState(document.visibilityState);
+  }, []);
+  return state;
+};
+```
+
+2. 通过 `isBrowser` 来做环境判断
+
+```js
+import React, { useState } from 'react';
+function isBrowser() {  
+  return !!(typeof window !== 'undefined' && window.document && window.document.createElement);
+}
+export default () => {  
+  const [state, setState] = useState(isBrowser() && document.visibilityState);
+  return state;
+};
+```
+
+##### 问题二 useLayoutEffect Warning
+
+如果使用了 `useLayoutEffect`，在 SSR 模式下，会出现以下警告
+
+```
+⚠️ Warning: useLayoutEffect does nothing on the server, because its effect cannot be encoded into the server renderer's output format. This will lead to a mismatch between the initial, non-hydrated UI and the intended UI. To avoid this, useLayoutEffect should only be used in components that render exclusively on the client. See https://fb.me/react-uselayouteffect-ssr for common fixes.
+```
+
+**解决方案**
+
+1. 使用 useEffect 代替 useLayoutEffect（废话）
+2. 根据环境动态的指定是使用 useEffect 还是 useLayoutEffect。这是来自社区的一种 hack 解决方案，目前在 [react-redux](https://github.com/reduxjs/react-redux/blob/d16262582b2eeb62c05313fca3eb59dc0b395955/src/components/connectAdvanced.js#L40)、[react-use](https://github.com/streamich/react-use/blob/master/src/useIsomorphicLayoutEffect.ts)、[react-beautiful-dnd](https://github.com/atlassian/react-beautiful-dnd/blob/master/src/view/use-isomorphic-layout-effect.js) 均使用的这种方案。
+
+```js
+import { useLayoutEffect, useEffect } from 'react';
+const useIsomorphicLayoutEffect = isBrowser() ? useLayoutEffect : useEffect;
+export default useIsomorphicLayoutEffect;
+```
+
+##### 总结：写 Hooks 时需要注意
+
+1. 不要在非 useEffect/useLayoutEffect 中，直接使用 DOM/BOM 属性
+2. 在非 useEffect/useLayoutEffect 使用 DOM/BOM 属性时，使用 `isBrowser` 判断是否在浏览器环境执行
+3. 使用 `useIsomorphicLayoutEffect` 来代替 `useLayoutEffect`
+4. 如果某个 Hook 需要接收 DOM/BOM 属性，需要支持函数形式传参。以 ahooks 的 useEventListener 举例，必须支持函数形式来指定 target 属性。
+
+```diff
+import React, { useState } from 'react';
+import { useEventListener } from 'ahooks';
+
+export default () => {
+  const [value, setValue] = useState(0);
+
+  const clickHandler = () => {
+    setValue(value + 1);
+  };
+
+  useEventListener(
+    'click',
+    clickHandler,
+    {
+-       target: document.getElementById('click-btn')
++       target: () => document.getElementById('click-btn')
+    }
+  );
+
+  return (
+    <button id="click-btn" type="button">
+      You click {value} times
+    </button>
+  );
+};
+```
+
+
 
 #### FAQ
 
@@ -8691,6 +8813,94 @@ Context 是跨组件传值的一种方案，但我们需要知道，我们无法
 有渲染的组件没有状态：
 能够进行视图渲染的组件，不要包含实际的业务状态，而是通过接受父辈的参数来进行渲染；
 这样的话，有渲染的组件没有实际的业务状态，就与实际的业务解耦了，能够更好的服务于其他的有状态的组件，实现组件的复用。
+
+#### 问题
+
+##### React hooks 的闭包陷阱
+
+下面的情况，基本数据类型会出现，而引用类型不会出现
+
+```js
+function App(){
+    const [count, setCount] = useState(1);
+    useEffect(()=>{
+        setInterval(()=>{
+            console.log(count)
+        }, 1000)
+    }, [])
+}
+```
+
+在这个定时器里面去打印 `count` 的值，会发现，不管在这个组件中的其他地方使用 `setCount` 将 `count` 设置为任何值，还是设置多少次，打印的都是1。
+
+###### 原因
+
+首先，可能都听过react的 Fiber 架构，其实一个 Fiber节点就对应的是一个组件。对于 `classComponent` 而言，有 `state` 是一件很正常的事情，Fiber对象上有一个 `memoizedState` 用于存放组件的 `state`。ok，现在看 hooks 所针对的 `FunctionComponnet`。 无论开发者怎么折腾，一个对象都只能有一个 `state` 属性或者 `memoizedState`  属性，可是，谁知道可爱的开发者们会在 `FunctionComponent` 里写上多少个 `useState`，`useEffect` 等等 ? 所以，react用了链表这种数据结构来存储 `FunctionComponent` 里面的 hooks。比如：
+
+```js
+function App(){
+    const [count, setCount] = useState(1)
+    const [name, setName] = useState('chechengyi')
+    useEffect(()=>{
+        
+    }, [])
+    const text = useMemo(()=>{
+        return 'ddd'
+    }, [])
+}
+```
+
+在组件第一次渲染的时候，为每个hooks都创建了一个对象
+
+```ts
+type Hook = {
+  memoizedState: any,
+  baseState: any,
+  baseUpdate: Update<any, any> | null,
+  queue: UpdateQueue<any, any> | null,
+  next: Hook | null,
+};
+```
+
+最终形成了一个链表：
+
+```
+useState -> useState -> useEffect -> useMemo
+```
+
+ ![img](https://p1-jj.byteimg.com/tos-cn-i-t2oaga2asx/gold-user-assets/2020/6/16/172bd37d7a7abc28~tplv-t2oaga2asx-zoom-in-crop-mark:1304:0:0:0.awebp)
+
+这个对象的`memoizedState`属性就是用来存储组件上一次更新后的 `state`,`next`毫无疑问是指向下一个hook对象。在组件更新的过程中，hooks函数执行的顺序是不变的，就可以根据这个链表拿到当前hooks对应的`Hook`对象，函数式组件就是这样拥有了state的能力。
+
+所以，知道为什么不能将hooks写到if else语句中了把？因为这样可能会导致顺序错乱，导致当前hooks拿到的不是自己对应的Hook对象。
+
+`useEffect` 接收了两个参数，一个回调函数和一个数组。数组里面就是 `useEffect` 的依赖，当为 [] 的时候，回调函数只会在组件第一次渲染的时候执行一次。如果有依赖其他项，react 会判断其依赖是否改变，如果改变了就会执行回调函数。说回最初的场景：
+
+```js
+function App(){
+    const [count, setCount] = useState(1);
+    useEffect(()=>{
+        setInterval(()=>{
+            console.log(count)
+        }, 1000)
+    }, [])
+    function click(){ setCount(2) }
+}
+```
+
+好，开动脑袋开始想象起来，组件第一次渲染执行 `App()`，执行 `useState` 设置了初始状态为1，所以此时的 `count` 为1。然后执行了 `useEffect`，回调函数执行，设置了一个定时器每隔 1s 打印一次 `count`。
+
+接着想象如果 `click` 函数被触发了，调用 `setCount(2)` 肯定会触发react的更新，更新到当前组件的时候也是执行 `App()`，之前说的链表已经形成了哈，此时 `useState` 将 `Hook` 对象 上保存的状态置为2， 那么此时 `count` 也为2了。然后在执行 `useEffect` ，由于依赖数组是一个空的数组，所以此时回调并不会被执行，`useEffect`的`memoizedState`也不会更新。
+
+ok，这次更新的过程中根本就没有涉及到这个定时器，这个定时器还在坚持的，默默的，每隔1s打印一次 `count`。 注意这里打印的 `count` ，是组件第一次渲染的时候 `App()` 时的 `count`， `count`的值为1。
+
+###### 解决：使用useRef 和 函数式更新
+
+`useRef` 返回一个可变的 ref 对象（每次都是返回相同的引用），且在组件的整个生命周期内保持不变。
+
+如果在上述的定时器中更新state，可使用函数式更新 `setCount(v=>v+1)`
+
+
 
 #### 浏览器支持
 
