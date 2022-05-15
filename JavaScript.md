@@ -79,7 +79,7 @@ var不支持块级作用域。
 
 不能在同一作用域下用 let 重复声明变量。
 
-> let会不会变量提升，官方是没有明确说明的，也许底层机制上是提升了，但是形式是没有提升。无需纠结。
+> let会不会变量提升，官方是没有明确说明的，也许底层机制上是提升了，但是形式是没有提升，无需纠结。
 
 ##### const
 
@@ -747,6 +747,43 @@ Symbol 值作为属性名时，该属性是公有属性不是私有属性，可�
 
 但是不会出现在 for...in 、 for...of 的循环中，也不会被 Object.keys() 、 Object.getOwnPropertyNames() 返回。如果要读取到一个对象的 Symbol 属性，可以通过 Object.getOwnPropertySymbols() 和 Reflect.ownKeys() 取到。
 
+#### for in 和 for of
+
+1、for in遍历会遍历到自身和原型链上的可枚举的索引、属性、方法，而且不按实际顺序，更适合遍历对象。
+
+2、for in遍历对象的顺序不一定按照实际对象的内部顺序，遍历数组是按照数组的索引遍历，遍历数组的索引为字符串型数字，但是通过一些算术运算符实现隐式转换进行运算。
+
+3、for in如果不想遍历原型方法和属性的话，可以在循环内部判断一下,hasOwnProperty方法可以判断某属性是否是该对象的实例属性。
+
+4、for of可以成功遍历数组所有**索引**的值,而不是索引，不会遍历原型。for of只能用于可迭代对象上。for of是迭代器，只能用来遍历可迭代对象。可迭代对象有：String, Array, array-like objects（类数组）(e.g., arguments or NodeList), TypedArray, Map, Set, and user-defined iterables
+
+5、forEach不支持break, continue, return等。forEach是用来遍历数组等iterable（可迭代）对象，遍历数组的索引为数值型。
+
+for ... in循环由于历史遗留问题，它遍历的实际上是对象的属性名称。一个Array数组实际上也是一个对象，它的每个元素的索引被视为一个属性。
+
+当我们手动给Array对象添加了额外的属性后，for ... in循环将带来意想不到的意外效果：
+
+```js
+var a = ['A', 'B', 'C'];
+a.name = 'Hello'; //对象.属性操作后，enumerable是true
+for (let x in a) {
+  console.log(x); // '0', '1', '2', 'name'
+}
+console.log(a.length); // 3
+```
+
+for ... in循环将把name包括在内，但Array的length属性却不不变。
+
+for ... of循环则完全修复了这些问题（循环不包含额外增加的属性name），而且Array的length属性也不变，它只循环集合本身的元素：
+
+```js
+var a = ['A', 'B', 'C'];
+a.name = 'Hello';
+for (let x of a) {
+	console.log(x); // 'A', 'B', 'C'
+}
+```
+
 #### Set和Map数据结构
 
 ##### Set
@@ -754,6 +791,10 @@ Symbol 值作为属性名时，该属性是公有属性不是私有属性，可�
 ###### 基本用法
 
 `Set`对象是值的集合，你可以按照插入的顺序迭代它的元素（元素是有序的）。 Set中的元素只会**出现一次**，即 Set 中的元素是唯一的。
+
+```js
+new Set([iterable])
+```
 
 `Set`本身是一个构造函数，用来生成 Set 数据结构。
 
@@ -771,8 +812,6 @@ for (let i of s) {
 上面代码通过`add()`方法向 Set 结构加入成员，结果表明 Set 结构不会添加重复的值。
 
 `Set`函数可以接受一个数组（或者具有 iterable 接口的其他数据结构）作为参数，用来初始化。
-
-`et`函数可以接受一个数组（或者具有 iterable 接口的其他数据结构）作为参数，用来初始化。
 
 ```javascript
 // 例一
@@ -1005,7 +1044,7 @@ set = new Set(Array.from(set, val => val * 2));
 它和 [`Set`](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Set) 对象的区别有两点:
 
 - 与`Set`相比，`WeakSet` 只能是**对象或数组的集合**，而不能是任何类型的任意值。
-- `WeakSet`持弱引用：集合中对象的引用为弱引用。 如果没有其他的对`WeakSet`中对象的引用，那么这些对象会被当成垃圾回收掉。 这也意味着WeakSet中没有存储当前对象的列表。 正因为这样，`WeakSet` 是不可枚举的，没有办法拿到它包含的所有元素（所以没有遍历方法）。
+- `WeakSet`持弱引用：集合中对象的引用为弱引用。 如果没有其他的对这些对象的引用时（任何weakSet或weakMap内对其的引用都看作是没有引用），那么这些对象会被当成垃圾回收掉。 这也意味着WeakSet中没有存储当前对象的列表。 正因为这样，`WeakSet` 是不可枚举的，没有办法拿到它包含的所有元素（所以没有遍历方法）。
 
 因为`WeakSet` 对象不可遍历，因此`WeakSet` 对象内属性的顺序不重要，无遍历方法，无size属性，无clear方法。
 
@@ -1101,6 +1140,10 @@ Object 结构提供了“字符串—值”的对应，Map 结构提供了“值
 上面的例子展示了如何向 Map 添加成员。作为构造函数，Map 也可以接受一个数组作为参数。该数组的成员是一个个表示键值对的数组。
 
 `Map` 可以接受一个[可迭代对象](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Statements/for...of)或空数组作为参数，且该可迭代对象的所有成员需要是对象或数组类型。
+
+```js
+new Map([iterable])
+```
 
 ```javascript
 const map = new Map([
@@ -1478,7 +1521,7 @@ jsonToMap('[[true,7],[{"foo":3},["abc"]]]')
 
 ###### 基本用法
 
-**`WeakMap`** 对象是一组键/值对的集合，其中的键是弱引用的。其键必须是对象，而值可以是任意的。键是唯一的，相同键名，后面的键值会覆盖前面的键值。
+**`WeakMap`** 对象是一组键/值对的集合，其中的**键**是弱引用的，这意味着在没有其他引用这个键的存在时（任何weakSet或weakMap内对其的引用都看作是没有引用），垃圾回收能正确进行。其键必须是对象，而值可以是任意的。键是唯一的，相同键名，后面的键值会覆盖前面的键值。
 
 语法
 
@@ -1497,7 +1540,30 @@ WeakMap 有以下三个方法。
 - **WeakMap.prototype.set(key,value)**：向 WeakMap 实例添加一个键值对。
 - **WeakMap.prototype.get(key)**：返回 WeakMap 实例的指定成员。
 - **WeakMap.prototype.delete(key)**：清除 WeakMap 实例的指定成员。
-- **WeakMap.prototype.has(value)**：返回一个布尔值，表示某个值是否在 WeakMap 实例之中。
+- **WeakMap.prototype.has(key)**：返回一个布尔值，根据WeakMap对象的元素中是否存在key键。
+
+
+
+**任何weakSet或weakMap内对其的引用都看作是没有引用**
+
+```js
+let a = new WeakMap();
+let b = new WeakMap();
+let c = { x: 1 };
+let d = { y: 2 };
+// 看似互相被引用了，形成死锁，不会被释放内存，实际上任何weakSet或weakMap内对其的引用都看作是没有引用
+a.set(c, d);
+b.set(d, c);
+
+c=null
+d=null
+
+setTimeout(() => {
+  console.log(a, b); // wWeakMap {} , WeakMap {}
+}, 10000); // 时间长一些，不然gc还没释放内存
+```
+
+
 
 ###### 使用场景
 
@@ -2050,7 +2116,7 @@ function* generator() {
 }
 var a = generator()
 console.log(a.next()) // 启动，打印 { value: 123, done: false }
-console.log(a.next()) // 打印 undefined，打印 { value: 'world', done: false }
+console.log(a.next()) // 打印 undefined（yield 123返回undefined），打印 { value: 'world', done: false }
 console.log(a.next(1)) // 打印 1，打印 { value: 'ending', done: true }
 console.log(a.next()) // 打印 { value: undefined, done: true }
 ```
@@ -2669,7 +2735,7 @@ var fetch = require('node-fetch');
 
 function* gen(){
   var url = 'https://api.github.com/users/github';
-  var result = yield fetch(url);
+  var result = yield fetch(url); // fetch() 返回一个Promise
   console.log(result.bio);
 }
 ```
@@ -2692,6 +2758,62 @@ result.value.then(function(data){
 上面代码中，首先执行 Generator 函数，获取遍历器对象，然后使用`next`方法（第二行），执行异步任务的第一阶段。由于`Fetch`模块返回的是一个 Promise 对象，因此要用`then`方法调用下一个`next`方法。
 
 可以看到，虽然 Generator 函数将异步操作表示得很简洁，但是流程管理却不方便（即何时执行第一阶段、何时执行第二阶段）。
+
+
+
+##### 异步生成器函数 AsyncGenerator ES2018
+
+```js
+function resloveName() {
+    return new Promise((reslove, reject) => {
+        setTimeout(() => {
+            reslove('也笑')
+        }, 2000)
+    })
+}
+
+async function* outputName() {
+    console.log('开始', Date.now());
+    const name = await resloveName();
+    console.log('结束:', name, Date.now());
+    yield 'slifree';
+    console.log('yield 结束');
+}
+```
+
+看到`*`标志，我们就知道它是一个生成器函数，而`async`关键字是异步函数的标志，所以合在一起就是异步生成器函数。
+
+异步生成器函数的 `next`、`return`、`throw` 方法都是返回一个promise对象，可以使用then或在 async函数中使用await获取其返回的状态及结果。
+
+```js
+async function foo(){
+	await bar.next();
+}
+```
+
+此时我们直接运行`outputName()`是没有结果的，我们需要通过`next`方法调用，如下：
+
+```js
+const asyncGenerator=outputName();
+asyncGenerator.next()
+```
+
+输出结果为：
+
+```js
+开始 1637464817195
+结束: 也笑 1637464819215
+```
+
+如果我们再执行一次`asyncGenerator.next()`的输出结果是：
+
+```
+yield 结束
+```
+
+
+
+
 
 #### 原生js获取元素的各种位置
 
@@ -2733,6 +2855,22 @@ child.getBoundingClientRect().top - parent.getBoundingClientRect().top
 ##### 屏幕宽高：
 
 - window.screen.width
+
+#### 原生事件
+
+##### MouseEvent
+
+```ts
+function handle(e: MouseEvent){
+	// screen参照点：电脑屏幕左上角
+  // client参照点：浏览器可视内容区域左上角
+  // page参照点：网页的左上角
+  // pageY = clientY + window.pageYOffset(文档垂直方向滚动距离)
+  const { screenX, screenY, clientX, clientY, pageX, pageY } = e;
+}
+```
+
+
 
 #### try-catch-finally
 
@@ -3268,6 +3406,8 @@ console.log(target===p)//false
 ```
 
 ##### Reflect
+
+https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Reflect
 
 **Reflect**是一个内置的对象，它提供拦截 JavaScript 操作的方法。这些方法与[proxy handlers](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Proxy)的方法相同。Reflect不是一个函数对象，因此它是不可构造的。
 
@@ -5586,7 +5726,7 @@ location.hash // '#/aaa/bbb'
 - hash变化会触发网页跳转，即浏览器的前进和后退。
 - `hash` 可以改变 `url` ，但是不会触发页面重新加载（hash的改变是记录在 `window.history` 中），即不会刷新页面。也就是说，所有页面的跳转都是在客户端进行操作。因此，这并不算是一次 `http` 请求，所以这种模式不利于 `SEO` 优化。`hash` 只能修改 `#` 后面的部分，所以只能跳转到与当前 `url` 同文档的 `url` 。
 - `hash` 通过 `window.onhashchange` 的方式，来监听 `hash` 的改变，借此实现无刷新跳转的功能。
-- `hash` 永远不会提交到 `server` 端（可以理解为只在前端自生自灭）。
+- `hash`（#以及后面的） 永远不会提交到 `server` 端（可以理解为只在前端自生自灭）。
 
 ##### History模式
 
@@ -5666,6 +5806,8 @@ SSE 与 WebSocket 作用相似，都是建立浏览器与服务器之间的通�
 > - SSE IE浏览器不支持。
 
 #### 模块化规范
+
+模块内具有作用域。
 
 ##### Node端
 

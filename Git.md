@@ -1037,57 +1037,23 @@ Awesome + keyword：关键字 Awesome,帮忙找到优秀的工具列表
 
 关键字 in 是用来限定搜索的范围，可以指定是在名称、描述、readme文档中搜索关键字
 
-in:name：指定搜索范围是仓库名称或关键字
-
-in:description：指定搜索范围是摘要中
-
-in:readme：指定搜索范围是readme文档中
-
-\# 按照项目名/仓库名搜索（大小写不敏感）
-
-in:name xxx
-
-\# 按照README搜索（大小写不敏感）
-
-in:readme xxx
-
-\# 按照description搜索（大小写不敏感）
-
-in:description xxx
-
-\# stars数大于xxx
-
-stars:>xxx
-
-\# 筛选stars数量在start和end区间的仓库
-
-stars:start..end
-
-\# forks数大于xxx
-
-forks:>xxx
-
-\# 筛选fork数量在start和end区间的仓库
-
-fork:start..end
-
-\# 编程语言为xxx
-
-language:xxx
-
-\# 创建日期或更新日期晚于YYYY-MM-DD
-
-created:>YYYY-MM-DD
-
-pushed:>YYYY-MM-DD
-
-\# 项目填写的地址
-
-location:China
-
-\# 匹配用户名为jack
-
-jack in:fullname
+```
+in:name xxx 名称条件
+in:name xxx xxx 多个名称条件
+in:description xxx 项目描述 description
+in:readme xxx 搜索readme里的内容
+stars:>xxx 点赞大于
+stars:start..end 点赞数量区间
+fork:>xxx fork数大于
+fork:start..end fork数量区间
+size:>=xxx 项目大小，单位kb
+created:>YYYY-MM-DD 创建日期晚于YYYY-MM-DD
+pushed:>YYYY-MM-DD  更新日期晚于YYYY-MM-DD
+language:xxx 项目使用语言
+user:xxx 作者名称
+location:China 项目填写的地址
+jack in:fullname 匹配用户名为jack
+```
 
 #### Gitee搜索技巧
 

@@ -612,7 +612,7 @@ class LoggingButton extends React.Component {
 
 上述两种方式是等价的，分别通过 箭头函数 和 `Function.prototype.bind` 来实现。
 
-在这两种情况下，React 的事件对象 `e` 会被作为参数传递。如果通过箭头函数的方式，事件对象必须显式的进行传递，而通过 `bind` 的方式，事件对象以及更多的参数将会被隐式的进行传递（第二种情况下，e 是最后一个参数—隐藏的）。
+在这两种情况下，React 的事件对象 `e` 会被作为参数传递。如果通过箭头函数的方式，事件对象必须显式的进行传递，而通过 `bind` 的方式，事件对象以及更多的参数将会被隐式的进行传递（第二、三种情况下，e 是最后一个参数—隐藏的）。
 
 值得注意的是，通过 bind 方式向监听函数传参的情况下，在类组件中定义的事件监听函数，事件对象 e 要排在所传递参数的后面。 
 
@@ -1805,6 +1805,48 @@ componentDidCatch(error, info)
 2. `info` —— 带有 `componentStack` key 的对象，其中包含[有关组件引发错误的栈信息](https://react.docschina.org/docs/error-boundaries.html#component-stack-traces)。
 
 `componentDidCatch()` 会在“提交”阶段被调用，因此允许执行副作用。 它应该用于记录错误之类的情况。
+
+##### 执行顺序
+
+**组件挂载的过程**
+
+```
+Parent constructor
+Parent componentWillMount
+Parent render
+Child constructor
+Child componentWillMount
+Child render
+Child componentDidMount
+Parent componentDidMount
+```
+
+**更新组件的两种方式**
+
+1.主动更新：组件通过setState修改自己的状态。
+
+```
+Child shouldComponentUpdate(nextProps, nextState)
+Child componentWillUpdate(nextProps, nextState)
+Child render
+Child componetDidUpdate(prevProps, prevState)
+```
+
+2.被动更新：父组件通过props把自己的state传递给子组件，父组件执行setState更新状态
+
+```
+Parent shouldComponentUpdate(nextProps, nextState)
+Parent componentWillUpdate(nextProps, nextState)
+Parent render
+Child componentWillReceiveProps(nextProps)
+Child shouldComponentUpdate(nextProps, nextState)
+Child componentWillUpdate(nextProps, nextState)
+Child render
+Child componetDidUpdate(prevProps, prevState)
+Parent componetDidUpdate(prevProps, prevState)
+```
+
+
 
 ##### 其他API
 
@@ -7100,9 +7142,25 @@ function FriendStatus(props) {
 }
 ```
 
-**为什么要在 effect 中返回一个函数？** 这是 effect 可选的清除机制。每个 effect 都可以返回一个清除函数。如此可以将添加和移除订阅的逻辑放在一起。它们都属于 effect 的一部分。
+**为什么要在 effect 中返回一个函数？** 这是 effect 可选的清除机制。每个 effect 执行后都可以返回一个清除函数（即使是在 if 等条件语句中返回）。如此可以将添加和移除订阅的逻辑放在一起。它们都属于 effect 的一部分。
 
-**React 何时清除 effect？**  **effect 的清除阶段在组件每次重新渲染时执行，并且先执行清除上一个 effect 的副作用**。我们稍后将讨论[为什么这将助于避免 bug](https://react.docschina.org/docs/hooks-effect.html#explanation-why-effects-run-on-each-update)以及[如何在遇到性能问题时跳过此行为](https://react.docschina.org/docs/hooks-effect.html#tip-optimizing-performance-by-skipping-effects)。
+**React 何时清除 effect？**  **effect 的清除阶段在组件每次重新渲染时执行，并且先执行清除上一个 effect 的副作用**。useEffect首次执行时，清除函数不会执行。当组件卸载时，无论有没有依赖项数组或是空数组，清除函数都会执行。
+
+注意清除必须是 return 一个函数
+
+```js
+function fn(){
+  console.log(1)
+}
+useEffect(()=>{
+  // fn() 会立即执行，而不是在清除阶段执行，若fn有返回值，则必须返回函数
+	return fn();
+},[deps])
+```
+
+但是 `return fn()`是一个万能的写法，因为 `fn()`没返回值会立即执行，若返回一个函数则代表有清除函数。
+
+我们稍后将讨论[为什么这将助于避免 bug](https://react.docschina.org/docs/hooks-effect.html#explanation-why-effects-run-on-each-update)以及[如何在遇到性能问题时跳过此行为](https://react.docschina.org/docs/hooks-effect.html#tip-optimizing-performance-by-skipping-effects)。
 
 > 注意
 > 
@@ -7634,13 +7692,18 @@ function BatchedComponent() {
 `initialState` 参数只会在组件的初始渲染中起作用，后续渲染时会被忽略。如果初始 state 需要通过复杂计算获得，则可以传入一个函数，在函数中计算并返回初始的 state，此函数只在初始渲染时被调用：
 
 ```js
+class A {}
+
 const [state, setState] = useState(fn()); // fn() 每次渲染都会被调用
+const [state, setState] = useState(new A()); // new A() 每次渲染都会被调用
+
 const [state, setState] = useState(() => fn()); // fn() 整个生命周期只会被调用一次
+const [state, setState] = useState(() => new A()); // new A() 整个生命周期只会被调用一次
 
 const [state,setState] = useState(value) // value初始化赋值给state在整个生命周期只会被调用一次
 // 例如
 const [stateA,setStateA] = useState(1)
-const [stateB, setStateB] = useState(state1); // stateA变成2之后，stateB 依旧是 1
+const [stateB, setStateB] = useState(stateA); // stateA变成2之后，stateB 依旧是 1
 useEffect(()=>{
   setStateA(2)
 },[])
@@ -7652,7 +7715,7 @@ useEffect(()=>{
 
 需要注意的是，React 可能仍需要在跳过渲染前渲染该组件。不过由于 React 不会对组件树的“深层”节点进行不必要的渲染，所以大可不必担心。如果你在渲染期间执行了高开销的计算，则可以使用 `useMemo` 来进行优化。
 
-> useState不能设置set和map
+
 
 ###### useEffect
 
@@ -8109,7 +8172,18 @@ const refContainer = useRef(initialValue);
 
 `useRef` 返回一个可变的 ref 对象，其 `.current` 属性被初始化为传入的参数（`initialValue`）。返回的 ref 对象在组件的整个生命周期内保持不变。而且 useRef 实现了类似 class 中的 `this` 的功能。
 
-**initialValue只会在初始化时（而不是每次渲染）赋值给current属性，因此initialValue只在初始化时有效，即使其是变化的或者useRef在其他hooks中初始化。**
+**initialValue只会在组件的初始渲染中起作用并赋值给current属性，后续渲染时会被忽略，即使initialValue再后续是变化的。**
+
+```ts
+class A{}
+
+function fn(){
+	return 1
+}
+
+const ref = useRef(fn()) // fn() 每次渲染都会被调用
+const ref = useRef(new A()) // new A() 每次渲染都会被调用
+```
 
 使用场景：useRef( ).current 可以跨越渲染周期存储数据（在current 上增加属性存储对象，current 可以保存任何可变值，当其被赋值给 DOM 元素或组件的 ref 属性，current 会指向 DOM 元素或组件实例），而且对 current 修改也不会引起组件渲染。
 
@@ -8297,7 +8371,7 @@ https://ahooks.js.org/zh-CN/guide/blog/hmr
 
 ##### Hook FAQ
 
-**如何获取上一轮的 props 或 state？**
+###### 如何获取上一轮的 props 或 state？
 
 目前，你可以 [通过 ref](https://react.docschina.org/docs/hooks-faq.html#is-there-something-like-instance-variables) 来手动实现：
 
@@ -8377,6 +8451,22 @@ function Image(props) {
 }
 ```
 
+###### 闭包陷阱
+
+闭包：
+
+**「函数」和「函数内部能访问到的变量」（也叫环境）的总和，就是一个闭包。**
+
+effect 函数引用了 state 且保存到 memorizedState，形成闭包。如果 [deps] 包括 state，当state改变时，effect会重新执行，并引用新的state。
+
+**解决：使用useRef 、 函数式更新、添加依赖项**
+
+`useRef` 返回一个可变的 ref 对象（每次都是返回相同的引用），且在组件的整个生命周期内保持不变。
+
+如果在上述的定时器中更新state，可使用函数式更新 `setCount(v=>v+1)`
+
+
+
 #### Hooks & SSR
 
 ##### 问题一：DOM/BOM 缺失
@@ -8387,7 +8477,10 @@ SSR 是在 node 环境下运行 React 代码，而此时 window、document、nav
 
 ```js
 import React, { useState } from 'react';
-export default () => {  const [state, setState] = useState(document.visibilityState);  return state;};
+export default () => {  
+  const [state, setState] = useState(document.visibilityState);
+  return state;
+};
 ```
 
 **解决方案**
@@ -8442,7 +8535,7 @@ export default useIsomorphicLayoutEffect;
 1. 不要在非 useEffect/useLayoutEffect 中，直接使用 DOM/BOM 属性
 2. 在非 useEffect/useLayoutEffect 使用 DOM/BOM 属性时，使用 `isBrowser` 判断是否在浏览器环境执行
 3. 使用 `useIsomorphicLayoutEffect` 来代替 `useLayoutEffect`
-4. 如果某个 Hook 需要接收 DOM/BOM 属性，需要支持函数形式传参。以 ahooks 的 useEventListener 举例，必须支持函数形式来指定 target 属性。
+4. 如果某个 Hook 需要接收 DOM/BOM 属性，需要支持函数形式 `()=>dom` 传参支持SSR场景。以 ahooks 的 useEventListener 举例，必须支持函数形式来指定 target 属性。
 
 ```diff
 import React, { useState } from 'react';
@@ -8894,11 +8987,13 @@ function App(){
 
 ok，这次更新的过程中根本就没有涉及到这个定时器，这个定时器还在坚持的，默默的，每隔1s打印一次 `count`。 注意这里打印的 `count` ，是组件第一次渲染的时候 `App()` 时的 `count`， `count`的值为1。
 
-###### 解决：使用useRef 和 函数式更新
+###### 解决：使用useRef 、 函数式更新、添加依赖项
 
 `useRef` 返回一个可变的 ref 对象（每次都是返回相同的引用），且在组件的整个生命周期内保持不变。
 
 如果在上述的定时器中更新state，可使用函数式更新 `setCount(v=>v+1)`
+
+此案例不适合使用添加依赖项，因为会导致计时不准确。
 
 
 
