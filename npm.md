@@ -278,19 +278,39 @@ npm unlink common
 
 这样本地的`common`包模块就解除了，其他项目的软连接也失效了。
 
-#### npm version 更新版本
+#### npm version 版本
 
 方式一：修改版本号：使用 `npm version <update_type>` 进行修改，`update_type` 有三个参数
 
-- patch：这个是补丁的意思，补丁最合适；
-- minor：这个是小修小改；
-- major：这个是大改咯；
+- `major`: 当你发了一个含有 Breaking Change 的 API
+- `minor`: 当你新增了一个向后兼容的功能时
+- `patch`: 当你修复了一个向后兼容的 Bug 时
 
 > 比如我想来个1.0.1版本，注意，是最后一位修改了增1，那么命令：npm version patch
 > 比如我想来个1.1.0版本，注意，是第二位修改了增1，那么命令： npm version minor
 > 比如我想来个2.0.0版本，注意，是第一位修改了增1，那么命令： npm version major
 
 方式二：修改 package.json 的 version。
+
+#### 版本号~和^和*的区别
+
+- `~` 会匹配最近的 patch 版本依赖包，版本号范围是 `>=1.2.3 <1.3.0`
+- `^` 会匹配最新的 minor 版本依赖包，版本号范围是 `>=1.2.3 <2.0.0`
+- `* ` 这意味着安装最新版本的依赖包
+
+推荐使用~，只会修复版本的bug，比较稳定。
+
+当我们 `npm i` 时，默认的版本号是 `^`，可最大限度地在向后兼容与新特性之间做取舍。
+
+
+
+**npm i 某个 package 时会修改 `package-lock.json` 中的版本号吗**
+
+当 `package-lock.json` 中该 package 锁死的版本号符合 `package.json` 中的版本号范围时，将以 `package-lock.json` 锁死版本号为主。
+
+当 `package-lock.json` 中该 package 锁死的版本号不符合 `package.json` 中的版本号范围时，将会安装该 package 符合 `package.json` 版本号范围的最新版本号，并重写 `package-lock.json`。
+
+
 
 #### npm 工具
 

@@ -402,6 +402,8 @@ class MySocket {
 
 	websocketOnOpen() {
 		console.log('WebSocket连接成功', this.socket!.readyState);
+    this.reconnectCount = 0;
+    this.lockReconnect = false;
 		this.heartCheck();
 	}
 

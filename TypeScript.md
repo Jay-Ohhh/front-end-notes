@@ -1579,9 +1579,9 @@ function testCat(cat: Cat) {
 
 
 
-**as const**
+##### as const
 
-const 断言，它的作用是让里头的所有东西变成只读
+const 断言，它的作用是让里头的所有东西变成只读，且数组被限定成了一个元组。
 
 ```ts
 function a () {
@@ -4381,7 +4381,7 @@ class Animal {
 }
 ```
 
-在`private`关键字之上使用私有类字段的区别在于前者有更好的运行时保证。用`private`关键字声明的 TypeScript 字段将在编译后的JavaScript代码中成为常规字段。另一方面，私有类字段在编译后的代码中仍然是私有的。
+私有类字段`#`有更好的运行时保证。用`private`关键字声明的 TypeScript 字段将在编译后的JavaScript代码中成为常规字段，非私有。另一方面，私有类字段在编译后的代码中仍然是私有的。
 
 试图在运行时访问私有类字段将导致语法错误。我们也使用浏览器开发工具也检查不了私有类字段。
 
@@ -5606,8 +5606,8 @@ https://zhuanlan.zhihu.com/p/410029602
 
 协变和逆变是编程理论中一个很重要的话题。用于表达父类子类在安全类型转换后的兼容性（或者说继承关系）。定义为：`f()`表示类型转换
 
-- 协变时：`A` 通过 `fn()`，生成表示类型更广的类型 `B`， 即 `A extends B`
-- 逆变时：`A` 通过 `fn()`，生成表示类型更窄的类型 `B`,    即 `B extends A`
+- 协变时：`A` 通过 `fn()`，生成表示类型更广的类型 `B`，关系： `A extends B`
+- 逆变时：`A` 通过 `fn()`，生成表示类型更窄的类型 `B`,   关系： `B extends A`
 - 双变时：则以上均成立
 - 不变时：若，则以上均不成立，没有兼容关系
 
@@ -6646,9 +6646,7 @@ ts-node -r tsconfig-paths/register main.ts
 
 使用 `process.env.TS_NODE_PROJECT` 可以指定 tsconfig.json。
 
-##### tsc
 
-直接运行 `tsc` 命令 `tsconfig.json` 文件才会生效，要是指定文件比如 `tsc dome.ts` ，`tsconfig.json` 文件不会生效。但是 `ts-node` 指定文件是遵循 `tsconfig.json` 文件的。
 
 #### [编译选项](https://www.tslang.cn/docs/handbook/compiler-options.html)
 

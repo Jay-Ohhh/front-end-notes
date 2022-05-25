@@ -841,6 +841,8 @@ key值是不可读的：key 会传递信息给 React ，但不会传递给你的
 
 **受控组件**
 
+用 props 传入数据的话，组件可以被认为是**受props控制**（因为组件被父级传入的 props 控制）。数据只保存在组件内部的 state 的话，是**不受props控制**组件（因为外部没办法直接控制 state）。
+
 在 HTML 中，表单元素（如`<input>`、 `<textarea>` 和 `<select>`）之类的表单元素通常自己维护 state（例如type、name、value属性），并根据用户输入进行更新。而在 React 中，可变状态（mutable state）通常保存在组件的 state 属性中，并且只能通过使用` setState()`来更新。
 
 我们可以把两者结合起来，使 React 的 state 成为“唯一数据源”。渲染表单的 React 组件还控制着用户输入过程中表单发生的操作。被 React 以这种方式控制取值的表单输入元素就叫做“受控组件”。
@@ -1239,6 +1241,34 @@ function areEqual(prevProps, nextProps) {
   */
 }
 export default React.memo(MyComponent, areEqual);
+```
+
+
+
+```ts
+
+const Com = () => {
+  return <div>{+new Date()}</div>
+}
+
+const MemoCom = React.memo(() => {
+  return <div>{+new Date()}</div>
+})
+
+export default () => {
+  const [count, setCount] = useState(0);
+
+  return (
+    <>
+      <p>Submit count: {count}</p>
+      <button onClick={() => { setCount(c => c + 1) }}>Submit</button>
+      {/* 当点击button时，Com组件依旧会重新render，即使其接收的props是相同或没有接收任何props */}
+      <Com />
+      {/* 当点击button时，只要其接收的props是相同的，就不会重新render */}
+      <MemoCom />
+    </>
+  );
+};
 ```
 
 此方法仅作为**[性能优化](https://react.docschina.org/docs/optimizing-performance.html)**的方式而存在。但请不要依赖它来“阻止”渲染，因为这会产生 bug。
@@ -1862,7 +1892,7 @@ setState(updater, [callback])
 
 **`setState` 什么时候是异步的？**
 
-目前，在 React 管理的事件回调和生命周期中，setState 是异步的，而其他时候 setState 都是同步的。这个问题根本原因就是 React 在自己管理的事件回调和生命周期中，对于 setState 是批量更新的，而在其他时候是立即更新的。
+目前，**在 React 管理的事件回调和生命周期中**，setState 是**异步**的，而其他时候 setState 都是同步的。这个问题根本原因就是 React 在自己管理的事件回调和生命周期中，对于 setState 是**批量更新**的，而在其他时候是立即更新的。
 
 > 在setTimeout和原生DOM事件中，setState是同步的。
 > 
@@ -7595,6 +7625,21 @@ const [value, setValue] = useState(initialValue);
 
 在初始渲染期间，返回的状态 (`value`) 与传入的第一个参数 (`initialValue`) 值相同。
 
+只有 `value`更新，才会重新`render`
+
+重新 `render` 时，会重新执行hook内的代码
+
+```js
+// 例如
+const [state,setState] = useState(true)
+function a(){} // 重新render时会重新创建函数
+console.log(111) // 重新render时会再次执行
+// 即使点击了也不会重新render
+return <div onClick={()=>setState(true)}>
+  Click
+</div>
+```
+
 `setValue` 函数用于更新 value。**它接收一个新的 state 值替换旧值**，并将组件的一次重新渲染加入队列。
 
 ```js
@@ -7603,7 +7648,7 @@ setValue(newValue);
 
 在后续的重新渲染中，`useState` 返回的第一个值将始终是更新后最新的 value。
 
-与 class 组件中的 `setState` 方法不同，Hook 的`setState` 不会自动合并更新对象。你可以用函数式的 `setState` 结合展开运算符来达到合并更新对象的效果。
+与 class 组件中的 `setState` 方法不同，Hook 的`setState` 不会自动合并更新对象，而是**替换**。你可以用函数式的 `setState` 结合展开运算符来达到合并更新对象的效果。
 
 ```js
 setValue(preValue => {
@@ -8187,7 +8232,7 @@ const ref = useRef(new A()) // new A() 每次渲染都会被调用
 
 使用场景：useRef( ).current 可以跨越渲染周期存储数据（在current 上增加属性存储对象，current 可以保存任何可变值，当其被赋值给 DOM 元素或组件的 ref 属性，current 会指向 DOM 元素或组件实例），而且对 current 修改也不会引起组件渲染。
 
-> React.createRef 每次渲染都会返回一个新的引用，而`useRef` 会在每次渲染时返回同一个 ref 对象。
+> React.createRef 每次渲染都会返回一个新的引用，而`useRef` 会在每次渲染时返回同一个 ref 对象，ref对象是不变的，而current是可变的。
 
 本质上，`useRef` 就像是可以在其 `.current` 属性中保存一个可变值的“盒子”。
 
@@ -9178,7 +9223,7 @@ module.exports = {
 
 你不总是希望所有的文件都开启eslint检查，那么，给单独的js文件关闭eslint的方式，只需要在该文件的最顶部加上一段注释。
 
-```
+```js
 /*eslint-disable*/
 function test() {
     return true

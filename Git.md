@@ -1414,6 +1414,10 @@ https://www.pianshen.com/article/302848775/
 
 https://www.cnblogs.com/feiquan/p/11538433.html
 
+本章节是针对于 Clone With SSH 的情况。
+
+如果是 Clone With HTTP，则在克隆时输入用户名和密码，同时仓库管理员给你设置好权限就可以了。
+
 首先,介绍一下配置背景:
 
 1. 有两个邮箱A@mail.com  , B@mail.com

@@ -502,6 +502,136 @@ axios.interceptors.response.use(
 );
 ```
 
+##### 完整代码
+
+```ts
+// axios取消重复请求
+import qs from 'qs';
+import axios from 'axios';
+import type { AxiosRequestConfig, Canceler } from 'axios';
+
+// 用于根据当前请求的信息，生成请求 Key
+function generateReqKey(config: AxiosRequestConfig) {
+	const { method, url, params, data } = config;
+	return [method, url, qs.stringify(params), qs.stringify(data)].join('&');
+}
+
+// 用于把当前请求信息添加到pendingRequest对象中
+const pendingRequest = new Map<string, Canceler>();
+function addPendingRequest(config) {
+	const requestKey = generateReqKey(config);
+	config.cancelToken =
+		config.cancelToken ||
+		new axios.CancelToken((cancel) => {
+			if (!pendingRequest.has(requestKey)) {
+				pendingRequest.set(requestKey, cancel);
+			}
+		});
+}
+
+// 检查是否存在重复请求，若存在则取消已发的请求
+function removePendingRequest(config) {
+	const requestKey = generateReqKey(config);
+	if (pendingRequest.has(requestKey)) {
+		const cancelToken = pendingRequest.get(requestKey);
+		cancelToken!(requestKey);
+		pendingRequest.delete(requestKey);
+	}
+}
+
+// 设置请求拦截器
+axios.interceptors.request.use(
+	(config) => {
+		removePendingRequest(config); // 检查是否存在重复请求，若存在则取消已发的请求
+		addPendingRequest(config); // 把当前请求信息添加到pendingRequest对象中
+		return config;
+	},
+	(error) => {
+		return Promise.reject(error);
+	}
+);
+
+// 设置响应拦截器
+axios.interceptors.response.use(
+	(response) => {
+		removePendingRequest(response.config); // 从pendingRequest对象中移除请求
+		return response;
+	},
+	(error) => {
+		removePendingRequest(error.config || {}); // 从pendingRequest对象中移除请求
+		if (axios.isCancel(error)) {
+			console.log('已取消的重复请求：' + error.message);
+		} else {
+			// 添加异常处理
+		}
+		return Promise.reject(error);
+	}
+);
+```
+
+#### 请求重试
+
+对于请求重试的功能来说，我们希望让用户不仅能够设置**重试次数**，而且可以设置**重试延时时间**。
+
+适配器是一个函数，它接收一个 `config` 参数并返回一个 `Promise` 对象。
+
+##### 定义 retryAdapterEnhancer 函数
+
+为了让用户能够更灵活地控制请求重试的功能，我们定义了一个 `retryAdapterEnhancer` 函数，该函数支持两个参数：
+
+- adapter：预增强的 Axios 适配器对象；
+
+- options：默认的缓存配置对象，该对象支持  2 个属性，分别用于配置不同的功能：
+
+- - times：全局设置请求重试的次数；
+  - delay：全局设置请求延迟的时间，单位是 ms
+
+```ts
+// axios请求重试
+import axios from 'axios';
+import type { AxiosRequestConfig, AxiosAdapter } from 'axios';
+
+function retryAdapterEnhancer(adapter: AxiosAdapter, options) {
+	const { times = 0, delay = 300 } = options;
+
+	return async (config: AxiosRequestConfig & { retryTimes?: number; retryDelay?: number }) => {
+		const { retryTimes = times, retryDelay = delay } = config;
+		let __retryCount = 0;
+		const request = async () => {
+			try {
+				return await adapter(config);
+			} catch (err) {
+				// 判断是否进行重试
+				if (!retryTimes || __retryCount >= retryTimes) {
+					return Promise.reject(err);
+				}
+				__retryCount++; // 增加重试次数
+				// 延时处理
+				const delay = new Promise((resolve) => {
+					setTimeout(() => {
+						resolve(null);
+					}, retryDelay);
+				});
+				// 重新发起请求
+				return delay.then(() => {
+					return request();
+				});
+			}
+		};
+		return request();
+	};
+}
+
+const http = axios.create({
+	baseURL: 'http://localhost:3000/',
+	adapter: retryAdapterEnhancer(axios.defaults.adapter!, {
+		retryDelay: 1000,
+	}),
+});
+```
+
+
+
 #### 在开发环境中代理API请求
 
 原理：

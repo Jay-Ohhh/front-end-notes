@@ -1135,7 +1135,7 @@ class Foo {
 
 JavaScript 的对象（Object），本质上是键值对的集合（Hash 结构），但是传统上只能用字符串当作键。这给它的使用带来了很大的限制。
 
-Object 结构提供了“字符串—值”的对应，Map 结构提供了“值—值”的对应，是一种更完善的 Hash 结构实现。如果你需要“键值对”的数据结构，Map 比 Object 更合适。
+Object 结构提供了“字符串—值”的对应，Map 结构提供了“值—值”的对应，是一种更完善的 Hash 结构实现。如果你需要“键值对”的数据结构，Map 比 Object 更合适。**Map 对键的类型没有限制**
 
 上面的例子展示了如何向 Map 添加成员。作为构造函数，Map 也可以接受一个数组作为参数。该数组的成员是一个个表示键值对的数组。
 
@@ -1844,13 +1844,19 @@ p.then(function (x) {
 
 1、await  只能被用在 async 函数中，await后面一般是async函数（返回promise对象的函数）或者后面接new Promise() 或者任何要等待的值。await就是把promise的resolve的数据拿出来直接使用。
 
-> await 会将后面的值（不是promise时）传进 promise.resolve 并赋值给左边的变量，await 会将后面的promise对象内的resolve值赋值给左边的变量。
+> await 会将后面的值（不是promise时）传进 promise.resolve 并赋值给左边的变量
+>
+> await 会将后面的promise对象内的resolve值赋值给左边的变量。
 
 2、await会等待结果返回，再执行之后的代码
 
 > 如果await后面的跟的是promise，且promise没有resolve()，对await来说是失败了，后面的代码不会执行
-> 
-> 如果await右边的代码是同步执行，await左边的等号进行赋值相当于在then中取出参数resolve的值，是微任务，await之后的代码相当于是在then内执行，是微任务
+>
+> 如果await右边的代码是同步执行，await左边的等号进行赋值相当于在then中取出参数resolve的值，是微任务
+>
+> await 后面的代码当于是在new Promise内同步执行
+>
+> await下面的代码相当于是在then内执行，是微任务
 
 3、async 修饰的函数  隐式返回一个 promise（即使不写return）。箭头函数也能用async修饰。
 
@@ -1866,11 +1872,11 @@ async函数内return  xxx ，实际上是 return new Promise (resolve => resolve
 
 > 实际上，async / await 在底层转换成了 promise 和 then 回调函数。是基于promises的语法糖。每次我们使用 await, 解释器都创建一个 promise 对象，然后把剩下的 async 函数中的操作放到 then 回调函数中。
 
-- await会阻塞后面的代码
+- await会阻其下面的代码执行
 
 ```js
 async function fn(){
-    await console.log('a')
+  await console.log('a')
   console.log('c')
 }
 fn()
@@ -1913,6 +1919,56 @@ console.log(3)
 //1
 //3
 ```
+
+
+
+- await在async函数内才有效
+
+```js
+async function a1() {
+  await console.log('aaa');
+  console.log('bbb');
+}
+
+function a2() {
+  console.log('ccc');
+}
+
+function test() {
+  for (let cb of [a1, a2]) {
+    cb();
+  }
+}
+
+test();
+// aaa
+// ccc
+// bbb
+```
+
+```js
+async function a1() {
+  await console.log('aaa');
+  console.log('bbb');
+}
+
+function a2() {
+  console.log('ccc');
+}
+
+async function test() {
+  for (let cb of [a1, a2]) {
+    await cb();
+  }
+}
+
+test();
+// aaa
+// bbb
+// ccc
+```
+
+
 
 #### Generator函数
 
@@ -5813,10 +5869,12 @@ SSE 与 WebSocket 作用相似，都是建立浏览器与服务器之间的通�
 
 ###### CommonJS
 
-- 运行时同步加载
+- 运行时同步加载（动态加载）
   
   > 同步意味着阻塞加载，浏览器资源是异步加载的，因此有了AMD CMD解决方案
-
+  >
+  > CommonJS 加载的是一个对象（即module.exports属性），该对象只有在脚本运行完才会生成。
+  
 - 输出值的拷贝，会缓存第一次运行的结果
 
 **基本语法**
@@ -5824,9 +5882,21 @@ SSE 与 WebSocket 作用相似，都是建立浏览器与服务器之间的通�
 - 暴露模块：`module.exports.xxx = value`或`exports.xxx = value`
   
   > **exports指向的是module.exports**
-  > 
-  > exports = module.exports = { } // wrong，不能改变 exports （module.exports）的指向
-
+  
+  ```js
+  // module.exports和exports必须指向同一个值
+  exports = module.exports = {};
+  
+  // wrong: exports不再指向module.exports
+  exports = {};
+  ```
+  
+  保险起见，可使用以下方式：
+  
+  - modules.exports.foo = bar
+  
+  - export.foo = bar
+  
 - 引入模块：`require(xxx)`,如果是第三方模块，xxx为模块名；如果是自定义模块，xxx为模块文件路径
 
 ##### 浏览器端
@@ -5853,15 +5923,34 @@ SSE 与 WebSocket 作用相似，都是建立浏览器与服务器之间的通�
 
 实现：Sea.js
 
+
+
 ##### 浏览器 和 Node 兼容端
 
 ###### UMD
 
-统一AMD和CommonJS规范，解决跨平台问题
+统一AMD和CommonJS规范，解决跨平台问题。既可以在 node/webpack 环境中被 `require` 引用，也可以在浏览器中直接用 CDN 被 `script.src` 引入。
 
-UMD先判断是否支持Node.js的模块（exports）是否存在，存在则使用Node.js模块模式；再判断是否支持AMD（define是否存在），存在则使用AMD方式加载模块
+```js
+(function (root, factory) {
+  if (typeof define === "function" && define.amd) {
+    // AMD
+    define(["jquery"], factory);
+  } else if (typeof exports === "object") {
+    // CommonJS
+    module.exports = factory(require("jquery"));
+  } else {
+    // 全局变量
+    root.returnExports = factory(root.jQuery);
+  }
+})(this, function ($) {
+  // ...
+});
+```
 
-###### ES6 Module
+
+
+###### ESM
 
 [Pure ESM package](https://gist.github.com/sindresorhus/a39789f98801d908bbc7ff3ecc99d99c)
 
@@ -5869,13 +5958,13 @@ UMD先判断是否支持Node.js的模块（exports）是否存在，存在则使
 
 ES6 模块设计思想：尽量的静态化、使得编译时就能确定模块的依赖关系，以及输入和输出的变量（CommonJS和AMD模块，都只能在运行时确定这些东西）。
 
+- 编译时加载（静态加载）
+
+- 动态引用，不会缓存值
+
 - 输出值的引用
 
-- 静态解析
-
-- 动态引入，不会缓存值
-  
-  > 当ES6遇到import时，不会像CommonJS一样去执行模块，而是生成一个动态的只读引用，当真正需要的时候再到模块里去取值，所以ES6模块是动态引用，并且不会缓存值。
+  > 当ES6遇到import时，不会像CommonJS一样去执行模块，而是生成一个动态的只读引用（在代码静态解析阶段就会生成），当真正需要的时候再到模块里去取值，所以ES6模块是动态引用，并且不会缓存值。
   > 
   > 编译：类似翻译，就是将源代码翻译成机器能识别的代码。
   > 
@@ -5883,11 +5972,214 @@ ES6 模块设计思想：尽量的静态化、使得编译时就能确定模块�
 
 
 
-#### IntersectionObserver
+#### Intersection Observer
+
+https://developer.mozilla.org/zh-CN/docs/Web/API/IntersectionObserver
 
 [利用&quot;交叉观察者&quot;这个小宝贝儿，轻松实现懒加载、吸顶、触底 ❗ - 掘金](https://juejin.cn/post/6844903926815277069)
 
 [谈谈IntersectionObserver懒加载 - 简书](https://www.jianshu.com/p/84a86e41eb2b)
+
+`IntersectionObserver`**接口** (从属于[Intersection Observer API](https://developer.mozilla.org/en-US/docs/Web/API/Intersection_Observer_API)) 提供了一种异步观察目标元素与其祖先元素或顶级文档视窗([viewport](https://developer.mozilla.org/zh-CN/docs/Glossary/Viewport))交叉状态的方法。祖先元素与视窗([viewport](https://developer.mozilla.org/zh-CN/docs/Glossary/Viewport))被称为**根(root)。**
+
+##### polyfill
+
+```js
+npm install intersection-observer
+// index.js
+import 'intersection-observer';
+```
+
+##### 构造器
+
+```js
+var observer = new IntersectionObserver(callback[, options]);
+```
+
+##### 1. IntersectionObserver Callback
+
+当目标元素和根元素相交发生改变时，会触发监视器的回调。
+
+```ts
+interface IntersectionObserverCallback {
+    (entries: IntersectionObserverEntry[], observer: IntersectionObserver): void;
+}
+```
+
+- **entries**
+
+一个[`IntersectionObserverEntry`](https://developer.mozilla.org/zh-CN/docs/Web/API/IntersectionObserverEntry)对象的数组，每个被触发的阈值，都或多或少与指定阈值有偏差。
+
+- **observer**
+
+被调用的[`IntersectionObserver`](https://developer.mozilla.org/zh-CN/docs/Web/API/IntersectionObserver)实例。
+
+
+
+##### 2. IntersectionObserver Options & 实例属性
+
+IntersectionObserver Options 是 IntersectionObserver 构造函数的第二个参数，用来配置监视器的部分信息。
+
+如果`options`未指定，observer实例默认使用文档视口作为root，并且没有margin，阈值为0%（意味着即使一像素的改变都会触发回调函数）。你可以指定以下配置：
+
+```ts
+interface IntersectionObserverInit {
+    root?: Element | Document | null;
+    rootMargin?: string;
+    threshold?: number | number[];
+}
+```
+
+**root**：设置监视器的根节点，不传则默认为文档视口。当root为文档视口时，被观察的目标元素被其他元素滚动卷起（隐藏），也会判断为消失。
+
+**rootMargin**： 类似于 CSS 的 margin 属性。用来缩小或扩大 rootBounds，从而影响相交的触发。默认值是"0px 0px 0px 0px"。（top、right、bottom 、 left）
+
+**threshold**：属性决定相交比例为多少时，触发回调函数。取值为 0 ~ 1，或者 0 ~ 1的数组。 当我们把  threshold 设置为 [0, 0.25, 0.5, 0.75, 1]，绿色方块分别在 0%，25%，50%，75%，100% 可见时，触发回调函数。
+
+
+
+##### 3. IntersectionObserver Entry
+
+IntersectionObserverEntry 对象提供了目标元素与跟元素相交的详细信息。他有如下几个属性。
+
+```ts
+ const observer = new IntersectionObserver(
+        (entries) => {
+          for (const entry of entries) {
+          	// entry: IntersectionObserverEntry
+          }
+      );
+```
+
+```ts
+interface IntersectionObserverEntry {
+ 	readonly boundingClientRect: DOMRectReadOnly;
+  readonly intersectionRatio: number;
+  readonly intersectionRect: DOMRectReadOnly;
+  readonly isIntersecting: boolean;
+  readonly rootBounds: DOMRectReadOnly | null;
+  readonly target: Element;
+  readonly time: DOMHighResTimeStamp;
+};
+```
+
+
+![img](https://p1-jj.byteimg.com/tos-cn-i-t2oaga2asx/gold-user-assets/2019/8/29/16cdccc7f71311ee~tplv-t2oaga2asx-zoom-in-crop-mark:1304:0:0:0.awebp)
+
+**time**：发生相交到相应的时间，毫秒。
+
+**rootBounds**：根元素矩形区域的信息，图中蓝色部分区域，如果没有设置根元素则返回null。
+
+**boundingClientRect**：目标元素的矩形区域的信息，图中黑色边框的区域。
+
+**intersectionRect**：目标元素与视口（或根元素）的交叉区域的信息，图中蓝色方块和粉红色方块相交的区域。
+
+**isIntersecting**：目标元素与根元素是否相交。
+
+**intersectionRatio**：目标元素与视口（或根元素）的相交比例。
+
+**target**：目标元素，图中黑色边框的部分。
+
+
+
+##### 4. 实例方法
+
+[`IntersectionObserver.disconnect()`](https://developer.mozilla.org/zh-CN/docs/Web/API/IntersectionObserver/disconnect)
+
+使`IntersectionObserver`对象停止监听工作。
+
+[`IntersectionObserver.observe(target)`](https://developer.mozilla.org/zh-CN/docs/Web/API/IntersectionObserver/observe)
+
+使`IntersectionObserver`开始监听一个目标元素。可以监听多个目标元素。
+
+```ts
+const observer = new IntersectionObserver((entries) => {});
+observer.observe(element1)
+observer.observe(element2)
+```
+
+[`IntersectionObserver.takeRecords()`](https://developer.mozilla.org/zh-CN/docs/Web/API/IntersectionObserver/takeRecords)
+
+返回所有观察目标的[`IntersectionObserverEntry`](https://developer.mozilla.org/zh-CN/docs/Web/API/IntersectionObserverEntry)对象数组。
+
+[`IntersectionObserver.unobserve(target)`](https://developer.mozilla.org/zh-CN/docs/Web/API/IntersectionObserver/unobserve)
+
+使`IntersectionObserver`停止监听特定目标元素。
+
+
+
+##### 交集的计算
+
+理解交集如何计算是重要的。首先，Intersection Observer API 将任意物体都视为矩形以便计算。这些矩形在包含目标内容的前提下，将被尽可能小的计算。
+
+![Bounding box outlines](https://p1-jj.byteimg.com/tos-cn-i-t2oaga2asx/gold-user-assets/2019/11/21/16e8c26fbf0623d8~tplv-t2oaga2asx-zoom-in-crop-mark:1304:0:0:0.awebp)目标矩形的边界轮廓
+
+
+
+对于根元素，基于 `rootMargin` 的值考虑其矩形边界，这个值会扩大或减小根元素的尺寸。
+
+
+
+![Root Margin Calculations](https://p1-jj.byteimg.com/tos-cn-i-t2oaga2asx/gold-user-assets/2019/11/21/16e8c26fc9f4e57f~tplv-t2oaga2asx-zoom-in-crop-mark:1304:0:0:0.awebp)
+
+#### ResizeObserver
+
+**`ResizeObserver`** 接口可以监听到 [`Element`](https://developer.mozilla.org/zh-CN/docs/Web/API/Element) 的内容区域或 [`SVGElement`](https://developer.mozilla.org/zh-CN/docs/Web/API/SVGElement)的边界框改变。内容区域则需要减去内边距padding。（有关内容区域、内边距资料见[盒子模型](https://developer.mozilla.org/docs/Learn/CSS/Introduction_to_CSS/Box_model) ）
+
+##### polyfill
+
+```js
+import ResizeObserver from 'resize-observer-polyfill';
+```
+
+##### 构造器
+
+```ts
+var resizeObserver:ResizeObserver = new ResizeObserver(callback[]);
+resizeObserver.observe(element1);
+resizeObserver.observe(element2);
+```
+
+- callback
+
+```ts
+interface ResizeObserverCallback {
+	(entries: ResizeObserverEntry[], observer: ResizeObserver): void
+}
+
+interface ResizeObserverEntry {
+  readonly target: Element; // 被观察的目标元素
+  readonly contentRect: DOMRectReadOnly; // 目标元素的矩形区域，包含x,y,width,height,top,right,bottom,left属性），与元素的getBoundingClientRect不同，contentRect的width和height值不包含padding。contentRect.top/y是元素的顶部padding，contentRect.left/x是元素的左侧padding
+}
+
+// 实例，只有方法无属性
+interface ResizeObserver {
+  observe(target: Element): void; // 用于观察一个指定Element 或 SVGElement。
+  unobserve(target: Element): void; // 用于结束一个指定的 Element 或 SVGElement 的观察。
+  disconnect(): void; // 会停止和取消目标对象上所有对Element 或 SVGElement 的监听。
+}
+```
+
+
+
+##### 示例
+
+以下示例通过观察box的宽度变化从而改变其边框圆角半径。
+
+```js
+const resizeObserver = new ResizeObserver(entries => {
+  for (let entry of entries) {
+    entry.target.style.borderRadius = Math.max(0, 250 - entry.contentRect.width) + 'px';
+  }
+});
+resizeObserver.observe(document.querySelector('.box'));
+```
+
+#### MutationObserver
+
+MutationObserver 可以监听对元素的属性的修改、对它的子节点的增删改。
+
+
 
 #### 术语
 

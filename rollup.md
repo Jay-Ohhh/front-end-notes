@@ -549,20 +549,20 @@ rollup -i src/main.js ... -e foo,bar,baz
 
 ```js
 {
-    input: 'src/index.ts',
-  output: [
+  	input: 'src/index.ts',
+    output: [
       {
-          file: pkg.module,
-          format: 'umd',
-          name: "xxx",
-          globals:{
-              react: "React",
-        "react-dom": "ReactDOM",
-              jquery: "$",
-          }
+        file: pkg.module,
+        format: 'umd',
+        name: "xxx",
+        globals:{
+          react: "React",
+          "react-dom": "ReactDOM",
+          jquery: "$",
+        }
       },
-  ],
-  external:['react', 'react-dom', 'jquery']
+    ],
+  	external:['react', 'react-dom', 'jquery']
 }
 ```
 
