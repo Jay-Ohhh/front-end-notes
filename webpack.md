@@ -150,29 +150,126 @@ source map模式详细说明：https://blog.csdn.net/zwkkkk1/article/details/887
 
 ##### optimization
 
+###### chunkIds: 'deterministic'
+
+假设有两个文件: `index.js` 和 `lib.js`，且 index 依赖于 lib，其内容如下。
+
+**index.js**
+
+```js
+// index.js
+import("./lib").then((o) => console.log(o));
+```
+
+**lib.js**
+
+```js
+export const a = 3;
+```
+
+由 webpack 等打包器打包后将会生生两个 chunk (为了方便讲解，以下 aaaaaa 为 hash 值)
+
+- `index.aaaaaa.js`
+- `lib.aaaaaa.js`
+
+问: 假设 lib.js 文件内容发生变更，index.js 由于引用了 lib.js，可能包含其文件名，那么它的 hash 是否会发生变动
+
+答: 不一定。打包后的 `index.js` 中引用 lib 时并不会包含 `lib.aaaaaa.js`，而是采用 chunkId 的形式，如果 chunkId 是固定的话，则不会发生变更。
+
+```js
+// 打包前
+import("./lib");
+
+// 打包后，201 为固定的 chunkId (chunkIds = deterministic 时)
+__webpack_require__.e(/* import() | lib */ 201);
+```
+
+在 webpack 中，通过 `optimization.chunkIds` 可设置确定的 chunkId，来增强 Long Term Cache 能力。
+
+```bash
+{
+  optimization: {
+    chunkIds: 'deterministic'
+  }
+}
+```
+
+设置该选项且 `lib.js` 内容发生变更后，打包 chunk 如下，仅仅 `lib.js` 路径发生了变更。
+
+- `index.aaaaaa.js`
+- `lib.bbbbbb.js`
+
+
+
+###### moduleIds: 'deterministic' 同上
+
+
+
+
+
 ###### splitChunks
 
 使用webpack打包项目时一方面我们要防止单个文件太大，另一方面要防止文件碎片化，即打包文件太多，导致网络请求过多。所以合理的配置应该是兼顾打包文件的数量以及打包文件的个数。
 
 **splitChunks.chunks**
 
-Chunks 有三个提供的值，分别是 async、initial、all
+https://mp.weixin.qq.com/s/HbgIXi0zpvU_-kdILHGi3A
 
-- async 只对动态（异步）导入的模块进行分离
-- initial 对所有模块进行分离，如果一个模块既被异步引用，也被同步引用，那么会生成两个包
-- all 对所有模块进行分离，如果一个模块既被异步引用，也被同步引用，那么只会生成一个共享包
+Webpack 内部包含三种类型的 Chunk：
+
+- Initial Chunk：基于 Entry 配置项生成的 Chunk，此 chunk 包含为入口起点指定的所有模块及其依赖项
+- Async Chunk：异步模块引用，如 `import(xxx)` 语句对应的异步 Chunk
+- Runtime Chunk：只包含运行时代码的 Chunk
+
+而 `SplitChunksPlugin` 默认只对 Async Chunk 生效，开发者也可以通过 `optimization.splitChunks.chunks`（默认 `async` ） 调整作用范围，该配置项支持如下值：
+
+- 字符串 `'all'` ：对 Initial Chunk 与 Async Chunk 都生效，如果一个模块既被异步引用，也被同步引用，那么只会生成一个共享包，建议优先使用该值
+- 字符串 `'initial'` ：只对 Initial Chunk 进行分离，不会将同步加载和异步加载一起处理，而是分开处理，如果一个模块既被异步引用，也被同步引用，那么会生成两个包
+- 字符串 `'async'` ：只对 Async Chunk 进行分离，webpack会在用到的时候通过webpack djsonp方法动态创建script标签加载相应的文件，我们在react和Vue的懒加载路由中使用的也是这种方式
+- 函数 `(chunk) => boolean` ：该函数返回 `true` 时生效
 
 具体可以参考这篇文章: [Webpack 4 Mysterious SplitChunks Plugin](https://link.juejin.cn/?target=https%3A%2F%2Fmedium.com%2Fdailyjs%2Fwebpack-4-splitchunks-plugin-d9fbbe091fd0)
 
-**splitChunks.minChunk**
+**最佳实践**
+
+那么，如何设置最适合项目情况的分包规则呢？这个问题并没有放诸四海皆准的通用答案，因为软件系统与现实世界的复杂性，决定了很多计算机问题并没有银弹，不过我个人还是总结了几条可供参考的最佳实践：
+
+1. **「尽量将第三方库拆为独立分包」**
+
+例如在一个 React + Redux 项目中，可想而知应用中的大多数页面都会依赖于这两个库，那么就应该将它们从具体页面剥离，避免重复加载。`chunks: all`
+
+但对于使用频率并不高的第三方库，就需要按实际情况灵活判断，例如项目中只有某个页面 A 接入了 Three.js，如果将这个库跟其它依赖打包在一起，那用户在访问其它页面的时候都需要加载 Three.js，最终效果可能反而得不偿失，这个时候可以尝试异步引入 Three.js 并使用异步加载功能将 Three.js 独立分包。`chunks: async`
+
+2. **「保持按路由分包，减少首屏资源负载」**
+
+设想一个超过 10 个页面的应用，假如将这些页面代码全部打包在一起，那么用户访问其中任意一个页面都需要等待其余 9 个页面的代码全部加载完毕后才能开始运行应用，这对 TTI 等性能指标明显是不友好的，所以应该尽量保持按路由维度做异步模块加载，所幸很多知名框架如 React、Vue 对此都有很成熟的技术支持
+
+3.  **高频库**
+
+   一个模块被 N(2 个以上) 个 Chunk 引用，可称为公共模块，可把公共模块给抽离出来，形成 `vendor.js`。
+
+   问：那如果一个模块被用了多次 (2 次以上)，但是该模块体积过大(1MB)，每个页面都会加载它(但是无必要，因为不是每个页面都依赖它)，导致性能变差，此时如何分包？
+
+   答：如果一个模块虽是公共模块，但是该模块体积过大，可直接 `import()` 引入，异步加载，单独分包，比如 `echarts` 等
+
+   问：如果公共模块数量多，导致 vendor.js 体积过大(1MB)，每个页面都会加载它，导致性能变差，此时如何分包
+
+   答：有以下两个思路
+
+   1. 思路一: 可对 vendor.js 改变策略，比如被引用了十次以上，被当做公共模块抽离成 verdor-A.js，五次的抽离为 vendor-B.js，两次的抽离为 vendor-C.js
+   2. 思路二: 控制 vendor.js 的体积，当大于 100KB 时，再次进行分包，多分几个 vendor-XXX.js，但每个 vendor.js 都不超过 100KB
+
+**splitChunks.minChunks**
 
 某个包的引用次数必须大于等于设置的数值，该模包才能被拆分出来；
+
+“被 Chunk 引用次数”并不直接等价于被 `import` 的次数，而是取决于上游调用者是否被视作 Initial Chunk 或 Async Chunk 处理
 
 **splitChunks.minSize**
 
 字面意思就可以看出来是满足相应大小的包才会被提取出来，单位是字节，minSize的值为30000，也就是说小于这个数的包不会被提取而是会被打到引用的文件中去，maxSize与之相反，但优先级小于minSize，另外值得注意的是，这两个值只对静态引入的公共包有影响，对于异步引入的包，不管大小多少哪怕minSize设置的很大，也同样是会被提取出来的。
 
-maxSize如果为非0值时，切忌小于minSize；
+maxSize如果为非0值时，不能小于minSize；
 
 **splitChunks.cacheGroups**
 
@@ -1298,6 +1395,8 @@ module.exports = {
 
 #### 常用配置
 
+[webpack 最佳实践](https://mp.weixin.qq.com/s/xNGQSW4CUn-neIUpiEkdXA)
+
 ```js
 import path from 'path';
 import fs from 'fs';
@@ -1388,12 +1487,21 @@ const config: Configuration = {
 		// noParse: content => {},
 		rules: [
 			{ test: /\.json$/, use: 'json-loader', type: 'javascript/auto' },
+
+			// 按照以往的套路，直接引用社区的三件套 raw-loader、url-loader、file-loader，安装依赖，配置依赖，一通操作下来就解决了问题。现在我们使用 webpack5就方便多了，不用安装任何依赖，直接修改 webpack.base.js 配置文件 https://webpack.docschina.org/guides/asset-modules/
+			// webpack5的配置
+			// 	{
+			//     test: /\.(png|jpg|gif|jpeg|webp|svg|eot|ttf|woff|woff2)$/,
+			//     type: 'asset',
+			// },
+
 			/**
 			 * url-loader应该是file-loader上加了一层过滤。小于8k采用base64编码，减少一次http请求，大于8k则采用file-loader处理
 			 */
 			// 图片
 			{
 				test: /\.(png|jpe?g|gif|ico)$/,
+				// limit 单位b，大于等于不会转成base64格式的字符串
 				use: [{ loader: 'url-loader', options: { limit: 8192, name: 'images/[name].[hash:8].[ext]', publicPath: '' } }],
 			},
 			// 字体图标
@@ -1538,6 +1646,7 @@ if (isDevMode) {
 									// i不区分大小写
 									auto: /\.module\.\w+$/i,
 									// [path]：源文件相对于 compiler.context 或者 modules.localIdentContext 配置项的相对路径
+									// [local] - 原始类名
 									localIdentName: '[path][name]_[local]',
 									// 默认：compiler.context
 									localIdentContext: srcPath,
@@ -1731,6 +1840,9 @@ if (!isDevMode) {
 		],
 		optimization: {
 			// moduleIds: 'deterministic' 在 webpack 5 中被添加，而且 moduleIds: 'hashed' 相应地会在 webpack 5 中废弃。
+			// webpack5 生产环境长期缓存配置
+			// chunkIds:'deterministic',
+			// chunkIds: 'deterministic',
 			moduleIds: 'hashed',
 			// runtimeChunk：将 runtime 代码拆分为一个单独的 chunk。
 			// runtimeChunk：可用来优化持久化缓存的。runtime，以及伴随的 manifest 数据，主要是指：在浏览器运行过程中，webpack 用来连接模块化应用程序所需的所有代码。模块信息清单（runtime 代码、manifest 数据）在每次有模块变更(hash 变更)时都会变更, 所以我们想把这部分代码单独打包出来, 配合后端缓存策略, 这样就不会因为某个模块的变更导致包含模块信息的模块(通常会被包含在最后一个 bundle 中)缓存失效. optimization.runtimeChunk 就是告诉 webpack 是否要把这部分单独打包出来。
@@ -1774,10 +1886,13 @@ if (!isDevMode) {
 						priority: 1,
 					},
 					schema: {
+						// [xxx] 目标文本需包含【任意一个包含在括号中的元素】
+						// [\\/] 兼容 \path\ 和 /path/
 						test: /[\\/]src[\\/]pages[\\/].*\.(schema|react)\.(ts|tsx|js|jsx|json)$/,
 						chunks: 'async',
 						minSize: 1024 * 256,
 						maxSize: 1024 * 1024,
+						// 告诉 webpack 忽略 splitChunks.minSize、splitChunks.minChunks、splitChunks.maxAsyncRequests 和 splitChunks.maxInitialRequests 选项，并始终为此缓存组创建 chunk。
 						// enforce: true,
 						priority: 2,
 					},

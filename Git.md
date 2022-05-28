@@ -1535,6 +1535,10 @@ ssh -T 地址 // 测试是否连上
 
 例如：`https://stackblitz.com/github/Jay-Ohhh/rolib-cli`
 
+8个github技巧
+
+https://mp.weixin.qq.com/s/BpmyTfdI9BUrMnL8k2r1BQ
+
 #### 使用 Travis CI 自动更新
 
 https://cli.vuejs.org/zh/guide/deployment.html#github-pages

@@ -5699,6 +5699,23 @@ A(new Cat());
 
 所以`(param: Animal) => void -> (param: Cat) => void` 。根据前面的定义可以看出函数参数是逆变的。
 
+**再举一个例子**
+
+```ts
+let fn1!: (a: string, b: number) => void;
+let fn2!: (a: string, b: number, c: boolean) => void;
+// 第一种情况
+fn1 = fn2; // TS Error: 不能将fn2的类型赋值给fn1
+fn1('a', 1); // 报错，因为实际上调用的是fn2，缺少一个参数
+
+fn2 = fn1; // correct
+fn2('a', 1, true ); // 实际上调用的是fn1，多一个参数没关系
+```
+
+
+
+
+
 ##### 返回值兼容性
 
 我们假设`() => Cat`为`A`，此时有以下两种函数：
@@ -5741,6 +5758,21 @@ result.purr();
 此时函数成功运行。那么假设成立。
 
 所以`() => WhiteCat -> () => Cat`。根据前面的定义可以看出函数返回值是协变的。
+
+**再举一个例子**
+
+```ts
+let fn1!: (a: string, b: number) => string;
+let fn2!: (a: string, b: number) => string | number | boolean;
+
+// 第一种情况
+fn2 = fn1; // correct 
+let a = fn2(); // a的类型为string | number | boolean，而实际调用的是fn1，返回string
+
+// 第二种情况
+fn1 = fn2 // error: 不可以将 string|number|boolean 赋给 string 类型
+let b = fn1(); // b的类型是string，实际调用的是fn2，返回 string|number|boolean
+```
 
 
 

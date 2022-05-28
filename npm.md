@@ -92,13 +92,113 @@ https://segmentfault.com/a/1190000016365409
 > 
 > The `module` field is not an official npm feature but a common convention among bundlers to designate how to import an ESM version of our library.
 
+
+
+##### exports
+
+exports 字段 (https://webpack.js.org/guides/package-exports/)，用于webpack打包
+
+exports 字段声明了一个对应关系，用 import "package" 和 import "package/sub/path" 会返回不同的模块。
+
+这替换了默认返回 main 字段文件的行为。
+
+当指定了 exports 字段时，只有声明了那些模块是可用的，其他的模块会抛出 ModuleNotFound Error。
+
+```js
+// package.json
+{
+  name: 'midash',
+  main: './index.js',
+  exports: {
+    '.': './dist/index.js',
+    'get': './dist/get.js'
+  }
+}
+
+// 正常工作
+import get from 'midash/get'
+
+// 无法正常工作，无法引入
+import get from 'midash/dist/get'
+```
+
+```json
+{
+  "exports": {
+    ".": "./main.js",
+    "./sub/path": "./secondary.js",
+    "./prefix/": "./directory/",
+    "./prefix/deep/": "./other-directory/",
+    "./other-prefix/*": "./yet-another/*/*.js"
+  }
+}
+```
+
+根据模块的引用语法，来引用不同的文件
+
+```json
+"exports": {
+    ".": {
+      "import": "./lib/esm/index.mjs",
+      "require": "./command.js"
+    },
+    "./package.json": "./package.json"
+  }
+```
+
+`exports` 不仅可根据模块化方案不同选择不同的入口文件，还可以根据环境变量(`NODE_ENV`)、运行环境(`nodejs`/`browser`/`electron`) 导入不同的入口文件
+
+```json
+{
+  "type": "module",
+  "exports": {
+    "electron": {
+      "node": {
+        "development": {
+          "module": "./index-electron-node-with-devtools.js",
+          "import": "./wrapper-electron-node-with-devtools.js",
+          "require": "./index-electron-node-with-devtools.cjs"
+        },
+        "production": {
+          "module": "./index-electron-node-optimized.js",
+          "import": "./wrapper-electron-node-optimized.js",
+          "require": "./index-electron-node-optimized.cjs"
+        },
+        "default": "./wrapper-electron-node-process-env.cjs"
+      },
+      "development": "./index-electron-with-devtools.js",
+      "production": "./index-electron-optimized.js",
+      "default": "./index-electron-optimized.js"
+    },
+    "node": {
+      "development": {
+        "module": "./index-node-with-devtools.js",
+        "import": "./wrapper-node-with-devtools.js",
+        "require": "./index-node-with-devtools.cjs"
+      },
+      "production": {
+        "module": "./index-node-optimized.js",
+        "import": "./wrapper-node-optimized.js",
+        "require": "./index-node-optimized.cjs"
+      },
+      "default": "./wrapper-node-process-env.cjs"
+    },
+    "development": "./index-with-devtools.js",
+    "production": "./index-optimized.js",
+    "default": "./index-optimized.js"
+  }
+}
+```
+
+
+
 ##### typings
 
 TypeScript 的入口文件
 
 ```json
 {
-    "typings": "dist/index.d.ts",
+  "typings": "dist/index.d.ts",
 }
 ```
 
@@ -121,11 +221,24 @@ $ NODE_ENV=production npm install
 
 - 如果我们对外提供的是一个依赖包，在别人引用我们的包的时候devDependencies中的依赖不会被 npm 下
 
+**对于应用开发而言**
+
 是否将模块打包和dependencies、devDependencies没有任何关系，只要引入且使用了模块，就会被模块打包器识别并打包。
+
+**对于库 (Package) 开发而言，是有严格区分的**
+
+- dependencies: 在生产环境中使用
+- devDependencies: 在开发环境中使用，如 webpack/babel/eslint 等
+
+当在项目中安装一个依赖的 Package 时，该依赖的 `dependencies` 也会安装到项目中，即被下载到 `node_modules` 目录中。但是 `devDependencies` 不会。
 
 ##### peerDependencies
 
-目的是提示宿主环境去安装满足插件peerDependencies所指定依赖的包，然后在插件import或者require所依赖的包的时候，永远都是引用宿主环境统一安装的npm包，最终解决插件与所依赖包不一致的问题。
+目的是提示宿主环境去安装满足库peerDependencies所指定依赖的包，然后在import或者require所依赖的包的时候，永远都是引用宿主环境统一安装的npm包，最终解决库与所依赖包不一致的问题。
+
+>例如 `ant-design` 的 peerDependencies : "react": ">=16.9.0"
+>
+>意思是 `ant-design` 依赖对应版本的react，同时要求宿主环境安装该范围版本的react，避免 `ant-design` 引用 react 出错。
 
 比方其中有一个依赖包PackageA，该包的package.json文件指定了对PackageB的依赖：
 
@@ -167,6 +280,8 @@ var packageB = require('PackageB')
 **peerDependencies的引入**
 
 例如上面PackageA的package.json文件如果是下面这样：
+
+版本号通常是范围 `~`、`^`
 
 ```json
 {
@@ -302,6 +417,20 @@ npm unlink common
 
 当我们 `npm i` 时，默认的版本号是 `^`，可最大限度地在向后兼容与新特性之间做取舍。
 
+##### 升级版本号
+
+使用 `npm outdated` 虽能发现需要升级版本号的 package，但仍然需要手动在 package.json 更改版本号进行升级。
+
+此时推荐一个功能更强大的工具 `npm-check-updates`，比 `npm outdated` 强大百倍。
+
+`npm-check-updates -u`，可自动将 package.json 中待更新版本号进行重写。
+
+升级 [minor] 小版本号，有可能引起 `Break Change`，可仅仅升级到最新的 patch 版本。
+
+```bash
+$ npx npm-check-updates --target patch
+```
+
 
 
 **npm i 某个 package 时会修改 `package-lock.json` 中的版本号吗**
@@ -347,6 +476,30 @@ serve folder_name
 #### npm scripts hooks
 
 http://www.ruanyifeng.com/blog/2016/10/npm_scripts.html
+
+https://docs.npmjs.com/cli/v8/using-npm/scripts#npm-rebuild
+
+**npm run**
+
+- `pre<user-defined>`
+- `<user-defined>`
+- `post<user-defined>`
+
+npm 脚本有`pre`和`post`两个钩子。举例来说，`build`脚本命令的钩子就是`prebuild`和`postbuild`
+
+```
+"prebuild": "echo I run before the build script",
+"build": "cross-env NODE_ENV=production webpack",
+"postbuild": "echo I run after the build script"
+```
+
+用户执行`npm run build`的时候，会自动按照下面的顺序执行
+
+```shell
+npm run prebuild && npm run build && npm run postbuild
+```
+
+
 
 #### 分析
 

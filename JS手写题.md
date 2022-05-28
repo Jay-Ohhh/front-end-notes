@@ -695,6 +695,8 @@ HTL的解析和CSS的解析是并行的，DOM解析和CSS解析会阻塞render�
 
 ###### 图片优化
 
+[性能优化——图片压缩、加载和格式选择](https://mp.weixin.qq.com/s/FtaUER4Hv3RzCReKTqIRNQ)
+
 1. 压缩图片
 
 2. url-loader：小图片则进行base64编码

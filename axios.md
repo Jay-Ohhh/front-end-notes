@@ -520,6 +520,7 @@ function generateReqKey(config: AxiosRequestConfig) {
 const pendingRequest = new Map<string, Canceler>();
 function addPendingRequest(config) {
 	const requestKey = generateReqKey(config);
+  // 如果请求config含有cancelToken，则意味是开发者故意传进来的，因此取消请求则应该由开发者在适当时机去调用
 	config.cancelToken =
 		config.cancelToken ||
 		new axios.CancelToken((cancel) => {
