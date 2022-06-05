@@ -836,15 +836,15 @@ git reset --hard 错误的commitHash
 
 
 
-##### 设置 git 短命令
+#### 设置 git 短命令
 
-#### 方式一
+###### 方式一
 
 ```sh
 git config --global alias.ps push
 ```
 
-#### 方式二
+###### 方式二
 
 打开全局配置文件
 
@@ -863,7 +863,7 @@ vim ~/.gitconfig
         cp = cherry-pick
 ```
 
-#### 使用
+###### 使用
 
 ```sh
 # 等同于 git cherry-pick <commitHash>
@@ -1172,11 +1172,13 @@ git push -f
 
 #### 解决冲突
 
-https://www.liaoxuefeng.com/wiki/896043488029600/900004111093344
-
 当Git无法自动合并分支时，就必须首先解决冲突。解决冲突后，再add 、commit、merge。
 
 解决冲突就是把Git合并失败的文件手动编辑为协商好的版本，再提交。需要与领导同事协商。
+
+#### Gitlab 请求合并
+
+https://blog.csdn.net/panjunnn/article/details/106388986
 
 #### pull request
 

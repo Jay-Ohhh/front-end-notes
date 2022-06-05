@@ -858,9 +858,11 @@ Tree Shaking是一个术语，通常用于描述移除 JavaScript 上下文中�
 - 使用 ES2015 模块语法（即 `import` 和 `export`）。
   
   > 因为在使用 CommonJS 时，会导入整个库(library)对象
-  > 
+  >
   > 但是在使用 ES6 模块时，可以只导入(import)我们所需的对象或函数
-
+  >
+  > 尽量使用 `name export`，export default 导出整体对象结果，不利于 tree shaking 进行分析；另一方面，export default 导出的结果可以随意命名变量，不利于团队统一管理
+  
 - 确保没有编译器将您的 ES2015 模块语法转换为 CommonJS 的（顺带一提，这是现在常用的 @babel/preset-env 的默认行为，详细信息请参阅[文档](https://babeljs.io/docs/en/babel-preset-env#modules)）。
 
 - 在项目的 `package.json` 文件中，添加 `"sideEffects"` 属性。
@@ -871,7 +873,7 @@ Tree Shaking是一个术语，通常用于描述移除 JavaScript 上下文中�
 
 如果你对优化输出很感兴趣，请进入到下个指南，来了解 [生产环境](https://webpack.docschina.org/guides/production) 构建的详细细节。
 
-但是要想使其生效，生成的代码必须是ES6模块。不能使用其它类型的模块如`CommonJS`之流。如果使用`Babel`的话，这里有一个小问题，因为`Babel`的预案（preset）默认会将任何模块类型都转译成`CommonJS`类型，这样会导致`tree-shaking`失效。修正这个问题也很简单，在`.babelrc`文件或在`webpack.config.js`文件中设置`modules： false`就好了
+但是要想使其生效，生成的代码必须是ES6模块。不能使用其它类型的模块如`CommonJS`之流。如果使用`Babel`的话，这里有一个小问题，因为`Babel`的预案（preset）默认会将任何模块类型都转译成`CommonJS`类型，这样会导致`tree-shaking`失效。修正这个问题也很简单，在`.babelrc`文件或在`webpack.config.js`文件中设置`modules: false`就好了
 
 ```js
 // .babelrc
@@ -906,6 +908,25 @@ module: {
     ]
 }
 ```
+
+##### package.json 中的 sideEffects
+
+在 Webpack 的 Tree Shaking 配置中，有一个可以在 `package.json` 中配置的叫 `sideEffects`，这个 `sideEffects` 的配置主要是让 Webpack 这种 bundler 知道此项目是否可以做 Tree Shaking 的动作。
+
+假如设定为 `false` 就代表可以将所有的文件进行 Tree Shaking，若读者知道有哪些档案是不能做 Tree Shaking 的，这时候只要在 `sideEffects` 内用一个数组将不能做 Tree Shaking 的文件路径写上去，这时候 bundler 就只会针对这个数组以外的文件进行 Tree Shaking。
+
+```json
+{
+	// 如果所有代码都不包含副作用，我们就可以简单地将该属性标记为 false，来告知 webpack 它可以安全地删除未用到的 export。
+	"sideEffects": false
+	// 除了数组内的文件或文件夹，都可以进行 tree shaking
+  "sideEffects": [
+  	".style/*.css"
+  ]
+}
+```
+
+
 
 #### Modules
 

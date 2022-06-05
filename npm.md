@@ -1,5 +1,7 @@
 #### 发包
 
+[发包步骤](https://juejin.cn/post/7052307032971411463)
+
 ##### NPM发包文件黑/白名单
 
 当执行`npm publish`命令，默认包含的文件（不区分大小写）有
@@ -340,6 +342,8 @@ https://unpkg.com/jquery@[latestVersion]/[pkg.unpkg]
 https://unpkg.com/jquery@[latestVersion]/[pkg.main] 
 ```
 
+
+
 #### npm link
 
 **用法**
@@ -479,7 +483,38 @@ http://www.ruanyifeng.com/blog/2016/10/npm_scripts.html
 
 https://docs.npmjs.com/cli/v8/using-npm/scripts#npm-rebuild
 
-**npm run**
+##### npm install
+
+These also run when you run `npm install -g <pkg-name>`
+
+- `preinstall`
+- `install`
+- `postinstall`
+- `prepublish`
+- `preprepare`
+- `prepare`
+- `postprepare`
+
+##### npm publish
+
+- `prepublishOnly`
+- `prepack`
+- `prepare`
+- `postpack`
+- `publish`
+- `postpublish`
+
+##### npm ci
+
+- `preinstall`
+- `install`
+- `postinstall`
+- `prepublish`
+- `preprepare`
+- `prepare`
+- `postprepare`
+
+##### npm run
 
 - `pre<user-defined>`
 - `<user-defined>`
@@ -497,6 +532,54 @@ npm 脚本有`pre`和`post`两个钩子。举例来说，`build`脚本命令的�
 
 ```shell
 npm run prebuild && npm run build && npm run postbuild
+```
+
+
+
+
+
+#### 发布scope包
+
+一  登录npm 个人中心 添加或新建组织
+
+二  更改包名称
+
+package.json：
+
+> name: "@aaa/bbb"
+
+三 发包
+
+然后进行登录，输入你注册的账号密码邮箱：
+
+```bash
+npm login
+```
+
+还可以用下面命令退出当前账号
+
+```bash
+npm logout
+```
+
+如果不知道当前登录的账号可以用who命令查看身份：
+
+```bash
+npm who am i
+```
+
+登录成功就可以将我们的包推送到服务器上去了，执行下面命令，会看到一堆的npm notice：
+
+发布public库免费且无限制，发布private库需要收费7$/mon，因此我们公共库需要加上 `--access public` 
+
+```bash
+npm publish --access public
+```
+
+如果某版本的包有问题，我们还可以将其撤回
+
+```bash
+npm unpublish [pkg]@[version]
 ```
 
 

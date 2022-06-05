@@ -3139,8 +3139,6 @@ console.log(Days["Sat"] === 6.5); // true
 
 **字符串枚举**
 
- 在一个字符串枚举里，每个成员都必须用字符串字面量，或另外一个字符串枚举成员进行初始化。
-
 ```ts
 enum Direction {
     Up = "UP",
@@ -3152,7 +3150,7 @@ enum Direction {
 
 **异构枚举**
 
-异构枚举可以混合字符串和数字成员 ：
+异构枚举可以混合字符串和数字成员，但不能混合其他类型，不过可以使用断言 any，变成计算值 ：
 
 ```ts
 enum Days {Sun = 7, Mon, Tue, Wed, Thu, Fri, Sat = "S"}; 
@@ -3288,7 +3286,7 @@ var directions = [0 /* Up */, 1 /* Down */, 2 /* Left */, 3 /* Right */];
 
 **外部枚举**
 
-外部枚举（Ambient Enums）是使用 `declare enum` 定义的枚举类型：
+外部枚举（Ambient Enums）是使用 `declare enum` 定义的枚举类型，用来描述已经存在的枚举类型的形状
 
 ```ts
 declare enum Directions {
@@ -3306,6 +3304,7 @@ let directions = [Directions.Up, Directions.Down, Directions.Left, Directions.Ri
 上例的编译结果是：
 
 ```js
+// 假设Directions已存在
 var directions = [Directions.Up, Directions.Down, Directions.Left, Directions.Right];
 ```
 
@@ -3477,7 +3476,7 @@ const b = new B();
 b.constructor === B.prototype.constructor // true
 ```
 
-上面代码中，`b`是`B`类的实例，它的`constructor()`方法就是`B`类原型的`constructor()`方法。
+上面代码中，`b`是`B`类的实例，它（本身没有constructor方法会在原型链上找）的`constructor()`方法就是`B`类原型的`constructor()`方法。
 
 由于类的方法都定义在`prototype`对象上面，所以类的新方法可以添加在`prototype`对象上面。`Object.assign()`方法可以很方便地一次向类添加多个方法。 
 
@@ -3779,9 +3778,7 @@ class Cat extends Animal {
 }
 ```
 
-ES5的继承，实质是先创造子类的实例对象，然后再将父类属性添加到实例对上面。
 
-class的继承， 实质是先创造父类的实例对象，然后再将子类属性添加到实例对象上面。必须先通过父类的构造函数完成塑造，然后再对其加工，加上子类自身的属性。如果不调用super方法，子类就得不到父类的实例对象。
 
 ###### 注意点
 
@@ -4004,7 +4001,7 @@ Foo.prop // 1
 
 上面的写法为`Foo`类定义了一个静态属性`prop`。
 
-目前，只有这种写法可行，因为 **ES6 明确规定，Class 定义时内部只有静态方法，没有静态属性**。现在[ES7提案](https://github.com/tc39/proposal-class-fields)提供了类的静态属性，写法是在实例属性的前面，加上`static`关键字。
+目前，只有这种写法可行，因为 **ES6 明确规定，Class 定义时内部只有静态方法，没有静态属性**。现在[ES7提案](https://github.com/tc39/proposal-class-fields)提供了类的静态属性，加上`static`关键字。
 
 这个新写法大大方便了静态属性的表达。
 
@@ -6118,9 +6115,9 @@ type Obj =  {
 
 ##### infer
 
-在条件类型语句中，可以用 `infer` 声明一个类型变量并且对它进行使用。
+在条件类型语句中，可以用 `infer` 推断一个类型变量并且对它进行使用。
 
-```
+```ts
 type ReturnType<T> = T extends (
   ...args: any[]
 ) => infer R ? R : any;
@@ -6348,7 +6345,7 @@ type Readonly<T> = {
 
 ##### `Pick<T, K>`
 
-从T类型中过滤出K属性，实现原理：
+从T类型t挑选出K属性，实现原理：
 
 ```ts
 // 利用 extends 关键字约束 K 类型必须为 keyof T 联合类型的子类型

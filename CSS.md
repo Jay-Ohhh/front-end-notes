@@ -1,4 +1,86 @@
-#### 样式模块化 CSS Modules
+#### 水平垂直居中
+
+##### 无宽高
+
+1. 绝对定位和translate；
+
+```css
+position: absolute;
+left: 50%;
+top: 50%;
+transform: translate(-50%, -50%);
+```
+
+2. 绝对定位和margin实现；
+
+```css
+position: absolute;
+left: 0;
+top: 0;
+bottom: 0;
+right: 0;
+margin: auto;
+```
+
+3. 为其父元素设置为flex水平垂直轴居中；
+
+```css
+display: flex;
+align-items: center;
+justify-content: center;
+```
+
+##### 有宽高
+
+1. 为其父元素设置line-height=高度配合text-align: center（仅限行内元素）；
+
+```css
+text-align: center;
+line-height: 等于高度;
+```
+
+2. 绝对定位配合margin-left左右偏移
+
+```css
+position: absolute;
+top: 50%;
+left: 50%;
+width:200px;
+height:200px;
+margin-top: -100px;
+margin-left: -100px;
+```
+
+#### flex
+
+**基本概念：**
+
+1. 容器&项目：采用 Flex 布局的元素，称为 Flex 容器（flex container），简称"容器"。它的所有子元素自动成为容器成员，称为 Flex 项目（flex item），简称"项目"。
+2. 主轴&交叉轴：堆叠的方向，默认主轴是水平方向，交叉轴是垂直方向。可通过`flex-derection: column`设置主轴为垂直方向。
+
+**容器属性：**
+
+- display: flex
+- flex-direction：主轴的方向（即项目的排列方向），row | row-reverse | column | column-reverse;
+- flex-wrap：是否换行，nowrap | wrap | wrap-reverse;
+- flex-flow：direction 和 wrap简写
+- justify-content：主轴对齐方式，flex-start | flex-end | center | space-between | space-around;
+- align-items：交叉轴对齐方式，flex-start | flex-end | center | baseline | stretch;
+- align-content: 多根轴线的对齐方式。如果项目只有一根轴线，该属性不起作用。flex-start | flex-end | center | space-between | space-around | stretch;
+
+**项目的属性:**
+
+- order：项目的排列顺序，数值越小，排列越靠前，默认为0。
+- flex-grow：放大比例，默认为0，指定元素分到的剩余空间的比例。
+- flex-shrink：缩小比例，默认为1，指定元素分到的缩减空间的比例。
+- flex-basis：分配多余空间之前，项目占据的主轴空间，默认值为auto
+- flex：grow, shrink 和 basis的简写，默认值为0 1 auto
+- align-self：单个项目不一样的对齐方式，默认值为auto，auto | flex-start | flex-end | center | baseline | stretch;
+- 参考：[Flex 布局教程：语法篇 - 阮一峰](http://www.ruanyifeng.com/blog/2015/07/flex-grammar.html)
+
+
+
+#### CSS Modules
 
 https://www.ruanyifeng.com/blog/2016/06/css_modules.html
 
@@ -377,26 +459,45 @@ vertical-align: top; // 设置成顶部对齐，默认是底部对齐
 
 ##### 移动端避免使用100vh
 
+在实际设备上测试我们的设计时，我们遇到了几个问题。
+
+- 大部分移动端的Chrome和Firefox浏览器在顶部都有一个UI（地址栏等）。
+- 在Safari浏览器上，地址栏在底部，这就变得更加棘手了。
+- 不同的浏览器有不同大小的视口
+- 移动设备计算浏览器视口为（顶栏+文档+底栏）=100vh
+
 移动端浏览器的地址栏有时可见有时不可见。
 
  这些浏览器没有将`100vh`高度调整为视口高度变化时屏幕的可见部分，而是将`100vh`设置为浏览器的高度。这就导致地址栏可见时，设置的100vh的元素的高度比屏幕的可见部分高度要大，出现滚动条。
 
 解决方案：
 
-- 将高度设置为window.innerHeight
-  
-  iOS Safari解决：
+**通过JS检测应用程序的高度**
 
-- ```css
-  body{
-      height:100vh;
-  }
-  @supports (-webkit-touch-callout:none){
-      body{
-          height:-webkit-fill-available;
-      }
-  }
-  ```
+```js
+const documentHeight = () => {
+ 	const doc = document.documentElement
+ 	doc.style.setProperty('--doc-height', `${window.innerHeight}px`)
+}
+window.addEventListener(‘resize’, documentHeight)
+documentHeight()
+```
+
+**使用 css 变量**
+
+```css
+:root {
+ 	--doc-height: 100%;
+}
+
+html,
+body {
+   padding: 0;
+   margin: 0;
+   height: 100vh; /* fallback for Js load */
+   height: var(--doc-height);
+}
+```
 
 #### :last-child无效
 
@@ -439,3 +540,47 @@ vertical-align: top; // 设置成顶部对齐，默认是底部对齐
 https://1linelayouts.glitch.me/
 
 https://mp.weixin.qq.com/s/I23bSM_nj0gQhhMM6NhF5g
+
+
+
+#### Retina
+
+对于 Retina 屏它的分辨率（物理像素数）是传统屏的两倍（假设是两倍），而屏幕大小没有变化，所以它需要的图片的分辨率应该是传统屏幕的两倍，显示时如果按传统屏的大小显示，就会因为图像分辨率不够而造成显示模糊。
+
+通常我们设置的CSS像素（逻辑像素）是传统屏的显示尺寸，假设该尺寸为x，（因为对于传统屏来说，1个CSS像素对应一个传统屏的物理像素），所以我们把相同的CSS像素设置给Retina屏就意味着要在Retina屏的显示尺寸为x。
+
+![像素比](http://jay_ohhh.gitee.io/imagehosting/H5C3/像素.png)
+
+假设设备像素比是2：
+
+图片是在普通屏下设计的，如上图所示，在普通屏幕下，1个位图像素对应着1个物理像素，图片可以完美的显示。可是在Retina屏幕下，1个位图像素对应着4个物理像素，由于位图像素不可以再分割，所以图片就会只能就进取色，导致图片模糊。
+
+设置CSS像素（逻辑像素）是设置显示尺寸。
+
+把50×50个位图像素（=传统屏像素=CSS像素）的图片传进传统屏，传统屏就显示50×50的尺寸，而且物理像素和CSS像素一一对应。
+
+把50×50个位图像素（=传统屏像素=CSS像素）的图片传进Reina屏，Retina屏也是显示50×50的尺寸，但是Retina屏的物理像素和CSS像素不是一一对应，而是一个CSS像素对应4个Retina屏的物理像素，这就会有问题：原先的50×50个位图像素的图片放进了Retina屏里，就意味着用100×100个Retina屏物理像素来显示，且显示尺寸不变，由上述可知位图像素是不可以再分割，导致了原先50×50个位图像素不能把100×100个Retina屏物理像素（显示尺寸）填满，所以Retina屏就会把不够的Retina屏物理像素用进取色填满，这就导致了图片的模糊。如果填满100×100个Retina屏物理像素，即实现传统屏图片在Retina屏上显示一样的效果（其实在Retina屏上显示会更加的细腻），则需要100×100个位图像素，即需要二倍图。
+
+浏览器调试时机型的宽高、显示的像素，是逻辑像素，是无论在什么屏幕下都是显示同样尺寸的大小。
+
+##### 二倍精灵图做法
+
+假设设备像素比是2：
+
+1、设置显示尺寸CSS像素，就写成background-size: 二倍精灵图的宽度/2;
+
+2、将这张二倍精灵图用PS等比例缩小一半，测量图标的坐标，填入backgroun-position。
+
+
+
+#### 雪碧图/精灵图（CSS Sprite）
+
+**优点**
+
+多张小图片合成一张图片，减少对服务器的请求次数，降低服务器压力，高了页面的加载速度。
+
+**缺点**
+
+要把多张图片有序的合理的合并成一张图片，还要留好足够的空间，防止板块内出现不必要的背景。
+
+维护麻烦，无论是修改雪碧图还是修改页面布局，牵一发而动全身

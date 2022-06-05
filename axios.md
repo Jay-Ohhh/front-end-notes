@@ -345,6 +345,8 @@ axios 使用 post 发送数据时，默认是直接把 json 放到请求体中�
 
 #### 取消重复请求
 
+[如何在请求拦截器中取消请求-how to cancel request inside request interceptor properly](https://stackoverflow.com/questions/50461746/axios-how-to-cancel-request-inside-request-interceptor-properly)
+
 假设页面中有一个按钮，用户点击按钮后会发起一个 AJAX 请求。如果未对该按钮进行控制，当用户快速点击按钮时，则会发出重复请求。
 
 ##### 一、取消请求
@@ -505,7 +507,10 @@ axios.interceptors.response.use(
 ##### 完整代码
 
 ```ts
-// axios取消重复请求
+// axios取消重复请求：
+// 两个版本重复则取消之前、重复则取消之后
+
+// 重复则取消之前:
 import qs from 'qs';
 import axios from 'axios';
 import type { AxiosRequestConfig, Canceler } from 'axios';
@@ -569,6 +574,84 @@ axios.interceptors.response.use(
 	}
 );
 ```
+
+
+
+```ts
+// 重复则取消之后:
+import qs from 'qs';
+import axios from 'axios';
+import type { AxiosRequestConfig } from 'axios';
+
+// 用于根据当前请求的信息，生成请求 Key
+function generateReqKey(config: AxiosRequestConfig) {
+	const { method, url, params, data } = config;
+	return [method, url, qs.stringify(params), qs.stringify(data)].join('&');
+}
+
+// 用于把当前请求信息添加到pendingRequest对象中
+const pendingRequest = new Set<string>();
+function addPendingRequest(config) {
+	const requestKey = generateReqKey(config);
+	pendingRequest.add(requestKey);
+}
+
+// 检查是否存在重复请求，若存在则取消本次的请求
+function needCancelRepeatCancel(config) {
+	const requestKey = generateReqKey(config);
+	if (pendingRequest.has(requestKey)) {
+		return requestKey || 'Cancel repeated request';
+	}
+	return false;
+}
+
+// 移除已请求的key
+function removePendingRequest(config) {
+	const requestKey = generateReqKey(config);
+	if (pendingRequest.has(requestKey)) {
+		pendingRequest.delete(requestKey);
+	}
+}
+
+// 设置请求拦截器
+axios.interceptors.request.use(
+	(config) => {
+		const cancelMsg = needCancelRepeatCancel(config);
+		if (cancelMsg) {
+			return {
+				...config,
+				// 如果请求config含有cancelToken，则意味是开发者故意传进来的，因此取消请求则应该由开发者在适当时机去调用
+				cancelToken: config.cancelToken || new axios.CancelToken((cancel) => cancel(cancelMsg)),
+			};
+		}
+		addPendingRequest(config); // 把当前请求信息添加到pendingRequest对象中
+		return config;
+	},
+	(error) => {
+		return Promise.reject(error);
+	}
+);
+
+// 设置响应拦截器
+axios.interceptors.response.use(
+	(response) => {
+		removePendingRequest(response.config); // 从pendingRequest对象中移除请求
+		return response;
+	},
+	(error) => {
+		removePendingRequest(error.config || {}); // 从pendingRequest对象中移除请求
+		if (axios.isCancel(error)) {
+			console.log('已取消的重复请求：' + error.message);
+		} else {
+			// 添加异常处理
+		}
+		return Promise.reject(error);
+	}
+);
+
+```
+
+
 
 #### 请求重试
 

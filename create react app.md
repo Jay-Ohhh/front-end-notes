@@ -1134,7 +1134,7 @@ if (process.env.NODE_ENV === 'production') {
 
 **在 Shell 中添加临时环境变量**
 
-在shell中定义环境变量可能因操作系统而异。
+在shell中定义环境变量可能因操作系统而异。**建议使用 `cross-env` 跨平台设置环境变量。**
 
 Windows (cmd.exe)
 
