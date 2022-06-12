@@ -1162,6 +1162,14 @@ function WelcomeDialog() {
 
 如果你想要在组件间复用非 UI 的功能，我们建议将其提取为一个单独的 JavaScript 模块，如函数、对象或者类。组件可以直接引入（import）而无需通过 extend 继承它们。 
 
+
+
+#### virtual dom / fiber / diff
+
+https://www.yuque.com/jayohhh/uqef3e/pqhy90/edit#wrL2N
+
+
+
 #### React API
 
 `React` 是 React 库的入口。如果你通过使用 `<script>` 标签的方式来加载 React，则可以通过 `React` 全局变量对象来获得 React 的顶层 API。当你使用 ES6 与 npm 时，可以通过编写 `import React from 'react'` 来引入它们。当你使用 ES5 与 npm 时，则可以通过编写 `var React = require('react')` 来引入它们。
@@ -1222,6 +1230,8 @@ const MyComponent = React.memo(function MyComponent(props) {
 ```
 
 `React.memo` 为[高阶组件](https://react.docschina.org/docs/higher-order-components.html)。
+
+当父组件的一个状态改变后，无论和子组件是否有关，子组件都会收到影响进行重渲染，这是React的默认行为。
 
 如果你的组件在相同 props 的情况下渲染相同的结果，那么你可以通过将其包装在 `React.memo` 中调用，以此通过记忆组件渲染结果的方式来提高组件的性能表现。这意味着在这种情况下，React 将跳过渲染组件的操作并直接复用最近一次渲染的结果。
 
@@ -2334,6 +2344,8 @@ declare module '*.svg' {
 
 ##### 合成事件
 
+`React`自己实现了一套自己的事件机制，模拟了事件冒泡和捕获的过程，采用了事件代理，批量更新等方法，抹平了各个浏览器的事件兼容性问题。
+
 ###### 概览
 
 `SyntheticEvent` 实例将作为参数被传递给你的事件处理函数，它是浏览器的原生事件的跨浏览器包装器。除兼容所有浏览器外，它还拥有和浏览器原生事件相同的接口，包括 `stopPropagation()` 和 `preventDefault()`。
@@ -2362,17 +2374,17 @@ string type
 
 ###### 事件池
 
+> 注意：
+>
+> 从 v17 开始，`e.persist()` 将不再生效，因为 `SyntheticEvent` 不再放入[事件池](https://zh-hans.reactjs.org/docs/legacy-event-pooling.html)中。
+>
+> Web 端的 React 17 **不使用**事件池。
+
 `SyntheticEvent` 是合并而来。这意味着 `SyntheticEvent` 对象可能会被重用，而且在事件回调函数被调用后，所有的属性都会无效。出于性能考虑，你不能通过异步访问事件。
 
 > 所有产生的事件都会生成一个事件对象，按正常逻辑 在我们的事件处理函数执行完后，这个事件对象就应该被释放了，等待着被内存回收；但如果在短时间内触发了许多次事件，就要频繁的生成和销毁事件对象；那么 为了提高性能，React就用了一个“事件池”这么一个池子，被使用完后的事件，并不直接销毁，而是将其身上的属性清空掉了后放进事件池中， 等到了下一次有同类型事件发生时，就不用再new一个新的事件对象了，直接从事件池取出一个现成的就可以用了， 从而实现事件对象的*重用*。
 
 在合成事件机制里，一旦事件监听回调被执行，合成事件对象的属性就会被清空，将合成事件对象放进事件池。如果你想异步访问事件属性，你需在事件上调用 `event.persist()`，此方法会从池中移除合成事件，允许用户代码保留对事件的引用。
-
-> 注意：
-> 
-> 从 v17 开始，`e.persist()` 将不再生效，因为 `SyntheticEvent` 不再放入[事件池](https://zh-hans.reactjs.org/docs/legacy-event-pooling.html)中。
-> 
-> Web 端的 React 17 **不使用**事件池。
 
 ```js
 function onClick(event) {
@@ -5599,24 +5611,15 @@ class Parent extends React.Component {
 
 ##### How to share ref （将组件内部属性暴露出去）
 
-- React.forwardRef
+- React.forwardRef、useImperativeHandle
 
 - ```jsx
-  const MyComponent = () => {
-    const handlers = useSwipeable({ onSwiped: () => console.log('swiped') })
+  const MyComponent = ({ref:any}) => {
+    useEffect(()=>{
+      ref.current = val
+    },[val])
   
-    // setup ref for your usage
-    const myRef = React.useRef();
-  
-    const refPassthrough = (el) => { // 该函数可以从外部传进来
-      // call useSwipeable ref prop with el
-      handlers.ref(el);
-  
-      // set myRef el so you can access it yourself
-      myRef.current = el;
-    }
-  
-    return (<div {...handlers} ref={refPassthrough} />
+    return (<div />
   }
   ```
 
@@ -5676,7 +5679,7 @@ class MouseTracker extends React.Component {
 
 现在的问题是：我们如何在另一个组件中复用这个行为？换个说法，若另一个组件需要知道鼠标位置，我们能否封装这一行为，以便轻松地与其他组件共享它？？
 
-由于组件是 React 中最基础的代码复用单元，现在尝试重构一部分代码使其能够在 `` 组件中封装我们需要共享的行为。
+由于组件是 React 中最基础的代码复用单元，现在尝试重构一部分代码使其能够在组件中封装我们需要共享的行为。
 
 ```jsx
 // <Mouse> 组件封装了我们需要的行为...
@@ -6416,7 +6419,7 @@ class Greeting extends React.Component {
 
 ##### 受控和非受控组件
 
-受控组件：表单元素的状态和用户输入过程中表单发生的操作由 React 控制。
+受控组件：表单元素的状态和用户输入过程中表单发生的操作由 React （props或state）控制。
 
 非受控组件：表单元素的状态由自己控制，并根据用户输入进行更新，不受 React 控制。
 
@@ -6457,15 +6460,15 @@ class NameForm extends React.Component {
 
 如果你还是不清楚在某个特殊场景中应该使用哪种组件，那么 [这篇关于受控和非受控输入组件的文章](https://goshakkk.name/controlled-vs-uncontrolled-inputs-react/) 会很有帮助。
 
-| 特征                                                                           | 不受控制 | 受控  |
-| ---------------------------------------------------------------------------- | ---- | --- |
-| 一次性取值（例如在提交时）                                                                | ✅    | ✅   |
-| [提交时验证](https://goshakkk.name/submit-time-validation-react/)                 | ✅    | ✅   |
-| [即时现场验证](https://goshakkk.name/instant-form-fields-validation-react/)        | ❌    | ✅   |
-| [有条件地禁用提交按钮](https://goshakkk.name/form-recipe-disable-submit-button-react/) | ❌    | ✅   |
-| 强制输入格式                                                                       | ❌    | ✅   |
-| 一个数据的多个输入                                                                    | ❌    | ✅   |
-| [动态输入](https://goshakkk.name/array-form-inputs/)                             | ❌    | ✅   |
+| 特征                                                         | uncontrolled | controlled |
+| ------------------------------------------------------------ | ------------ | ---------- |
+| 一次性取值（例如在提交时）                                   | ✅            | ✅          |
+| [提交时验证](https://goshakkk.name/submit-time-validation-react/) | ✅            | ✅          |
+| [即时现场验证](https://goshakkk.name/instant-form-fields-validation-react/) | ❌            | ✅          |
+| [有条件地禁用提交按钮](https://goshakkk.name/form-recipe-disable-submit-button-react/) | ❌            | ✅          |
+| 强制输入格式                                                 | ❌            | ✅          |
+| 一个数据的多个输入                                           | ❌            | ✅          |
+| [动态输入](https://goshakkk.name/array-form-inputs/)         | ❌            | ✅          |
 
 **默认值**
 
@@ -6911,6 +6914,8 @@ customElements.define('x-search', XSearch);
 ```
 
 #### Hooks
+
+[fiber 是解决性能问题的，而 hooks 是解决逻辑复用问题的](https://mp.weixin.qq.com/s?__biz=Mzg3OTYzMDkzMg==&mid=2247485621&idx=1&sn=0b104ba457275a5a4673e62eb7439bea&chksm=cf00c78ef8774e9867b7a8d0d4313dea1696c54dd3a80b6ebf6830611f5924ca3f24da472de7&scene=178&cur_album_id=2150426582392406017#rd)
 
 ##### 简介
 

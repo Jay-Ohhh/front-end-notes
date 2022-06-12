@@ -3473,10 +3473,10 @@ Point.prototype = {
 class B {}
 const b = new B();
 
-b.constructor === B.prototype.constructor // true
+b.constructor === B === B.prototype.constructor // true
 ```
 
-上面代码中，`b`是`B`类的实例，它（本身没有constructor方法会在原型链上找）的`constructor()`方法就是`B`类原型的`constructor()`方法。
+上面代码中，`b`是`B`类的实例，它（本身若没有constructor方法会在原型链上找）的`constructor()`方法就是`B`类原型的`constructor()`方法。
 
 由于类的方法都定义在`prototype`对象上面，所以类的新方法可以添加在`prototype`对象上面。`Object.assign()`方法可以很方便地一次向类添加多个方法。 
 
@@ -3505,7 +3505,7 @@ Object.assign(Point.prototype, {
 });
 ```
 
-`prototype`对象的`constructor()`属性，直接指向“类”的本身，这与 ES5 的行为是一致的。
+`prototype`对象的`constructor()`属性，直接指向“类”的本身，这与 ES5 的行为是一致的，因此我们能可以把类看成是一个构造函数 `class A {} => function A (){}`。
 
 ```javascript
 Point.prototype.constructor === Point // true

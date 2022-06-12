@@ -834,3 +834,44 @@ withCredentials : boolean，表示跨域请求时是否需要使用凭证
 
 这是因为请求的首部中携带了 `Cookie` 信息，如果 `Access-Control-Allow-Origin` 的值为“`*`”，请求将会失败。而将 `Access-Control-Allow-Origin` 的值设置为具体域名，例如 `https://example.com`，则请求将成功执行。
 
+
+
+#### refreshToken
+
+思路是这样：token失效的话401，用refreshToken请求刷新token，此时正在刷新token，把之后的请求用一个队列数组缓存起来处于等待状态，等到刷新token后再逐个重试清空请求队列。那么如何做到让这个请求处于等待中呢？为了解决这个问题，我们得借助Promise。将请求存进队列中后，同时返回一个Promise，让这个Promise一直处于Pending状态（即不调用resolve），此时这个请求就会一直等啊等，只要我们不执行resolve，这个请求就会一直在等待。当刷新请求的接口返回来后，我们再调用resolve，逐个重试。
+
+```js
+let isReflesh = false
+let reTryReqeustList = []
+let token = ''
+
+axios.interceptors.response.use((response) => {
+  // ...
+  return response
+}, async (error) => {
+  if (error.response && error.response.status === 401) {
+    if (!this.isReflash) {
+      this.isReflash = true
+      try {
+        reflashTokenConfig && await _reflashToken() // 记得更改token
+        this.isReflash = false
+        while (this.reTryReqeustList.length > 0) {
+          const cb = this.reTryReqeustList.shift()
+          cb()
+        }
+        return axios.request(error.response.config)
+      } catch (err) {
+        return Promise.reject(err)
+      }
+    } else {
+      return new Promise((resolve) => {
+        this.reTryReqeustList.push(
+          () => resolve(axios.request({...error.response.config, token})) // 要使用最新的token
+        )
+      })
+    }
+  }
+  return Promise.reject(error)
+})
+```
+
