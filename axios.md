@@ -621,6 +621,7 @@ axios.interceptors.request.use(
 			return {
 				...config,
 				// 如果请求config含有cancelToken，则意味是开发者故意传进来的，因此取消请求则应该由开发者在适当时机去调用
+        // https://stackoverflow.com/questions/50461746/axios-how-to-cancel-request-inside-request-interceptor-properly/67266644#67266644
 				cancelToken: config.cancelToken || new axios.CancelToken((cancel) => cancel(cancelMsg)),
 			};
 		}
@@ -850,13 +851,13 @@ axios.interceptors.response.use((response) => {
   return response
 }, async (error) => {
   if (error.response && error.response.status === 401) {
-    if (!this.isReflash) {
-      this.isReflash = true
+    if (!isReflash) {
+      isReflash = true
       try {
         reflashTokenConfig && await _reflashToken() // 记得更改token
-        this.isReflash = false
-        while (this.reTryReqeustList.length > 0) {
-          const cb = this.reTryReqeustList.shift()
+        isReflash = false
+        while (reTryReqeustList.length > 0) {
+          const cb = reTryReqeustList.shift()
           cb()
         }
         return axios.request(error.response.config)
@@ -865,7 +866,7 @@ axios.interceptors.response.use((response) => {
       }
     } else {
       return new Promise((resolve) => {
-        this.reTryReqeustList.push(
+        reTryReqeustList.push(
           () => resolve(axios.request({...error.response.config, token})) // 要使用最新的token
         )
       })

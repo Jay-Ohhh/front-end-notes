@@ -6,6 +6,212 @@ rollup的定位是偏向于JavaScript库的构建，打包的体积也比webpack
 
 Rollup有一项webpack不具有的功能：通过配置output.format开发者可以选择输出资源的模块形式（cjs（CommonJS），esm（ES6 Modules），amd，umd，iife，system等），此特性对于打包JavaScript库特别有用，因为往往一个库需要支持多种不同的模块形式，而通过rollup几个命令就可以把一份源代码打包为多份。
 
+#### 区别
+
+##### 处理源代码模块
+
+rollup诞生于esm标准出来后，是针对esm设计的。
+
+|         | 纯esm              | 纯cjs                                           | 两者混用                                        |
+| ------- | ------------------ | ----------------------------------------------- | ----------------------------------------------- |
+| webpack | 支持（有代码注入） | 支持（有代码注入）                              | 支持（有代码注入）                              |
+| rollup  | 支持（无注入）     | 原生不支持（需增加插件@rollup/plugin-commonjs） | 原生不支持（需增加插件@rollup/plugin-commonjs） |
+
+##### 处理对外暴露模块
+
+- rollup打包 导出（非常干净，无注入代码），配置文件无需特殊配置，而且还可以支持多种模块导出（esm，cjs，umd，amd等）
+- webpack暂时只能支持导出 cjs 或 更往前兼容的包(umd)，实验性支持esm
+
+> https://webpack.docschina.org/configuration/output/#outputmodule
+>
+> https://webpack.docschina.org/configuration/experiments/#experiments
+
+##### 开发调试能力
+
+webpack的热更新效果更好
+
+##### 定制化程度
+
+webpack的定制化程度更高
+
+##### 动态路由加载
+
+rollup需要具备两个条件
+
+- esm包
+
+- 因为rollup自己没有实现`动态import`，因此需要浏览器支持import
+
+webpack
+
+- webpack是**自己实现的“动态import“**（借助promise + script标签 + window对象 + 模拟import方法）
+
+##### 打包体积
+
+**rollup 打包体积更小，代码精简，无额外注入代码**
+
+此demo是纯esm的写法
+
+```js
+// 入口main。js
+import { b } from './test/a'
+console.log(b + 1)
+console.log(1111)
+
+// './test/a'
+export const b = 'xx'
+export const bbbbbbb = 'xx'
+```
+
+rollup打包效果（非常干净，无注入代码）
+
+```js
+const b = 'xx';
+console.log(b + 1);
+console.log(1111);
+```
+
+webpack打包效果（有很多注入代码）
+
+- 实际上，我们自己写的代码在最下面。上面注入的大段代码 都是**webpack自己的兼容代码**，**目的是自己实现require，modules.exports，export，让浏览器可以兼容cjs和esm语法**
+- 可以理解为，**webpack自己实现polyfill支持模块语法，rollup是利用高版本浏览器原生支持esm，所以rollup无需代码注入**，因此rollup专注开发库，web应用使用库的时候把模块兼容性交给webpack去处理
+
+```js
+/******/ (function(modules) { // webpackBootstrap
+/******/   // The module cache
+/******/   var installedModules = {};
+/******/
+/******/   // The require function
+/******/   function __webpack_require__(moduleId) {
+/******/
+/******/    // Check if module is in cache
+/******/    if(installedModules[moduleId]) {
+/******/     return installedModules[moduleId].exports;
+/******/    }
+/******/    // Create a new module (and put it into the cache)
+/******/    var module = installedModules[moduleId] = {
+/******/     i: moduleId,
+/******/     l: false,
+/******/     exports: {}
+/******/    };
+/******/
+/******/    // Execute the module function
+/******/    modules[moduleId].call(module.exports, module, module.exports, __webpack_require__);
+/******/
+/******/    // Flag the module as loaded
+/******/    module.l = true;
+/******/
+/******/    // Return the exports of the module
+/******/    return module.exports;
+/******/   }
+/******/
+/******/
+/******/   // expose the modules object (__webpack_modules__)
+/******/   __webpack_require__.m = modules;
+/******/
+/******/   // expose the module cache
+/******/   __webpack_require__.c = installedModules;
+/******/
+/******/   // define getter function for harmony exports
+/******/   __webpack_require__.d = function(exports, name, getter) {
+/******/    if(!__webpack_require__.o(exports, name)) {
+/******/     Object.defineProperty(exports, name, { enumerable: true, get: getter });
+/******/    }
+/******/   };
+/******/
+/******/   // define __esModule on exports
+/******/   __webpack_require__.r = function(exports) {
+/******/    if(typeof Symbol !== 'undefined' && Symbol.toStringTag) {
+/******/     Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
+/******/    }
+/******/    Object.defineProperty(exports, '__esModule', { value: true });
+/******/   };
+/******/
+/******/   // create a fake namespace object
+/******/   // mode & 1: value is a module id, require it
+/******/   // mode & 2: merge all properties of value into the ns
+/******/   // mode & 4: return value when already ns object
+/******/   // mode & 8|1: behave like require
+/******/   __webpack_require__.t = function(value, mode) {
+/******/    if(mode & 1) value = __webpack_require__(value);
+/******/    if(mode & 8) return value;
+/******/    if((mode & 4) && typeof value === 'object' && value && value.__esModule) return value;
+/******/    var ns = Object.create(null);
+/******/    __webpack_require__.r(ns);
+/******/    Object.defineProperty(ns, 'default', { enumerable: true, value: value });
+/******/    if(mode & 2 && typeof value != 'string') for(var key in value) __webpack_require__.d(ns, key, function(key) { return value[key]; }.bind(null, key));
+/******/    return ns;
+/******/   };
+/******/
+/******/   // getDefaultExport function for compatibility with non-harmony modules
+/******/   __webpack_require__.n = function(module) {
+/******/    var getter = module && module.__esModule ?
+/******/     function getDefault() { return module['default']; } :
+/******/     function getModuleExports() { return module; };
+/******/    __webpack_require__.d(getter, 'a', getter);
+/******/    return getter;
+/******/   };
+/******/
+/******/   // Object.prototype.hasOwnProperty.call
+/******/   __webpack_require__.o = function(object, property) { return Object.prototype.hasOwnProperty.call(object, property); };
+/******/
+/******/   // __webpack_public_path__
+/******/   __webpack_require__.p = "./";
+/******/
+/******/
+/******/   // Load entry module and return exports
+/******/   return __webpack_require__(__webpack_require__.s = 0);
+/******/ })
+/************************************************************************/
+/******/ ([
+/* 0 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+// ESM COMPAT FLAG
+__webpack_require__.r(__webpack_exports__);
+
+// CONCATENATED MODULE: ./src/test/a.js
+const b = 'xx';
+const bbbbbbb = 'xx';
+
+// CONCATENATED MODULE: ./src/main.js
+console.log(b + 1);
+console.log(1111); 
+
+/***/ })
+/******/ ]);
+
+```
+
+
+
+#### 为什么webpack需要注入这么多代码？
+
+因为webpack比rollup早出2年，诞生在esm标准出来前，commonjs出来后
+
+**当时的浏览器只能通过script标签加载模块**
+
+- script标签加载代码是没有作用域的，只能在代码内 用iife的方式 实现作用域效果，这就是webpack打包出来的代码 大结构都是iife的原因
+- 并且**每个模块都要装到function里面**，才能保证互相之间作用域不干扰。
+
+
+
+**关于webpack的代码注入问题**
+
+浏览器不支持cjs，所以webpack要去自己实现 `require` 和 `module.exports`的polyfill，因此才有很多注入代
+
+这么多年了，甚至到现在2022年，浏览器为什么不支持cjs？
+
+- cjs是同步的，运行时的，node环境用cjs，node本身运行在服务器，无需等待网络握手，所以同步处理是很快的
+- 浏览器是 客户端，访问的是服务端资源，中间需要等待网络握手，可能会很慢，所以不能 同步的 卡在那里等服务器返回的，体验太差
+
+- **后续出来esm后，webpack为了兼容以前发在npm上的老包**（并且当时心还不够决绝，导致这种“丑结构的包”越来越多，以后就更不可能改这种“丑结构了”），所以保留这个iife的结构和代码注入
+
+rollup诞生于esm标准出来后，就是针对esm设计的，也没有历史包袱，所以可以做到真正的“打包”（精简，无额外注入）。
+
+
+
 ### 使用TypeScript编写配置文件
 
 ```sh

@@ -2234,7 +2234,7 @@ React 会自动添加 ”px” 后缀到内联样式为数字的属性后。如�
 
 React 为 DOM 提供了一套以 JavaScript 为中心的 API。由于 React 组件经常采用自定义或和 DOM 相关的 props 的关系，React 采用了`小驼峰命名`的方式，正如 DOM APIs 那样：
 
-```div
+```jsx
 <div tabIndex="-1" />      // Just like node.tabIndex DOM API
 <div className="Button" /> // Just like node.className DOM API
 <input readOnly={true} />  // Just like node.readOnly DOM API
@@ -2862,9 +2862,9 @@ import("./math").then(math => {
 
 当使用Babel时，你要确保 Babel 能够解析动态 import 语法而不是将其进行转换。对于这一要求你需要 [babel-plugin-syntax-dynamic-import](https://yarnpkg.com/en/package/babel-plugin-syntax-dynamic-import) 插件。
 
-**React.lazy**
+> **NOTE**: This plugin is included in `@babel/preset-env`
 
-> `React.lazy` 和 Suspense 技术还不支持服务端渲染。如果你想要在使用服务端渲染的应用中使用，我们推荐 [Loadable Components](https://github.com/gregberge/loadable-components) 这个库。它有一个很棒的[服务端渲染打包指南](https://loadable-components.com/docs/server-side-rendering/)。 
+**React.lazy** 
 
 `React.lazy` 函数能让你像渲染常规组件一样处理动态引入（的组件）。
 
@@ -4093,7 +4093,7 @@ function WarningButton() {
 }
 ```
 
-如果你不使用 JavaScript 打包工具而是直接通过 `` 标签加载 React，则必须将 `React` 挂载到全局变量中。
+如果你不使用 JavaScript 打包工具而是直接通过script标签加载 React，则必须将 `React` 挂载到全局变量中。
 
 **在 JSX 类型中使用点语法**
 
@@ -4339,7 +4339,8 @@ function ListOfTenThings() {
 
 ```jsx
 <div>
-  {showHeader && <Header />}  <Content />
+  {showHeader && <Header />}
+  <Content />
 </div>
 ```
 
@@ -4798,9 +4799,9 @@ type ReactNode = ReactChild | ReactFragment | ReactPortal | boolean | null | und
 
 ```ts
 import { 
-MouseEvent,
-FormEvent,
-// ... 
+	MouseEvent,
+	FormEvent,
+	// ... 
 } from 'react'
 ```
 
@@ -4907,7 +4908,7 @@ const AlertButton: React.FC<AlertButtonProps> = props => (
 
  Portal 提供了一种将子节点渲染到存在于父组件以外的 DOM 节点的优秀的方案。 
 
-```jsx
+```js
 ReactDOM.createPortal(child, container)
 ```
 
@@ -4921,7 +4922,8 @@ render() {
   // `domNode` 是一个可以在任何位置的有效 DOM 节点。
   return ReactDOM.createPortal(
     this.props.children,
-    domNode  );
+    domNode
+  );
 }
 ```
 
@@ -4950,7 +4952,8 @@ render() {
 ```jsx
 render(
   <App>
-    <Profiler id="Navigation" onRender={callback}>      <Navigation {...props} />
+    <Profiler id="Navigation" onRender={callback}>
+    	<Navigation {...props} />
     </Profiler>
     <Main {...props} />
   </App>
@@ -5353,13 +5356,13 @@ Key 应该具有稳定，可预测，以及列表内唯一的特质。不稳定�
 
 随后 React进行【新虚拟DOM】与【旧虚拟DOM】的diff比较,比较规则如下：
 
-- 旧虚拟DOM中找到了与新虚拟D0M相同的key :
+- 旧虚拟DOM中找到了与新虚拟DOM相同的key :
 
-（1）若虚拟DOM中内容没变,直接使用之前的真实D0M
+（1）若虚拟DOM中内容没变,直接使用之前的真实DOM
 
-（2）若虚拟D0M中内容变了,则生成新的真实DOM，随后替换掉页面中之前的真实DOM
+（2）若虚拟DOM中内容变了,则生成新的真实DOM，随后替换掉页面中之前的真实DOM
 
-- 虚拟D中未找到与新虚拟D0M相同的key：
+- 虚拟DOM中未找到与新虚拟D0M相同的key：
 
 根据数据创建新的真实DOM，渲染到到页面
 
@@ -5434,7 +5437,8 @@ class CustomTextInput extends React.Component {
   focusTextInput() {
     // 直接使用原生 API 使 text 输入框获得焦点
     // 注意：我们通过 "current" 来访问 DOM 节点
-    this.textInput.current.focus();  }
+    this.textInput.current.focus();
+  }
 
   render() {
     // 告诉 React 我们想把 <input> ref 关联到
@@ -5607,7 +5611,7 @@ class Parent extends React.Component {
 
 **关于回调 refs 的说明**
 
-如果 `ref` 回调函数是以内联函数的方式定义的，在更新过程中它会被执行两次，第一次传入参数 `null`，然后第二次会传入参数 DOM 元素或 React 组件实例。这是因为在每次渲染时会创建一个新的函数实例，所以 React 清空旧的 ref 并且设置新的。通过将 ref 的回调函数定义成 class 的绑定函数（constructor内绑定）的方式可以避免上述问题，但是大多数情况下它是无关紧要的。
+如果 `ref` 回调函数是以内联函数的方式定义的，在更新过程中它会被执行两次，第一次传入参数 `null`，然后第二次会传入参数 DOM 元素或 React 类组件实例。这是因为在每次渲染时会创建一个新的函数实例，所以 React 清空旧的 ref 并且设置新的。通过将 ref 的回调函数定义成 class 的绑定函数（constructor内绑定）的方式可以避免上述问题，但是大多数情况下它是无关紧要的。
 
 ##### How to share ref （将组件内部属性暴露出去）
 
@@ -5619,7 +5623,7 @@ class Parent extends React.Component {
       ref.current = val
     },[val])
   
-    return (<div />
+    return <div />
   }
   ```
 
@@ -6497,7 +6501,7 @@ render() {
 
 在 HTML 中，`<input type="file">` 可以让用户选择一个或多个文件上传到服务器，或者通过使用 [File API](https://developer.mozilla.org/en-US/docs/Web/API/File/Using_files_from_web_applications) 进行操作。
 
-```
+```jsx
 <input type="file" />
 ```
 
@@ -6785,8 +6789,8 @@ import xxx from './index.module.css'
 
 React 为 DOM 提供了一套以 JavaScript 为中心的 API。由于 React 组件经常采用自定义或和 DOM 相关的 props 的关系，React 采用了`小驼峰命名`的方式，正如 DOM APIs 那样：
 
-```div
-<div tabIndex="-1" />      // Just like node.tabIndex DOM API
+```jsx
+·<div tabIndex="-1" />      // Just like node.tabIndex DOM API
 <div className="Button" /> // Just like node.className DOM API
 <input readOnly={true} />  // Just like node.readOnly DOM API
 ```
@@ -6923,7 +6927,7 @@ Hook 是 React 16.8 的新增特性。它可以让你在不编写 class 的情�
 
 Hook 在 class 内部是**不**起作用的。但你可以使用它们来取代 class 。
 
-Hook 是一个特殊的函数，它可以让你“钩入” React 的特性。例如，`useState` 是允许你在 React 函数组件中添加 state 的 Hook。
+Hook 是一个特殊的函数，它可以让你 “ 钩入” React 的特性。例如，`useState` 是允许你在 React 函数组件中添加 state 的 Hook。
 
 **动机**
 
@@ -7131,6 +7135,20 @@ function Example() {
 
 **为什么在组件内部调用 `useEffect`？** 将 `useEffect` 放在组件内部让我们可以在 effect 中直接访问 `count` state 变量（或其他 props）。我们不需要特殊的 API 来读取它 —— 它已经保存在函数作用域中。Hook 使用了 JavaScript 的闭包机制，而不用在 JavaScript 已经提供了解决方案的情况下，还引入特定的 React API。
 
+> 参数是值引用，则值在函数外的改变不会影响到函数内部的值
+>
+> ```js
+> function a(s){
+>     return function(){
+>         console.log(s)
+>     }
+> }
+> let b = 1
+> let c = a(b)
+> b = 2
+> c() // 1
+> ```
+
 **`useEffect` 会在每次渲染后都执行吗？** 是的，默认情况下，它在第一次渲染之后和每次更新之后都会执行。（我们稍后会谈到[如何控制它](https://react.docschina.org/docs/hooks-effect.html#tip-optimizing-performance-by-skipping-effects)。）你可能会更容易接受 effect 发生在“渲染之后”这种概念，不用再去考虑“挂载”还是“更新”。React 保证了每次运行 effect 的同时，DOM 都已经更新完毕。
 
 我们可以在 effect 中获取到最新的 `count` 值，因为他在函数的作用域内。当 React 渲染组件时，会保存已使用的 effect，并在更新完 DOM 后执行它。这个过程在每次渲染时都会发生，包括首次渲染。
@@ -7253,19 +7271,19 @@ useEffect(()=>{
 在[本章节开始时](https://react.docschina.org/docs/hooks-effect.html#example-using-classes-1)，我们介绍了一个用于显示好友是否在线的 `FriendStatus` 组件。从 class 中 props 读取 `friend.id`，然后在组件挂载后订阅好友的状态，并在卸载组件的时候取消订阅：
 
 ```jsx
-  componentDidMount() {
-    ChatAPI.subscribeToFriendStatus(
-      this.props.friend.id,
-      this.handleStatusChange
-    );
-  }
+componentDidMount() {
+  ChatAPI.subscribeToFriendStatus(
+    this.props.friend.id,
+    this.handleStatusChange
+  );
+}
 
-  componentWillUnmount() {
-    ChatAPI.unsubscribeFromFriendStatus(
-      this.props.friend.id,
-      this.handleStatusChange
-    );
-  }
+componentWillUnmount() {
+  ChatAPI.unsubscribeFromFriendStatus(
+    this.props.friend.id,
+    this.handleStatusChange
+  );
+}
 ```
 
 在 class 组件中，我们还需要添加 `componentDidUpdate` 来更新好友状态：
@@ -7379,7 +7397,7 @@ function Example({ someProp }) {
   function doSomething() {
     console.log(someProp);
   }
-
+	// 当 someProp 的值更新时，doSomething会被重新生成，地址改变，而useEffect中的doSomething和someProp却是旧的
   useEffect(() => {
     doSomething();
   }, []); // 🔴 []省略了doSomething：这样不安全（它调用的 `doSomething` 函数使用了 `someProp`）
@@ -7854,7 +7872,11 @@ useEffect(() => {
 
 详情查看 **Effect  Hook ** 章节。
 
+
+
 ###### useContext
+
+[useState/useReducer + useContext 实现全局状态管理](https://mp.weixin.qq.com/s/7mt13uwS4EmguMGTrmbICw)
 
 ```js
 const value = useContext(MyContext);
@@ -7919,6 +7941,8 @@ function ThemedButton() {
 ```js
 const [state, dispatch] = useReducer(reducer, initialArg, init);
 ```
+
+useReducer里的reducer永远是最新的，如果使reducer是定义在组件内部且依赖于某些状态，reducer可以拿到最新的状态，
 
 [`useState`](https://react.docschina.org/docs/hooks-reference.html#usestate) 的替代方案。它接收一个形如 `(state, action) => newState` 的 reducer，并返回当前的 state 以及与其配套的 `dispatch` 方法。（如果你熟悉 Redux 的话，就已经知道它如何工作了。）
 
@@ -8052,7 +8076,7 @@ function Counter() {
 
   useEffect(() => {
     const id = setInterval(() => {
-      dispatch({ type: 'tick' });
+      	dispatch({ type: 'tick' });
       }, 1000);
     return () => clearInterval(id);
   }, []); // deps数组不需要包含step
@@ -8263,7 +8287,7 @@ const refContainer = useRef(initialValue);
 
 `useRef` 返回一个可变的 ref 对象，其 `.current` 属性被初始化为传入的参数（`initialValue`）。返回的 ref 对象在组件的整个生命周期内保持不变。而且 useRef 实现了类似 class 中的 `this` 的功能。
 
-**initialValue只会在组件的初始渲染中起作用并赋值给current属性，后续渲染时会被忽略，即使initialValue再后续是变化的。**
+**initialValue只会在组件的初始渲染中起作用并赋值给current属性，后续渲染时会被忽略，即使initialValue在后续是变化的。**
 
 ```ts
 class A{}
@@ -8274,6 +8298,9 @@ function fn(){
 
 const ref = useRef(fn()) // fn() 每次渲染都会被调用
 const ref = useRef(new A()) // new A() 每次渲染都会被调用
+
+const ref = useRef(() => fn()) // fn() 整个生命周期只会被调用一次
+const ref = useRef(() => new A()) // new A() 整个生命周期只会被调用一次
 ```
 
 使用场景：useRef( ).current 可以跨越渲染周期存储数据（在current 上增加属性存储对象，current 可以保存任何可变值，当其被赋值给 DOM 元素或组件的 ref 属性，current 会指向 DOM 元素或组件实例），而且对 current 修改也不会引起组件渲染。
@@ -8344,7 +8371,7 @@ function App(props){
 
 ###### useImperativeHandle
 
-用于限制父组件中通过forward+useRef获取子组件DOM元素暴露的属性
+用于限制父组件中通过forwardRef+useRef获取子组件DOM元素暴露的属性
 
 ```js
 useImperativeHandle(ref, createHandle, [deps])
@@ -8473,8 +8500,9 @@ function Counter() {
   const [count, setCount] = useState(0);
 
   const prevCountRef = useRef(); // 返回的 ref 对象在组件的整个生命周期内保持不变
+  // useEffect 在浏览器渲染之后延迟调用
   useEffect(() => {
-    prevCountRef.current = count;
+    prevCountRef.current = count; // 不会引起重渲染
   });
   const prevCount = prevCountRef.current;
   return <h1>Now: {count}, before: {prevCount}</h1>;
@@ -8960,7 +8988,7 @@ Context 是跨组件传值的一种方案，但我们需要知道，我们无法
 
 ##### 副作用（side effect）
 
-副作用就是对所处的环境有改变：
+副作用是对外部环境有改变：
 
 函数副作用是指函数被调用，完成了函数既定的计算任务，但同时因为访问了外部数据，尤其是因为对外部数据进行了写操作，从而改变了外部环境。 
 
@@ -8999,6 +9027,16 @@ Context 是跨组件传值的一种方案，但我们需要知道，我们无法
 有渲染的组件没有状态：
 能够进行视图渲染的组件，不要包含实际的业务状态，而是通过接受父辈的参数来进行渲染；
 这样的话，有渲染的组件没有实际的业务状态，就与实际的业务解耦了，能够更好的服务于其他的有状态的组件，实现组件的复用。
+
+
+
+##### 声明式
+
+「声明式」直接描述**最终效果**，不关心如何实现。
+
+「命令式」关注如何实现，明确怎么一步步达到这个效果。
+
+
 
 #### 问题
 

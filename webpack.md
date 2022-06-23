@@ -223,9 +223,9 @@ Webpack 内部包含三种类型的 Chunk：
 
 而 `SplitChunksPlugin` 默认只对 Async Chunk 生效，开发者也可以通过 `optimization.splitChunks.chunks`（默认 `async` ） 调整作用范围，该配置项支持如下值：
 
-- 字符串 `'all'` ：对 Initial Chunk 与 Async Chunk 都生效，如果一个模块既被异步引用，也被同步引用，那么只会生成一个共享包，建议优先使用该值
+- 字符串 `'all'` ：对 Initial Chunk 与 Async Chunk 都生效，如果一个模块既被异步引用，也被入口同步引用，那么只会生成一个共享包，建议优先使用该值
 - 字符串 `'initial'` ：只对 Initial Chunk 进行分离，不会将同步加载和异步加载一起处理，而是分开处理，如果一个模块既被异步引用，也被同步引用，那么会生成两个包
-- 字符串 `'async'` ：只对 Async Chunk 进行分离，webpack会在用到的时候通过webpack djsonp方法动态创建script标签加载相应的文件，我们在react和Vue的懒加载路由中使用的也是这种方式
+- 字符串 `'async'` ：只对 Async Chunk 进行分离，webpack会在用到的时候通过webpack jsonp方法动态创建script标签加载相应的文件，我们在react和Vue的懒加载路由中使用的也是这种方式
 - 函数 `(chunk) => boolean` ：该函数返回 `true` 时生效
 
 具体可以参考这篇文章: [Webpack 4 Mysterious SplitChunks Plugin](https://link.juejin.cn/?target=https%3A%2F%2Fmedium.com%2Fdailyjs%2Fwebpack-4-splitchunks-plugin-d9fbbe091fd0)
@@ -234,7 +234,7 @@ Webpack 内部包含三种类型的 Chunk：
 
 那么，如何设置最适合项目情况的分包规则呢？这个问题并没有放诸四海皆准的通用答案，因为软件系统与现实世界的复杂性，决定了很多计算机问题并没有银弹，不过我个人还是总结了几条可供参考的最佳实践：
 
-1. **「尽量将第三方库拆为独立分包」**
+1. **「尽量将高频第三方库拆为独立分包」**
 
 例如在一个 React + Redux 项目中，可想而知应用中的大多数页面都会依赖于这两个库，那么就应该将它们从具体页面剥离，避免重复加载。`chunks: all`
 

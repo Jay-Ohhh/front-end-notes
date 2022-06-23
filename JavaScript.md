@@ -94,6 +94,44 @@ const和let唯一不同的是，const声明的时候必须进行初始化赋值�
 
 若存储的值不需要变化则建议用const，因为const常量是不变的，不需要引擎实时监控，效率更高。
 
+
+
+#### 值引用和地址引用
+
+实际上函数参数（s）也是一个变量
+
+如果是值则直接拷贝，函数内外对值的改变都不会收到彼此的影响
+
+如果是地址则拷贝地址如果直接修改地址所指向的对象，则原对象会受到影响
+
+参数是值引用，函数内的改变不会影响到函数外的
+
+```js
+function a(s){
+    s=2
+}
+let b = 1
+a(b)
+console.log(b) // 1
+```
+
+参数是值引用，则函数外的改变不会影响到函数内的
+
+```js
+// 闭包
+function a(s){
+    return function(){
+        console.log(s)
+    }
+}
+let b = 1
+let c = a(b)
+b = 2
+c() // 1
+```
+
+
+
 #### 变量提升和函数提升
 
 ES6新增了块级作用域。块级作用域由 { } 包括，if 语句和 for 语句里面的{ }也属于块作用域。
@@ -175,7 +213,7 @@ console.log(a) // 10
 
 **eg3**
 
-var不支持块级作用域，所以在全局作用域重复声明了两次，提升的第二次声明会被忽略，仅用于赋值。
+var不支持块级作用域，同一作用域重复声明了两次，提升的第二次声明会被忽略，仅用于赋值。
 
 ```js
 // 全局作用域
@@ -306,7 +344,7 @@ var obj={
 obj.b()  // 打印1
 ```
 
-6、定时器setTimeout(function(){})里回调函数的this指向window，这是因为function( ){}调用的代码运行在window上，而不是setTimeout所在的执行环境里。
+6、定时器setTimeout(function(){})里回调函数的this指向全局对象，这是因为function( ){}调用的代码运行在全局作用域上，而不是setTimeout所在的执行环境里。
 
 如果定时器setTimeout(( )=>{})里是箭头函数，则箭头函数里的this指向setTimeout的外层函数的this所指向的对象。那么如何找这个setTimeout的外层函数呢？可以找( ){ }这样的结构就可以了
 
@@ -420,6 +458,10 @@ JavaScript 采用词法作用域(lexical scoping)，也就是静态作用域。
 因为 JavaScript 采用的是词法作用域，函数的作用域在函数定义的时候就决定了。
 
 词法作用域和this指向是两回事。
+
+词法作用域是自身的作用域
+
+this指向强调函数运行时所在的作用域。
 
 ```js
 var value = 1;
@@ -581,13 +623,13 @@ eg
 ```js
 function foo(){
   var local = 1
-     return function (){
+  return function (){
     console.log(local)
   }
 }
 // or
 function foo(local){
-    return function (){
+  return function (){
     console.log(local)
   }
 }
@@ -598,12 +640,6 @@ function foo(local){
 闭包可以用来封装一个需要持久保存的变量，也可以模拟命名空间，避免变量名的污染。
 
 > 闭包可以让你在一个内层函数中访问到其外层函数的作用域的状态
-
-##### 为什么要函数套函数呢？（不是必须的）
-
-是因为需要局部变量，所以才把 local 变量放在一个函数里，如果不把 local 变量放在一个函数里，local 就是一个全局变量了，达不到使用闭包的目的——隐藏变量。
-
-所以函数套函数只是为了造出一个局部变量，跟闭包无关。
 
 ##### 为什么要return函数呢？
 
@@ -616,6 +652,17 @@ function foo(){
   }
   return bar
 }
+
+// 这样也是闭包
+function foo(){
+  var local = 1
+  function bar(){
+    local++
+    return local
+  }
+  obj.bar = bar
+}
+let obj = {}
 ```
 
 因为如果不 return，你就无法使用这个闭包。把 return bar 改成 obj.bar = bar 也是一样的，只要让外面可以访问到这个 bar 函数就行了。
@@ -725,7 +772,7 @@ x => { foo: x }
 x => ({ foo: x })
 ```
 
-#### 词法作用域
+**词法作用域**
 
 由书写代码时函数声明的位置来决定的。
 
@@ -1720,7 +1767,7 @@ myWeakmap.set(
 document.getElementById('logo').addEventListener('click', function() {
   let logoData = myWeakmap.get(document.getElementById('logo'));
   logoData.timesClicked++;
-}, false);
+});
 ```
 
 #### Promise
@@ -1928,14 +1975,14 @@ new Promise((resolve, reject) => {
 ##### 手写Promise
 
 ```js
-function myPromise(constructor) {
+function MyPromise(constructor) {
   // 用self接受this，可以在resolve、reject中使用
   let self = this
   self.status = 'pending' //定义状态改变前的初始状态
   self.value = undefined //定义状态为resolved的时候的状态
   self.reason = undefined //定义状态为rejected的时候的状态
   function resolve(value) {
-    //两个==="pending"，保证了了状态的改变是不不可逆的
+    // 两个==="pending"，保证了了状态的改变是不可逆的
     if (self.status === 'pending') {
       self.value = value
       self.status = 'resolved'
@@ -1969,9 +2016,10 @@ myPromise.prototype.then = function (onFullfilled, onRejected) {
 }
 
 // 测试
-var p = new myPromise(function (resolve, reject) {
+var p = new MyPromise(function (resolve, reject) {
   resolve(1)
 })
+// p调用then，this指向p
 p.then(function (x) {
   console.log(x)
 })
@@ -1994,7 +2042,7 @@ p.then(function (x) {
 >
 > 如果await右边的代码是同步执行，await左边的等号进行赋值相当于在then中取出参数resolve的值，是微任务
 >
-> await 后面的代码当于是在new Promise内同步执行
+> await 后面的代码相当于是在new Promise内同步执行
 >
 > await下面的代码相当于是在then内执行，是微任务
 
@@ -2062,7 +2110,7 @@ console.log(3)
 
 
 
-- await在async函数内才有效
+- await在循环中的使用
 
 ```js
 async function a1() {
@@ -3013,8 +3061,6 @@ yield 结束
 
 #### 原生js获取元素的各种位置
 
-##### 加给元素：
-
 - offsetLeft （距离**定位**父级的距离）
 - offsetTop （距离**定位**父级的距离）
 - offsetWidth （可视宽度）
@@ -3081,6 +3127,14 @@ function handle(e: MouseEvent){
 **3、如果try和catch模块中存在throw语句**，那么在catch运行throw之前会运行finally中的代码。
  (1). 如果finally中存在return语句，则返回finally的return结果，代码运行结束。
  (2). 如果finally不存在return语句，则运行catch中的throw语句，代码运行结束。
+
+
+
+**总结**
+
+finally中的代码最后执行，其return优先级最高
+
+
 
 ##### 捕获异常
 
@@ -4471,9 +4525,9 @@ localStorage 存储的键和值始终采用 UTF-16 DOMString 格式，每个字�
 
 每个字符使用两个字节，是有前提条件的，就是码点小于`0xFFFF`(65535)， 大于这个码点的是四个字节。
 
-###### 5M 的单位是什么
+###### 5M 是什么多少
 
-**字符串的长度值, 或者utf-16的编码单元，更合理的是 10M字节空间**
+**字符串的长度值, 或者utf-16的编码单元数量，更合理的是 10M字节空间**
 
 5M = 5 * 1024 * 1024
 
@@ -4490,9 +4544,9 @@ String.length-字符串的长度：返回字符串中utf-16的编码单元的数
 "🔴".length // 2
 ```
 
-而根据 UTF-16编码规则，要么2个字节，要么四个字节，**`所以不如说是 10M 的字节数，更为合理。`**
+而根据 UTF-16编码规则，一个字符要么2个字节，要么4个字节，**`所以不如说是 10M 的字节数，更为合理。`**
 
-**`当然，2个字节作为一个utf-16的字符编码单元，也可以说是 5M 的utf-16的编码单元。`**
+**当然，2个字节作为一个utf-16的字符编码单元，也可以说是 5M 的utf-16的编码单元。**
 
 我们先编写一个utf-16字符串计算字节数的方法：非常简单，判断码点决定是2还是4
 

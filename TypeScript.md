@@ -446,8 +446,6 @@ function getString(something: string | number): string {
 
  联合类型的变量在被赋值的时候，会根据类型推论的规则推断出一个类型 。
 
- 属性名不能是联合类型。
-
 #### 交叉类型
 
 TypeScript 交叉类型是将多个类型合并为一个类型。这让我们可以把现有的多种类型叠加到一起成为一种类型，它包含了所需的所有类型的特性。
@@ -800,16 +798,11 @@ interface ObjectInterface {
 ##### 区别
 
 1. type可以声明 基本类型，联合类型，交叉类型，元组，interface不行
-
 2. type 语句中可以使用 typeof 获取类型实例
-
-3. `interface` 能够声明合并，`type`不能
-
-4. type不能用于多态this类型
-
-5. type 支持类型映射，interface不支持
-
-6. **由于interfac可以进行声明合并**，所以总有可能将新成员添加到同一个interface定义的类型上。**在使用interface去声明变量时，它们在那一刻类型并不是最终的类型**。会导致索引签名问题。
+3. type 支持类型映射，interface不支持
+4. `interface` 能够声明合并，`type`不能
+5. `interface` 能用于多态this类型
+6. **由于interface可以进行声明合并**，所以总有可能将新成员添加到同一个interface定义的类型上。**在使用interface去声明变量时，它们在那一刻类型并不是最终的类型**。会导致索引签名问题。
 
 
 
@@ -825,15 +818,15 @@ let props: propType
 type dataType = {
     title: string
 }
+
 interface dataType1 {
     title: string
 }
 const data: dataType = {title: "订单页面"}
 const data1: dataType1 = {title: "订单页面"}
 props = data
-// Error:类型“dataType1”不可分配给类型“propType”; 类型“dataType1”中缺少索引签名 
+// 不能将类型“dataType1”分配给类型“propType”。类型“dataType1”中缺少类型为“string”的索引签名，因为interfae有可能会进行声明合并，导致结构不确定
 props = data1
-
 ```
 
 
@@ -860,7 +853,7 @@ interface Student extends Person { stuNo: number }
 
 - **type 继承 type**
 
-```typescipt
+```typescript
 type Person{
     name:string
 }
@@ -2528,7 +2521,7 @@ declare namespace foo {
 
 ##### UMD 库
 
-既可以通过 `<script>` 标签引入，又可以通过 `import` 导入的库，称为 UMD 库。相比于 npm 包的类型声明文件，我们需要额外声明一个全局变量，为了实现这种方式，ts 提供了一个新语法 `export as namespace`。
+ UMD库相比于 npm 包的类型声明文件，我们需要额外声明一个全局变量，为了实现这种方式，ts 提供了一个新语法 `export as namespace`。
 
 **对于 npm 包和 UMD 库， 只有 `export` 导出的类型声明才能被导入。** 
 
@@ -3473,7 +3466,7 @@ Point.prototype = {
 class B {}
 const b = new B();
 
-b.constructor === B === B.prototype.constructor // true
+b.constructor === B.prototype.constructor === B // true
 ```
 
 上面代码中，`b`是`B`类的实例，它（本身若没有constructor方法会在原型链上找）的`constructor()`方法就是`B`类原型的`constructor()`方法。
@@ -4849,7 +4842,7 @@ function s({ a }: E) {}
 
 #### 泛型
 
- 泛型（Generics）是指在定义函数签名、接口或类的时候，不预先指定具体的类型，而在使用的时候再指定类型。可以理解为类型遍历。
+ 泛型（Generics）是指在定义函数签名、接口或类的时候，不预先指定具体的类型，而在使用的时候再指定类型。可以理解为类型变量。
 
 - 把类型当作参数传递
 - 作用：不用写死类型
@@ -5707,6 +5700,7 @@ fn1('a', 1); // 报错，因为实际上调用的是fn2，缺少一个参数
 
 fn2 = fn1; // correct
 fn2('a', 1, true ); // 实际上调用的是fn1，多一个参数没关系
+// 结论：参数选择类型更窄的那个
 ```
 
 
@@ -5769,6 +5763,7 @@ let a = fn2(); // a的类型为string | number | boolean，而实际调用的是
 // 第二种情况
 fn1 = fn2 // error: 不可以将 string|number|boolean 赋给 string 类型
 let b = fn1(); // b的类型是string，实际调用的是fn2，返回 string|number|boolean
+// 结论：返回值选择类型更广的那个
 ```
 
 
@@ -5802,7 +5797,7 @@ type U5 = Bar<{ a: (x: string) => void, b: (x: number) => void }>;  // string & 
 
 那么为什么ts会让函数参数类型保留双变转换呢？下面是一个十分常见的例子：
 
-```js
+```ts
 interface Event { timestamp: number; }
 interface MouseEvent extends Event { x: number; y: number }
 
@@ -6399,7 +6394,7 @@ const info = Record<'name' | 'id', string> = {
 
 ##### `Exclude<T, U>`
 
-从 T 中移除那些可以赋值给 U 的属性，实现原理：
+从 T 中移除 U 中的属性，实现原理：
 
 ```ts
 // T extends U ? never : 如果T是U的子类，返回never类型，如果不是返回T类型

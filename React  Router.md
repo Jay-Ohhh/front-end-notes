@@ -28,6 +28,18 @@ npm install react-router-dom
 
 #### 路由模式
 
+**hash模式和history模式为什么页面不会刷新**
+
+1.hash模式
+
+[http://www.test.com/#/](https://link.zhihu.com/?target=http%3A//www.test.com/%23/)就是 Hash URL，当#后面的哈希值发生变化时，可以通过hashchange事件来监听到 URL 的变化，从而进行跳转页面，并且无论哈希值如何变化，服务端接收到的 URL 请求永远是[http://www.test.com](https://link.zhihu.com/?target=http%3A//www.test.com)。Hash 模式相对来说更简单，并且兼容性也更好。每一次改变#后的部分，都会在浏览器的访问历史中增加一个记录，使用"后退"按钮，就可以回到上一个位置。
+
+2.history模式
+
+History模式是HTML5 新推出的功能，主要使用history.pushState和history.replaceState改变 URL。通过 History 模式改变 URL 同样不会引起页面的刷新，只会更新浏览器的历史记录。当用户做出浏览器动作时，比如点击后退按钮时会触发popState事件。
+
+
+
 React Router 是建立在 [history](https://github.com/rackt/history) 之上的。 简而言之，一个 history 知道如何去监听浏览器地址栏的变化， 并解析这个 URL 转化为 `location` 对象， 然后 router 使用它匹配到路由，最后正确地渲染对应的组件。
 
 常用的 history 有三种形式， 但是你也可以使用 React Router 实现自定义的 history。
@@ -140,7 +152,7 @@ Hash history 不需要服务器任何配置就可以运行，如果你刚刚入�
 
 ##### createMemoryHistory
 
-Memory history 不会在地址栏被操作或读取。这就解释了我们是如何实现服务器渲染的。同时它也非常适合测试和其他的渲染环境（像 React Native ）。
+Memory history 不会在地址栏被操作或读取。这就解释了我们是如何实现服务器渲染的。同时它也非常适合测试和其他非DOM的渲染环境（像 React Native ）。
 
 和另外两种history的一点不同是你必须创建它，这种方式便于测试。
 
@@ -326,16 +338,20 @@ Webpack 会将任何一个异步模块与相同的块名称组合到相同的异
 
 当使用 [Babel](https://babeljs.io/) 时，你要确保 Babel 能够解析动态 import 语法而不是将其进行转换。对于这一要求你需要 [@babel/plugin-syntax-dynamic-import](https://classic.yarnpkg.com/en/package/@babel/plugin-syntax-dynamic-import) 插件。
 
+> **NOTE**: This plugin is included in `@babel/preset-env`
+
 ```
-npm install --save-dev @babel/plugin-syntax-dynamic-import
+npm install --save-dev @babel/preset-env
 ```
 
 package.json
 
 ```json
 {
-  "presets": ["@babel/preset-react"],
-  "plugins": ["@babel/plugin-syntax-dynamic-import"]
+  "presets": [
+    "@babel/preset-env",
+    "@babel/preset-react"
+  ],
 }
 ```
 
@@ -1706,7 +1722,11 @@ const ShowTheLocationWithRouter = withRouter(ShowTheLocation);
 
 比如app.js这个组件，一般是首页，不是通过路由跳转过来的，而是直接从浏览器中输入地址打开的，如果不使用withRouter此组件的this.props为空，没法执行props中的history、location、match等方法。
 
-withRouter不追踪location的更改，而是在从< Router >组件传递出去的location改变后重新渲染，这意味着withRouter不会在路由改变时重新渲染，除非他的父组件重新渲染。
+`withRouter` 只是用来处理数据更新问题的。在使用一些 redux 的connect()或者 mobx的inject()的组件中，如果依赖于路由的更新要重新渲染，会出现路由更新了但是组件没有重新渲染的情况。这是因为 redux 和 mobx 的这些连接方法会修改组件的shouldComponentUpdate。
+
+所以在使用 `withRouter` 解决更新问题的时候，一定要保证 `withRouter` 在最外层，比如`withRouter(connect()(Component))`，而不是 `connect()(withRouter(Component))`。
+
+
 
 组件（ShowTheLocation）的所有非React的静态方法和属性都会被自动的复制到已连接的组件（withRouter(ShowTheLocation)）。
 
@@ -2042,7 +2062,7 @@ const RouteView = (props: IRouteViewProps) => {
 }
 // 这里我们使用了redux给RouteView生成一个容器组件
 // 如果不使用redux，也可以直接使用RouteView组件
-const RouteViewContainer = connect()(withRouter(RouteViewContainer))
+const RouteViewContainer = withRouter(connect()(RouteViewContainer))
 export default RouteViewContainer
 ```
 
@@ -2846,7 +2866,7 @@ const {state}=this.props.location
 #### 解决路径刷新页面样式丢失问题
 
 1. pub1ic/ index.html 中引入样式时不使用相对路径，使用绝对路径，即将 `./`改为 `/`
-2. pub1ic/ index.html 中引入样式时不使用相对路径，使用绝对路径，即将 `./`改为 `%PUBLIC_URL%`，只适用于react脚手架， `%PUBLIC_URL%`是 public 文件夹的路径
+2. pub1ic/ index.html 中引入样式时不使用相对路径，使用绝对路径，即将 `./`改为 `%PUBLIC_URL%`，只适用于create react app， `%PUBLIC_URL%`是 public 文件夹的路径
 3. 使用 HashRouter
 
 #### TS 手动引入路由组件属性类型

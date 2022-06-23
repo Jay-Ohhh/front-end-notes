@@ -81,7 +81,7 @@ function listerner() {
 
 ##### 单一数据源
 
-整个应用的 state 被储存在一棵 object tree 中，并且这个 object tree 只存在于唯一一个 store 中，即整个应用只能有一个 Store。。
+整个应用的 state 被储存在一棵 object tree 中，并且这个 object tree 只存在于唯一一个 store 中，即整个应用只能有一个 Store。
 
 ##### State是只读的
 
@@ -409,7 +409,9 @@ const rootReducer = combineReducers({potato: potatoReducer, tomato: tomatoReduce
 
 **返回值**
 
-(*Function*)：返回一个可以调用用 `reducers` 对象里所有 reducer 的 reducer，并且构造一个与 `reducers` 对象结构相同的 state 对象。
+(*Function*)：返回一个可以调用用 `reducers` 对象里所有 reducer 的 **reducer**，并且构造一个与 `reducers` 对象结构相同的 state 对象。
+
+
 
 ###### applyMiddleware(...middleware)
 
@@ -870,6 +872,29 @@ render(
 
 上面代码中，`Provider`在根组件外面包了一层，这样一来，`App`的所有 `connect` 子组件通过 mapStateToProps拿到state。
 
+或者直接使用 `useSelector`、`useDispatch`
+
+```jsx
+import React from 'react'
+import { useSelector, shallowEqual } from 'react-redux'
+import TodoListItem from './TodoListItem'
+
+const selectTodoIds = state => state.todos.map(todo => todo.id)
+
+const TodoList = () => {
+  // shallowEqual 判断是否一致，如果新旧值是对象或数组类型，则浅层比较属性值和索引值，当然也可以自己实现一个比较函数
+  const todoIds = useSelector(selectTodoIds, shallowEqual)
+
+  const renderedListItems = todoIds.map(todoId => {
+    return <TodoListItem key={todoId} id={todoId} />
+  })
+
+  return <ul className="todo-list">{renderedListItems}</ul>
+}
+```
+
+
+
 ##### 总结
 
 |            | 展示组件           | 容器组件                         |
@@ -1148,6 +1173,8 @@ redux middleware的洋葱模型：
 在Express和koa这类框架中，middleware 是指可以被嵌入在框架接收请求到产生响应过程之中的代码。例如，Express 或者 Koa 的 middleware 可以完成添加 CORS headers、记录日志、内容压缩等工作。
 
 在Redux中，**它提供的是位于 action 被发起之后，到达 reducer 之前的扩展点（一旦action被发起后，middleware会对dispatch进行扩展，调用链最后一个middleware才会接受真实的store.dispactch）。** 你可以利用 Redux middleware 来进行日志记录、创建崩溃报告、调用异步接口或者路由等等。
+
+> 当action命中当前middleware对应的情况时，这个中间件就是调用链的最后一个middleware
 
 每个 middleware 接受 [`Store`](https://www.reduxjs.cn/api/store) 的 [`dispatch`](https://www.reduxjs.cn/api/store#dispatch) 和 [`getState`](https://www.reduxjs.cn/api/store#getState) 函数作为参数，并返回一个函数，且该函数返回一个接收 action 的新函数。调用链中最后一个 middleware 会接受真实的 store 的 [`dispatch`](https://www.reduxjs.cn/api/store#dispatch) 方法作为 `next` 参数，并借此结束调用链。所以，middleware 的函数签名是 `({ getState, dispatch }) => next => action=>{ 函数内需要调用next(action) }`。
 
@@ -1675,7 +1702,7 @@ https://www.cnblogs.com/anin/p/13582345.html
 
 ##### 副作用（side effect）
 
-副作用就是对所处的环境有改变：
+副作用是对外部环境有改变：
 
 函数副作用是指函数被调用，完成了函数既定的计算任务，但同时因为访问了外部数据，尤其是因为对外部数据进行了写操作，从而一定程度地改变了外部环境。 
 

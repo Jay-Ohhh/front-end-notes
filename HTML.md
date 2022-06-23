@@ -7,6 +7,24 @@ src和href都是**用来引用外部的资源**，它们的区别如下：
 
 
 
+### script标签
+
+defer和async属性异步加载脚本，文档解析过程不中断。
+
+defer：等文档解析结束之后，DOMContentLoaded 触发之前，defer 脚本执行
+
+async：只要加载完脚本就会执行
+
+
+
+如果同时存在defer和async ，则defer 的优先级更高
+
+
+
+DOMContentLoaded **触发**定义：当初始的 **HTML** 文档被完全加载和解析完成之后，DOMContentLoaded 事件被触发，而无需等待样式表、图像和子框架的完全加载。另一个不同的事件 [load](https://developer.mozilla.org/en-US/docs/Mozilla_event_reference/load) 应该仅用于检测一个资源完全加载的页面。 
+
+
+
 ### meta标签
 
 #### viewport
