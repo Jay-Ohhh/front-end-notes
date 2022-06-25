@@ -1407,8 +1407,6 @@ app.listen(9000);
 
 这是因为当 `/todos/42` 有新的页面加载时，服务器会查找文件 `build/todos/42` 并且找不到它。需要配置服务器以通过提供`index.html` 来响应对 `/todos/42` 的请求。例如，我们可以修改上面的 Express 示例，为任何未知路径提供 `index.html` ：
 
-知路径提供 `index.html` ：
-
 ```diff
  app.use(express.static(path.join(__dirname, 'build')));
 

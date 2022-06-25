@@ -32,11 +32,19 @@ npm install react-router-dom
 
 1.hash模式
 
-[http://www.test.com/#/](https://link.zhihu.com/?target=http%3A//www.test.com/%23/)就是 Hash URL，当#后面的哈希值发生变化时，可以通过hashchange事件来监听到 URL 的变化，从而进行跳转页面，并且无论哈希值如何变化，服务端接收到的 URL 请求永远是[http://www.test.com](https://link.zhihu.com/?target=http%3A//www.test.com)。Hash 模式相对来说更简单，并且兼容性也更好。每一次改变#后的部分，都会在浏览器的访问历史中增加一个记录，使用"后退"按钮，就可以回到上一个位置。
+hash 通过监听浏览器 onhashchange 事件变化，查找对应路由应用。通过改变 location.hash 改变页面路由。
+
+[http://www.test.com/#/]()就是 Hash URL，当#后面的哈希值发生变化时，可以通过hashchange事件来监听到 URL 的变化，从而进行跳转页面，并且无论哈希值如何变化，都不向服务器端请求，服务器端接收到的 URL 请求永远是[http://www.test.com]()。Hash 模式相对来说更简单，并且兼容性也更好。每一次改变#后的部分，都会在浏览器的访问历史中增加一个记录，使用"后退"按钮，就可以回到上一个位置。
 
 2.history模式
 
-History模式是HTML5 新推出的功能，主要使用history.pushState和history.replaceState改变 URL。通过 History 模式改变 URL 同样不会引起页面的刷新，只会更新浏览器的历史记录。当用户做出浏览器动作时，比如点击后退按钮时会触发popState事件。
+History模式是HTML5 新推出的功能，主要使用history.pushState和history.replaceState改变 URL。通过 History 模式改变 URL 同样不会引起页面的刷新，只会更新浏览器的历史记录。
+
+可通过 back、forward、go 等，可以读取历览器历史记录栈的信息，pushState、repalceState 还可以对浏览器历史记录栈进行修改。
+
+history模式下（因为使用了 History API），url变化不会向服务器发送请求，但是只要页面刷新就会向浏览器发请求（此时页面的所有资源被清空，会向服务器请求重新获取资源），
+
+发起请求后，服务器收到请求，根据自己配置的路由规则处理，若没有对应的路由，就会返回404给前端浏览器，因此需要服务端配置为未知路径提供 `index.html`
 
 
 
@@ -123,6 +131,8 @@ RewriteRule . /index.html [L]
 你可能会想为什么我们不后退到 hash history，问题是这些 URL 是不确定的。如果一个访客在 hash history 和 browser history 上共享一个 URL，然后他们也共享同一个后退功能，最后我们会以产生笛卡尔积数量级的、无限多的 URL 而崩溃。
 
 ##### hashHistory
+
+hash 通过监听浏览器 onhashchange 事件变化，查找对应路由应用。通过改变 location.hash 改变页面路由。
 
 Hash history 使用 URL 中的 hash（`#`）部分去创建形如 `example.com/#/some/path` 的路由。
 
@@ -2768,7 +2778,7 @@ useRouteMatch 尝试以与 <Route> 相同的方式匹配当前URL。它主要用
 接收参数：
 
 ```js
-const {name,age}=this.props.match.params
+const { name, age } = this.props.match.params
 ```
 
 > 刷新页面参数不消失，参数会在地址栏显示
@@ -2820,7 +2830,7 @@ qs.parse('name=tom&age=18')  // { name: 'Tom' , age : 18 }
 接收参数：
 
 ```js
-const {search}=this.props.location
+const { search } = this.props.location
 ```
 
 备注：获取到的 search是  `'name=tom&age=18'` 这样的字符串，需要借助 querystring 模块的qs.parse解析
@@ -2854,6 +2864,8 @@ const {state}=this.props.location
 ```
 
 > 1、BrowserRouter(history)模式下，刷新页面参数**不消失**，参数不会在地址栏显示，因为state保存在history对象中
+>
+> 2、HashRouter 不支持 location.key，location.state
 
 #### 404
 

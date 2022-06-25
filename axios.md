@@ -876,3 +876,43 @@ axios.interceptors.response.use((response) => {
 })
 ```
 
+
+
+#### 单点登录
+
+iframe + postMessage + localStorage
+
+处理步骤
+1、登录主系统，获取各个子系统的token；
+2、点击项目地址链接后，创建一个隐藏iframe并使用postMessage将token传递过去，iframe接收后将token存到iframe所对应的域名下的localStorage；
+3、通过window.open(url, ‘_blank’)打开一个新地址；
+4、移除该iframe。
+
+```js
+// 创建iframe存储localStorage
+var iframe = document.createElement('iframe')
+iframe.setAttribute(
+  'style',
+  'position:absolute;width:0px;height:0px;left:-500px;top:-500px;'
+)
+iframe.src = addr
+document.body.append(iframe)
+// 传递token给加载完成后的iframe
+iframe.onload = () => {
+  iframe.contentWindow.postMessage(
+    {
+      token: this.tokenMap[key]
+    },
+    `${addr}`
+  )
+  setTimeout(function () {
+    iframe.remove()
+    iframe = null
+  }, 5000)
+  setTimeout(function () {
+    window.open(addr, '_blank')
+  }, 0)
+}
+
+```
+
