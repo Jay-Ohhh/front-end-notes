@@ -8824,6 +8824,19 @@ PureComponent 和 React.memo 就是应对这种场景的，PureComponent 是对�
 
 如果存在很多子孙组件，「找出所有子孙组件使用的属性」就会有很多工作量，也容易因为漏测导致 bug。
 
+##### 函数作为props，要保持稳定的值
+
+```js
+const memoizedFn = useRef<PickFunction<T>>();
+if (!memoizedFn.current) {
+ memoizedFn.current = function (this, ...args) {
+   // 为什么要绑定this，因为有可能会被 bind(xxx)
+   //  ReturnType<T>: 返回 fn 的返回值的类型
+   return fnRef.current.apply(this, args);
+ };
+}
+```
+
 ##### useMemo、useCallback 实现稳定的 Props 值
 
 如果传给子组件的状态或函数，每次都是新的引用，那么 PureComponent 和 React.memo 优化就会失效。所以需要使用 useMemo 和 useCallback 来生成稳定值（当它的依赖未发生改变时，就不会触发重新计算），并结合 PureComponent 或 React.memo 避免子组件重新 Render。

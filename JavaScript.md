@@ -463,7 +463,7 @@ JavaScript 采用词法作用域(lexical scoping)，也就是静态作用域。
 
 词法作用域是自身的作用域
 
-this指向强调函数运行时所在的作用域。
+this指向强调函数运行时所在的作用域关联的对象。
 
 ```js
 var value = 1;

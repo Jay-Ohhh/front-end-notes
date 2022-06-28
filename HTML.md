@@ -11,7 +11,7 @@ src和href都是**用来引用外部的资源**，它们的区别如下：
 
 defer和async属性异步加载脚本，文档解析过程不中断。
 
-defer：等文档解析结束之后，DOMContentLoaded 触发之前，defer 脚本执行
+defer：等文档解析结束之后，DOMContentLoaded 触发之前，defer 脚本执行。对 module script 无效。
 
 async：只要加载完脚本就会执行
 
