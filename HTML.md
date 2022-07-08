@@ -129,25 +129,7 @@ content="no-cache, no-store, must-revalidate"
 <meta name="renderer" content="webkit"> //默认webkit内核
 ```
 
-### 块级盒子模型
 
-块级盒子模型分为W3C标准模型和IE标准模型，可以使用CSS的box-sizing属性控制。
-
-#### 标准盒子模型
-
-```css
-box-sizing:content-box;
-```
-
-**width**指的是内容区域**content**的宽度，**height**指的是内容区域**content**的高度
-
-#### IE标准的盒子模型（怪异盒模型）
-
-```css
-box-sizing:box-sizing;
-```
-
-**width**指的是内容、内边距、边框总的宽度（content +  padding + border）；**height**指的是内容、内边距、边框总的高度
 
 
 

@@ -71,7 +71,7 @@ https://segmentfault.com/a/1190000016365409
 
 当我们执行`webpack`命令的时候就会执行`bin/index.js`文件中的代码。
 
-在模块以依赖的方式被安装，如果存在`bin`选项。在`node_modules/.bin/`生成对应的文件， `Npm`会寻找这个文件，在node_modules/.bin/目录下建立符号链接。由于node_modules/.bin/目录会在运行时加入系统的`PATH`变量，因此在运行npm时，就可以不带路径，直接通过命令来调用这些脚本。执行结束后，再将 `PATH` 变量恢复原样。
+在模块以依赖的方式被安装，package.json如果存在`bin`选项，会在`node_modules/.bin/`生成对应的文件， `Npm`会寻找这个文件，在node_modules/.bin/目录下建立符号链接。由于node_modules/.bin/目录会在运行时加入系统的`PATH`变量，因此在运行npm时，就可以不带路径，直接通过命令来调用这些脚本。执行结束后，再将 `PATH` 变量恢复原样。
 
 所有node_modules/.bin/目录下的命令，都可以用npm run [命令]的格式运行。在命令行下，键入npm run，然后按tab键，就会显示所有可以使用的命令。
 

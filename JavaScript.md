@@ -2164,6 +2164,30 @@ test();
 
 
 
+#### 动态import
+
+静态的 `import` 语句用于导入由另一个模块导出的绑定。无论是否声明了 [`strict mode`](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Strict_mode)，导入的模块都运行在严格模式下。在浏览器中，`import` 语句只能在声明了 `type="module"` 的 `script` 的标签中使用。
+
+动态 `import()`，它不需要依赖 `type="module"` 的 script 标签。
+
+
+
+在您希望按照一定的条件或者按需加载模块的时候，动态 `import()` 是非常有用的。而静态型的 `import` 是初始化加载依赖项的最优选择，使用静态 `import` 更容易从代码静态分析工具和 [tree shaking](https://developer.mozilla.org/zh-CN/docs/Glossary/Tree_shaking) 中受益。
+
+```javascript
+// module.js
+export const a = 1
+export const b = 2
+export default {}
+
+// app.js
+import('module.js').then(module=>{
+	console.log(module) // { default:{}, a:1, b:2 }
+})
+```
+
+
+
 #### Generator函数
 
 ##### Generator函数

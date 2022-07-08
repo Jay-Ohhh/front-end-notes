@@ -419,6 +419,30 @@ export default () => {
 
 
 
+#### 盒子模型
+
+box-sizing 属性可以被用来调整这些表现：
+
+- `content-box` 默认值，标准盒子模型。如果你设置一个元素的宽为 100px，那么这个元素的内容区会有 100px 宽，并且任何边框和内边距的宽度都会被增加到最后绘制出来的元素宽度中。例如，`.box {width: 350px; border: 10px solid black; margin: 100px;}` 在浏览器中的渲染的实际宽度将是 370px。
+
+  尺寸计算公式：
+
+  `width` = 内容的宽度
+
+  `height` = 内容的高度
+
+
+
+- `border-box` 怪异/IE盒子模型。如果你将一个元素的 width 设为 100px，那么这 100px 会包含它的 border 和 padding，内容区的实际宽度是 width 减去 (border + padding) 的值。例如， `.box {width: 350px; border: 10px solid black;}` 导致在浏览器中呈现的宽度为 350px 的盒子。
+
+  尺寸计算公式：
+
+  `width` = border + padding + 内容的宽度
+
+  `height` = border + padding + 内容的高度
+
+
+
 #### 常见问题
 
 ##### 父元素宽度由子元素宽度决定
@@ -481,12 +505,13 @@ vertical-align: top; // 设置成顶部对齐，默认是底部对齐
 ##### 修改滚动条
 
 ```less
-.webkitScrollbar(@className) {
+// less
+.webkitScrollbar(@className, @width: 6px, @height: 6px) {
     /*修改滚动条样式*/
     .@{className}::-webkit-scrollbar {
     // 宽高最好设置成一致，否则水平和垂直的滚动条粗细不一样
-        width: 5px;
-        height: 5px;
+        width: @width;
+        height: @height;
     }
     .@{className}::-webkit-scrollbar-track {
         border-radius: 10px;
