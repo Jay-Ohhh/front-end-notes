@@ -977,6 +977,113 @@ for (let x of a) {
 }
 ```
 
+#### 标签函数
+
+标签函数是一种语法糖，后面直接跟模板字符串，可以对模板字符串中的字符和变量进行拆分，不需要通过 () 调用。
+
+```javascript
+let a = 6
+let b = 9
+let sum = 15
+function tagTemplate(strings, aVariable, bVariable, sumVariable) {
+  console.log(strings)        // ‘ 67、，遍历strings，不会遍历raw
+  console.log(aVariable)      // 6
+  console.log(bVariable)      // 9
+  console.log(sumVariable)    // 15
+}
+
+tagTemplate`${a} + ${b} = ${sum}`
+
+let c = '张三'
+let d = 24
+function tagTemplate(strings, cVariable, dVariable, notVariable) {
+  console.log(strings)        // ['我叫', '，今年', '岁了', raw: Array(3)]
+  console.log(cVariable)      // '张三'
+  console.log(dVariable)      // 24
+  console.log(notVariable)    // undefined
+}
+
+tagTemplate`我叫${c}，今年${d}岁了`
+
+```
+
+使用标签函数可以看到，参数里面的第一个参数是数组，是由字符串模板被插入变量分割之后剩余字符串组成的数组，之后的参数依次就是按顺序插入变量的值了。
+
+知道参数的形式后我们就可以用ES6的结构对插入变量进行一个遍历了
+
+```javascript
+
+let c = '张三'
+let d = 24
+function tagTemplate(strings, ...variable) {
+  console.log(strings)        // ['我叫', '，今年', '岁了']
+  for(let i = 0; i < variable.length; i++) {
+    console.log(variable[i])
+  }
+  // '张三'  24
+}
+
+tagTemplate`我叫${c}，今年${d}岁了`
+
+```
+
+标签函数下的raw数组
+
+- 采用模板标记函数后，第一个数组返回的是我们的非变量插入的字符串片段，这里的字符串片段是会转换成我们的实际展示形式的，比如 \u00A9 会转为 ©，\n 会转为一个空格
+- 如果我们想要拿到没有经过转换的原版字符串，这里我们就可以使用这个数组上的raw属性来获取原版字符串的数组，我们可以看下代码
+
+```javascript
+function tagTest(strings, ...rest){
+  for(let value of strings) {
+    console.log(value)
+  }
+  for(let value of strings.raw) {
+    console.log(value)
+  }
+}
+let a = '张三'
+let b = 24
+tagTest`你${ a }\u00A9,哈哈\n${ b }我`
+// strings遍历
+// 你
+// ©,哈哈 
+// 我
+
+// strings.raw遍历
+// 你
+// \u00A9,哈哈\n
+// 我
+```
+
+##### String.raw
+
+String.raw是ES6标准的一个字符串方法，使用方式类似于模板标记函数，后面直接跟一个模板字符串即可，会原样返回该模板字符串的值，不受可编译字符的影响，普通的字符串会返回经过转义的字符串结果，如下
+
+```javascript
+console.log(`\u00A9`)
+// ©
+console.log(String.raw`\u00A9`)
+// \u00A9
+
+console.log(`Hi\n`)
+// Hi
+console.log(String.raw`Hi\n`)
+// Hi\n
+
+console.log(`Hi
+张三`)
+// Hi
+// 张三
+console.log(String.raw`Hi
+张三`)
+// Hi
+// 张三
+```
+
+
+
+
+
 #### Set和Map数据结构
 
 ##### Set

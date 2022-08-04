@@ -1541,6 +1541,10 @@ ssh -T 地址 // 测试是否连上
 
 例如：`https://stackblitz.com/github/Jay-Ohhh/rolib-cli`
 
+**1s github**
+
+例如：`https://github1s.com/Jay-Ohhh/rolib-cli`
+
 8个github技巧
 
 https://mp.weixin.qq.com/s/BpmyTfdI9BUrMnL8k2r1BQ

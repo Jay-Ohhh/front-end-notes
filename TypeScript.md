@@ -2176,6 +2176,12 @@ declare namespace jQuery.fn {
 }
 ```
 
+##### declare global
+
+在 d.ts 声明文件中，任何的 declare 默认就是 global 的了，所以你在 d.ts 文件中是不能出现 `declare global` 的。只有在模块文件中的定义，如果想要全局就使用 `declare global`。
+
+
+
 ##### interface 和 type
 
 除了全局变量之外，可能有一些类型我们也希望能暴露出来。在类型声明文件中，我们可以直接使用 `interface` 或 `type` 来声明一个全局的接口或类型（不需要在前面加 `declare`）：
@@ -2725,6 +2731,12 @@ import { foo } from 'node-plugin';
 
 foo(global.process); // global是node环境下的全局对象
 ```
+
+###### js文件三斜杠注释///reference path用途
+
+编辑某个js文件时，要想这个js文件出现其他js成员的ide提示，可以再js文件开头使用3个斜杠注释和reference指令的path指向此 js/ts 文件路径，这样在编写这个 js/ts 文件时，ide就会自动出现path指向的js文件中的成员。
+
+
 
 ##### 拆分声明文件
 
