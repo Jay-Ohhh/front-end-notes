@@ -218,6 +218,9 @@ https://mp.weixin.qq.com/s/HbgIXi0zpvU_-kdILHGi3A
 Webpack 内部包含三种类型的 Chunk：
 
 - Initial Chunk：基于 Entry 配置项生成的 Chunk，此 chunk 包含为入口起点指定的所有模块及其依赖项
+
+> 因为是入口文件立即加载的模块，可以理解为同步引用，若不是立即加载，为异步引用
+
 - Async Chunk：异步模块引用，如 `import(xxx)` 语句对应的异步 Chunk
 - Runtime Chunk：只包含运行时代码的 Chunk
 
@@ -263,7 +266,9 @@ Webpack 内部包含三种类型的 Chunk：
 
 某个包的引用次数必须大于等于设置的数值，该模包才能被拆分出来；
 
-“被 Chunk 引用次数”并不直接等价于被 `import` 的次数，而是取决于上游调用者是否被视作 Initial Chunk 或 Async Chunk 处理
+“被 Chunk 引用次数”并不直接等价于被 `import` 的次数，而是取决于上游调用者是否被视作 Initial Chunk 或 Async Chunk 处理。
+
+
 
 **splitChunks.minSize**
 
@@ -274,6 +279,31 @@ maxSize如果为非0值时，不能小于minSize；
 **splitChunks.cacheGroups**
 
 缓存组可以继承和/或覆盖来自 `splitChunks.*` 的任何选项。但是 `test`、`priority` 和 `reuseExistingChunk` 只能在缓存组级别上进行配置。将它们设置为 `false`以禁用任何默认缓存组。
+
+```js
+optimization: {
+        splitChunks: {
+            //优化配置项...
+            chunks: "all",
+            cacheGroups: {
+                vendors: {    //属性名即是缓存的名称，改成common看看
+                    test: /[\\/]node_modules[\\/]/, 
+                    priority: 2
+                },
+                default: {        //默认缓存组设置，会覆盖掉全局设置
+                    minChunks: 2,
+                    priority: 1,
+                    reuseExistingChunk: true
+                }
+            }
+        }
+    },
+
+```
+
+在`cacheGroups`中，每一个对象就是一个`缓存组`分包策略，`属性名`便是`缓存组`的名称，对象中设置的值可以`继承`全局设置的属性（如`minChunks`等），也存在只有`缓存组`独特的属性，比如`test`（匹配模块名称规则）、`priority`（缓存组的优先级），`reuseExistingChunk`（重用已经被分离出的chunk）。
+
+
 
 **splitChunks.cacheGroups.{cacheGroup}.priority**
 

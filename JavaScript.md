@@ -6469,6 +6469,144 @@ ES6 模块设计思想：尽量的静态化、使得编译时就能确定模块�
   > 
   > 运行：就是将代码跑起来，被装载到内存中去了。
 
+##### [What's the purpose of `Object.defineProperty(exports, "__esModule", { value: !0 })`?](https://stackoverflow.com/questions/50943704/whats-the-purpose-of-object-definepropertyexports-esmodule-value-0)
+
+**__esModule 标识**
+
+不知道是 JS 圈子里的谁最先提出了 `__esModule` 这个解决方案，现在市面上的打包器都非常默契地遵守了这个约定。
+
+exports是node的一个全局对象。
+
+表面上看就是把一个导出对象标识为一个 ES 模块：
+
+```
+exports.__esModule = true
+```
+
+或
+
+```
+Object.defineProperty(exports, '__esModule', { value: true })
+```
+
+
+
+**Webpack 的处理方法**
+
+上面 ES 模块中导入 CommonJS 模块的例子，在 Webpack 4.43.0 打包后变成了这样（去掉所有注释）：
+
+```javascript
+(function(modules) {
+  // ...
+  function __webpack_require__ (moduleId) {
+    // ...
+  }
+
+  // ...
+
+  __webpack_require__.d = function(exports, name, getter) {
+    if(!__webpack_require__.o(exports, name)) {
+      Object.defineProperty(exports, name, { enumerable: true, get: getter });
+    }
+  };
+
+  __webpack_require__.r = function(exports) {
+    if(typeof Symbol !== 'undefined' && Symbol.toStringTag) {
+      Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
+    }
+    Object.defineProperty(exports, '__esModule', { value: true }); // <-- 重点
+  };
+
+  __webpack_require__.n = function(module) {
+    var getter = module && module.__esModule ?
+      function getDefault() { return module['default']; } :
+      function getModuleExports() { return module; }; // <-- 兼容处理
+    __webpack_require__.d(getter, 'a', getter);
+    return getter;
+  };
+
+  return __webpack_require__(__webpack_require__.s = 0);
+})({
+  "./mod.js": function (module, exports) {
+    function foo () {}
+    function bar () {}
+    module.exports = foo
+    module.exports.bar = bar
+  },
+  "./index.js": function (module, __webpack_exports__, __webpack_require__) {
+    "use strict";
+    __webpack_require__.r(__webpack_exports__); // <-- 标识 ES 模块
+    var _mod_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__("./mod.js");
+    var _mod_js__WEBPACK_IMPORTED_MODULE_0___default = __webpack_require__.n(_mod_js__WEBPACK_IMPORTED_MODULE_0__);
+
+    console.log(_mod_js__WEBPACK_IMPORTED_MODULE_0__["bar"])
+    console.log(_mod_js__WEBPACK_IMPORTED_MODULE_0___default.a)
+    console.log(_mod_js__WEBPACK_IMPORTED_MODULE_0___default()())
+  },
+  0: function (module, exports, __webpack_require__) {
+    module.exports = __webpack_require__("./index.js");
+  }
+  // ...
+})
+```
+
+可以看到在使用侧导入的默认导出实际上是一个 Getter 函数，读取值的时候访问了其自身的 `a` 属性，如果 __esModule 为 `true` 那么 `a` 就是 `module.exports.default`，Getter 调用也返回 `module.exports.default`，否则 `a` 的值和 Getter 返回值就是 `module.exports`。所以在 Webpack 中这样用是没有问题的，Webpack 会根据 __esModule 标识来自动处理 CommonJS 的模块导出对象，兼容 ES 模块中的导入。
+
+
+
+**TypeScript 的处理方法**
+
+同样的例子，在 TypeScript 3.9.5 中：
+
+```javascript
+// CJS mod.js
+function foo () {}
+function bar () {}
+module.exports = foo
+module.exports.bar = bar
+// mod.d.ts
+declare function foo(): void;
+
+declare namespace foo {
+  export function bar(): void;
+}
+
+export = foo;
+// ESM index.ts
+import { bar } from './mod'
+import foo from './mod' // <-- 必须配置 esModuleInterop: true
+
+console.log(bar)
+console.log(foo)
+console.log(foo())
+// tsconfig.json
+{
+  "compilerOptions": {
+    "module": "commonjs",
+    "target": "ES2019",
+    "esModuleInterop": true
+  }
+}
+```
+
+输出 `index.js` 是这样的：
+
+```javascript
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true }); // <-- 标识当前模块是 ES 模块
+
+const mod_1 = require("./mod");
+const mod_2 = __importDefault(require("./mod"));
+console.log(mod_1.bar);
+console.log(mod_2.default);
+console.log(mod_2.default());
+```
+
+开启 `esModuleInterop` （支持使用import d from 'cjs'的方式引入commonjs包）后，如果被导入的模块没有标识 `__esModule`，则默认导入将直接返回一个只含有 `default` 属性的对象。如果不开启 `esModuleInterop` 编译选项，则不能使用默认导入，必须用 `import * as mod from './mod'` 才能通过编译。
+
 
 
 #### Intersection Observer
