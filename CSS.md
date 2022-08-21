@@ -657,6 +657,30 @@ body {
 
 
 
+##### 外圆角tab栏
+
+```css
+ "&::before, &::after": {
+                        content: "",
+                        position: "absolute",
+                        top: 22,
+                        width: 8,
+                        height: 8,
+                        background: "radial-gradient(circle at 100% 0%, transparent 8px, #FFF 0)",
+                    },
+                    "&::before": {
+                        left: -8,
+                        transform: "rotateY(180deg)",
+                    },
+                    "&::after": {
+                        right: -8,
+                    },
+```
+
+
+
+
+
 #### 现代布局
 
 https://1linelayouts.glitch.me/
