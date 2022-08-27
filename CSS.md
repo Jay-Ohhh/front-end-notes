@@ -657,7 +657,7 @@ body {
 
 
 
-##### 外圆角tab栏
+##### tab栏外圆角
 
 ```css
  "&::before, &::after": {
@@ -675,6 +675,183 @@ body {
                     "&::after": {
                         right: -8,
                     },
+```
+
+or
+
+```css
+.ihqzYp::after {
+    left: -40px;
+    content: "";
+    background: transparent;
+    position: absolute;
+    bottom: -16px;
+    height: 56px;
+    width: 56px;
+    border-radius: 100%;
+    border-width: 16px;
+    border-style: solid;
+    border-color: transparent rgb(255, 255, 255) transparent transparent;
+    transform: rotate(45deg);
+    box-sizing: border-box;
+}
+```
+
+
+
+##### 移动端300ms延迟
+
+```css
+{
+  touch-action:"manipulation",
+}
+```
+
+
+
+##### 大纲左边框
+
+```css
+ "& .MuiTreeItem-content::before": {
+            content: "''",
+            position: "absolute",
+            top: 0,
+            right: -8,
+            width: 2,
+            height: 25,
+            backgroundColor: "#e8e9e8",
+            transformOrigin: "-123px center",
+            transform: "rotateY(180deg)",
+        },
+```
+
+##### 按钮点击涟漪效果
+
+**html**
+
+```html
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+
+    <title>涟漪特效按钮</title>
+    <link rel="stylesheet" href="../css/54.css">
+</head>
+
+<body>
+    <div class="btn-box">
+        <button>点赞</button>
+        <button>关注</button>
+        <button>收藏</button>
+        <button>转发</button>
+    </div>
+    <script type="text/javascript">
+        // 获取所有按钮
+        const btns=document.querySelectorAll("button");
+        // 循环所有按钮，并为每一个按钮添加点击事件
+        btns.forEach(btn=>{
+            btn.addEventListener("click",e=>{
+                // 创建span元素，并设置其位置为鼠标点击的位置
+                let span=document.createElement("span");
+               // MouseEvent 接口的只读属性 offsetX 规定了事件对象与目标节点的内填充边（padding edge）在 X 轴方向上的偏移量
+                span.style.left=e.offsetX+"px";
+                span.style.top=e.offsetY+"px";
+              	span.style.width = e.currentTarget.clientWidth + 'px';
+              	span.style.height = e.currentTarget.clientHeight + 'px';
+                // 将span元素添加至按钮标签里
+                btn.appendChild(span);
+                // 1秒后删除span元素
+                setTimeout(() => {
+                    span.remove();
+                  	span = null
+                }, 1000);
+            })
+        })
+    </script>
+</body>
+
+</html> 
+```
+
+**css**
+
+```css
+*{
+    /* 初始化 */
+    margin: 0;
+    padding: 0;
+}
+body{
+    /* 100窗口高度 */
+    height: 100vh;
+    /* 弹性布局 居中 */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    /* 渐变背景 */
+    background: linear-gradient(200deg,#80d0c7,#13547a);
+}
+.btn-box{
+    width: 500px;
+    /* 弹性布局 */
+    display: flex;
+    /* 横向排列 */
+    flex-direction: row;
+    /* 允许换行 */
+    flex-wrap: wrap;
+    /* 平均分配宽度给每一个子元素 */
+    justify-content: space-around;
+}
+.btn-box button{
+    /* 相对定位 */
+    position: relative;
+    border: none;
+    background: linear-gradient(to right,#52d1c2,#1ab3a1);
+    width: 200px;
+    height: 60px;
+    margin: 20px 0;
+    font-size: 18px;
+    color: #fff;
+    /* 字间距 */
+    letter-spacing: 3px;
+    border-radius: 30px;
+    /* 阴影 */
+    box-shadow: 3px 5px 10px rgba(0,0,0,0.1);
+    cursor: pointer;
+    /* 溢出隐藏 */
+    overflow: hidden;
+}
+.btn-box button:hover{
+    box-shadow: 3px 5px 10px rgba(0,0,0,0.2);
+}
+.btn-box button span{
+    /* 绝对定位 */
+    position: absolute;
+    background-color: #fff;
+    transform: translate(-50%,-50%);
+    border-radius: 50%;
+    /* 执行动画 */
+    animation: animate 1s ease;
+    /* 设置元素不对指针事件做出反应 */
+    pointer-events: none;
+}
+
+/* 定义动画 */
+@keyframes animate {
+    from{
+        width: 0;
+        height: 0;
+        opacity: 0.5;
+    }
+    to{
+        width: 400px;
+        height: 400px;
+        opacity: 0;
+    }
+} 
 ```
 
 

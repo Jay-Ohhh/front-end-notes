@@ -1049,7 +1049,7 @@ fork:start..end fork数量区间
 size:>=xxx 项目大小，单位kb
 created:>YYYY-MM-DD 创建日期晚于YYYY-MM-DD
 pushed:>YYYY-MM-DD  更新日期晚于YYYY-MM-DD
-language:xxx 项目使用语言
+c:xxx 项目使用语言
 topics:xxx 主题
 user:xxx 作者名称
 location:China 项目填写的地址

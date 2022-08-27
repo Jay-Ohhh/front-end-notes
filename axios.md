@@ -844,28 +844,21 @@ withCredentials : boolean，表示跨域请求时是否需要使用凭证
 ```js
 let isRefresh = false
 let reTryRequestList = []
-let token = ''
+let access_token = ''
+let refresh_token = ''
+
+async function _reflashToken(){
+  const {data} = await axios.request({url:"refresh"})
+  access_token = data.access_token
+  refresh_token = data.refresh_token
+}
 
 axios.interceptors.response.use((response) => {
   // ...
   return response
 }, async (error) => {
   if (error.response && error.response.status === 401) {
-    if (!isRefresh) {
-      isRefresh = true
-      try {
-        reflashTokenConfig && await _reflashToken() // 记得更改token
-        isRefresh = false
-        while (reTryRequestList.length > 0) {
-          const cb = reTryRequestList.shift()
-          cb?.()
-        }
-        return axios.request(error.response.config)
-      } catch (err) {
-        return Promise.reject(err)
-      }
-    } else {
-      return new Promise((resolve) => {
+    const promise = new Promise((resolve) => {
         reTryRequestList.push(
             (newToken) => resolve(axios.request({
               ...error.response.config, headers: {
@@ -875,11 +868,123 @@ axios.interceptors.response.use((response) => {
             })) // 要使用最新的token
           )
       })
+    if (!isRefresh) {
+      isRefresh = true
+      try {
+        await _reflashToken() // 记得更改token
+      } finally {
+        isRefresh = false
+        while (reTryRequestList.length > 0) {
+          const cb = reTryRequestList.shift()
+          cb?.(access_token)
+        }
+      }
     }
+    return promise
   }
+  
   return Promise.reject(error)
 })
 ```
+
+##### 小程序
+
+```typescript
+import Taro, { Chain } from '@tarojs/taro';
+
+const baseURL = 'http://www.treedeep.cn'
+
+let isRefresh = false
+let access_token: string = '';
+let refresh_token: string = '';
+let reTryRequestList: ((token: string) => void)[] = []
+
+const getTokenConfig: Taro.request.Option = {
+  url: "https://www.treedeep.cn/oauth/token?grant_type=password&username=admin&password=admin",
+  method: "POST",
+  header: {
+    Authorization: "Basic YXd1d2VhcHBhZG1pbjpZWGQxZDJWaGNIQTZZWEJ3V1RKNGNFQmFWelVoTUU="
+  }
+}
+
+const refreshTokenConfig: Taro.request.Option = {
+  url: `http://www.treedeep.cn/oauth/token?grant_type=refresh_token&refresh_token=${refresh_token}`,
+  method: "POST",
+  header: {
+    Authorization: "Basic YXd1d2VhcHBhZG1pbjpZWGQxZDJWaGNIQTZZWEJ3V1RKNGNFQmFWelVoTUU="
+  }
+}
+
+async function refreshToken() {
+  const { data } = await Taro.request(refreshTokenConfig)
+  access_token = data.access_token
+  refresh_token = data.refresh_token
+}
+
+const interceptor = async function (chain: Chain) {
+  const requestParams = chain.requestParams
+  const config = !access_token ? getTokenConfig : null
+
+  if (config) {
+    return chain.proceed(config).then(res => {
+      access_token = res.data.access_token
+      refresh_token = res.data.refresh_token
+      return chain.proceed({
+        ...requestParams,
+        header: {
+          ...requestParams.header,
+          Authorization: `Bearer ${access_token}`
+        }
+      }).then(res1 => res1)
+    })
+  }
+  return chain.proceed(requestParams).then(res1 => res1)
+}
+
+async function request(options: Taro.request.Option<any, any>) {
+  const config = {
+    ...options,
+    url: baseURL + options.url,
+    header: {
+      ...options.header,
+      Authorization: `Bearer ${access_token}`
+    }
+  }
+  Taro.addInterceptor(interceptor)
+  const { data } = await Taro.request(config)
+  if (data.error === "invalid_token") {
+    const promise = new Promise((resolve) => {
+      reTryRequestList.push(
+        (newToken) => resolve(Taro.request({
+          ...config,
+          header: {
+            ...options.header,
+            Authorization: `Bearer ${newToken}`
+          }
+        })) // 要使用最新的token
+      )
+    })
+    if (!isRefresh) {
+      try {
+        isRefresh = true
+        await refreshToken();
+      } finally {
+        isRefresh = false
+      }
+    }
+    while (reTryRequestList.length > 0) {
+      const cb = reTryRequestList.shift()
+      cb?.(access_token)
+    }
+    return promise
+  }
+  return data
+}
+
+export { request }
+```
+
+
 
 
 

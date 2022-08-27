@@ -5507,6 +5507,8 @@ Authorization: Bearer <token>
 
 另一种做法是，跨域的时候，JWT 就放在 POST 请求的数据体里面。
 
+Bearer：https://developer.mozilla.org/zh-CN/docs/Web/HTTP/Authentication
+
 ###### JWT 的几个特点
 
 （1）JWT 默认是不加密，但也是可以加密的。生成原始 Token 以后，可以用密钥再加密一次。
@@ -6684,7 +6686,13 @@ IntersectionObserverEntry 对象提供了目标元素与跟元素相交的详细
         (entries) => {
           for (const entry of entries) {
           	// entry: IntersectionObserverEntry
+            if (entry.isIntersecting) {
+              // do something
+            }
+            // or
+            if (entries[0].intersectionRatio <= 0) return;
           }
+        }
       );
 ```
 
@@ -6700,9 +6708,6 @@ interface IntersectionObserverEntry {
 };
 ```
 
-
-![img](https://p1-jj.byteimg.com/tos-cn-i-t2oaga2asx/gold-user-assets/2019/8/29/16cdccc7f71311ee~tplv-t2oaga2asx-zoom-in-crop-mark:1304:0:0:0.awebp)
-
 **time**：发生相交到相应的时间，毫秒。
 
 **rootBounds**：根元素矩形区域的信息，图中蓝色部分区域，如果没有设置根元素则返回null。
@@ -6716,6 +6721,8 @@ interface IntersectionObserverEntry {
 **intersectionRatio**：目标元素与视口（或根元素）的相交比例。
 
 **target**：目标元素，图中黑色边框的部分。
+
+![img](https://p1-jj.byteimg.com/tos-cn-i-t2oaga2asx/gold-user-assets/2019/8/29/16cdccc7f71311ee~tplv-t2oaga2asx-zoom-in-crop-mark:1304:0:0:0.awebp)
 
 
 
