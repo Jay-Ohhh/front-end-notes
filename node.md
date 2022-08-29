@@ -1,8 +1,19 @@
-#### process.cwd() 、__dirname
+#### process.cwd() 、__dirname、require.main
 
 - process.cwd() 是当前执行node命令时候的文件夹绝对路径
 
+> The `process.cwd()` method returns the current working directory of the Node.js process.
+
 - __dirname 当前文件所属目录的绝对路径
+- require.main 
+
+> ### Accessing the main module[#](https://nodejs.org/dist/latest-v16.x/docs/api/modules.html#accessing-the-main-module)
+>
+> When a file is run directly from Node.js, `require.main` is set to its `module`. That means that it is possible to determine whether a file has been run directly by testing `require.main === module`.
+>
+> For a file `foo.js`, this will be `true` if run via `node foo.js`, but `false` if run by `require('./foo')`.
+>
+> When the entry point is not a CommonJS module, `require.main` is `undefined`, and the main module is out of reach.
 
 #### `__dirname` 、`__filename`
 
