@@ -350,7 +350,7 @@ https://unpkg.com/jquery@[latestVersion]/[pkg.main]
 
 cd到模块目录，npm link，进行全局link
 
-cd到项目目录，npm link 模块名(package.json中的name)
+cd到项目目录，npm link 模块名(模块package.json中的name)
 
 **解除link**
 
@@ -587,3 +587,24 @@ npm unpublish [pkg]@[version]
 #### 分析
 
 [NPM.DEVTOOL.TECH](https://npm.devtool.tech/)
+
+
+
+#### Command
+
+##### --save  --no-save
+
+> Now install Express in the myapp directory and save it in the dependencies list. For example:
+
+```ruby
+$ npm install express --save
+```
+
+> To install Express temporarily and not add it to the dependencies list:
+
+```ruby
+$ npm install express --no-save
+```
+
+
+

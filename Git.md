@@ -836,6 +836,40 @@ git reset --hard 错误的commitHash
 
 
 
+##### config
+
+```shell
+git config --global user.name = Jay # 全局配置
+git config user.name = Jay # 项目配置
+git config --list --global # 查看配置
+```
+
+项目 **.git/config**
+
+```
+[core]
+	repositoryformatversion = 0
+	filemode = true
+	bare = false
+	logallrefupdates = true
+	ignorecase = true
+	precomposeunicode = true
+[remote "origin"]
+	url = http://10.10.10.24:8070/scm/pt/ef-oa.git
+	fetch = +refs/heads/*:refs/remotes/origin/*
+[branch "master"]
+	remote = origin
+	merge = refs/heads/master
+[branch "sales-ng"]
+	remote = origin
+	merge = refs/heads/sales-ng
+[user]
+	name = Jay
+	email = weijian.ou@ecoflow.com
+```
+
+
+
 #### 设置 git 短命令
 
 ###### 方式一
@@ -1031,37 +1065,7 @@ J = F^2  = B^3^2   = A^^3^2
 
 7、 git stash pop 恢复之前忽略的文件（非常重要的一步）
 
-#### Github 搜索技巧
 
-Awesome + keyword：关键字 Awesome,帮忙找到优秀的工具列表
-
-关键字 in 是用来限定搜索的范围，可以指定是在名称、描述、readme文档中搜索关键字
-
-```
-in:name xxx 名称条件
-in:name xxx xxx 多个名称条件
-in:description xxx 项目描述 description
-in:readme xxx 搜索readme里的内容
-stars:>xxx 点赞大于
-stars:start..end 点赞数量区间
-fork:>xxx fork数大于
-fork:start..end fork数量区间
-size:>=xxx 项目大小，单位kb
-created:>YYYY-MM-DD 创建日期晚于YYYY-MM-DD
-pushed:>YYYY-MM-DD  更新日期晚于YYYY-MM-DD
-c:xxx 项目使用语言
-topics:xxx 主题
-user:xxx 作者名称
-location:China 项目填写的地址
-jack in:fullname 匹配用户名为jack
-license:xxx
-is:public
-is:private
-```
-
-#### Gitee搜索技巧
-
-用户可以通过组合「关键字」+「开发语言类型」+「项目收藏数(Watch)」+「项目克隆数(Fork)」+「项目更新时间」等筛选条件，查找用户需要的项目。
 
 #### 入职公司拉取代码
 
@@ -1180,71 +1184,7 @@ git push -f
 
 解决冲突就是把Git合并失败的文件手动编辑为协商好的版本，再提交。需要与领导同事协商。
 
-#### Gitlab 请求合并
 
-https://blog.csdn.net/panjunnn/article/details/106388986
-
-#### pull request
-
-我尝试用类比的方法来解释一下 pull reqeust。想想我们中学考试，老师改卷的场景吧。你做的试卷就像仓库，你的试卷肯定会有很多错误，就相当于程序里的 bug。老师把你的试卷拿过来，相当于先 fork。在你的卷子上做一些修改批注，相当于 git commit。最后把改好的试卷给你，相当于发 pull request，你拿到试卷重新改正错误，相当于 merge。
-
-当你想更正别人仓库里的错误时，要走一个流程：
-
-1. 先 fork 别人的仓库，相当于拷贝一份，相信我，不会有人直接让你改修原仓库的
-2. clone 到本地分支，做一些 bug fix
-3. 发起 pull request 给原仓库，让他看到你修改的 bug
-4. 原仓库 review 这个 bug，如果是正确的话，就会 merge 到他自己的项目中
-
-至此，整个 pull request 的过程就结束了。
-
-https://zhuanlan.zhihu.com/p/87603185
-
-**pull request 步骤**
-
-- fork 到自己的仓库
-
-- git clone 到本地
-
-- 上游建立连接
-  `git remote add upstream 开源项目地址`
-
-- 创建开发分支 (非必须)
-  `git checkout -b test`
-
-- 推送到远程仓库
-  
-  `git push -u origin test`
-
-- 修改提交代码
-  `git status` `git add .` `git commit -m`  `git pull upstream dev ` `git push`
-
-- 提交pr
-  去自己github仓库对应fork的项目下new pull request
-
-**pr之后自动关闭相应的issue**
-
-Github提供了自动关联功能，commit提交代码时只需要在注释中包含issue编号，#issue_id
-
-关闭相应的issue：在commit 的最后加上
-
-- `fixes #xxx`
-- `fixed #xxx`
-- `fix #xxx`
-- `closes #xxx`
-- `close #xxx`
-- `closed #xxx`
-
-```sh
-git commit -m "Fix screwup, fixes #12"
-```
-
-**pr之后自动删除 remote 分支**
-
-拥有仓库管理员权限的用户可以配置 PR 合并后自动删除相应的分支。
-
-1. 打开仓库主页面
-2. 打开 **Settings**
-3. 在 **Merge button** 下面，勾选 **Automatically delete head branches**
 
 #### git远程操作
 
@@ -1635,3 +1575,121 @@ A detailed explanation can be found in this [document](https://docs.google.com/d
 - 先把本地的 yarn.lock 剪切到项目以外的目录（相当于删除了该文件），然后提交到远程仓库
 - 其他协作者 git pull，也会删除掉 yarn.lock
 - 然后把 yarn.lock 拷贝回本项目
+
+
+
+#### Github
+
+##### Github 搜索技巧
+
+Awesome + keyword：关键字 Awesome,帮忙找到优秀的工具列表
+
+关键字 in 是用来限定搜索的范围，可以指定是在名称、描述、readme文档中搜索关键字
+
+```
+in:name xxx 名称条件
+in:name xxx xxx 多个名称条件
+in:description xxx 项目描述 description
+in:readme xxx 搜索readme里的内容
+stars:>xxx 点赞大于
+stars:start..end 点赞数量区间
+fork:>xxx fork数大于
+fork:start..end fork数量区间
+size:>=xxx 项目大小，单位kb
+created:>YYYY-MM-DD 创建日期晚于YYYY-MM-DD
+pushed:>YYYY-MM-DD  更新日期晚于YYYY-MM-DD
+c:xxx 项目使用语言
+topics:xxx 主题
+user:xxx 作者名称
+location:China 项目填写的地址
+jack in:fullname 匹配用户名为jack
+license:xxx
+is:public
+is:private
+```
+
+##### Gitee搜索技巧
+
+用户可以通过组合「关键字」+「开发语言类型」+「项目收藏数(Watch)」+「项目克隆数(Fork)」+「项目更新时间」等筛选条件，查找用户需要的项目。
+
+
+
+##### pull request
+
+我尝试用类比的方法来解释一下 pull reqeust。想想我们中学考试，老师改卷的场景吧。你做的试卷就像仓库，你的试卷肯定会有很多错误，就相当于程序里的 bug。老师把你的试卷拿过来，相当于先 fork。在你的卷子上做一些修改批注，相当于 git commit。最后把改好的试卷给你，相当于发 pull request，你拿到试卷重新改正错误，相当于 merge。
+
+当你想更正别人仓库里的错误时，要走一个流程：
+
+1. 先 fork 别人的仓库，相当于拷贝一份，相信我，不会有人直接让你改修原仓库的
+2. clone 到本地分支，做一些 bug fix
+3. 发起 pull request 给原仓库，让他看到你修改的 bug
+4. 原仓库 review 这个 bug，如果是正确的话，就会 merge 到他自己的项目中
+
+至此，整个 pull request 的过程就结束了。
+
+https://zhuanlan.zhihu.com/p/87603185
+
+**pull request 步骤**
+
+- fork 到自己的仓库
+
+- git clone 到本地
+
+- 上游建立连接
+  `git remote add upstream 开源项目地址`
+
+- 创建开发分支 (非必须)
+  `git checkout -b test`
+
+- 推送到远程仓库
+
+  `git push -u origin test`
+
+- 修改提交代码
+  `git status` `git add .` `git commit -m`  `git pull upstream dev ` `git push`
+
+- 提交pr
+  去自己github仓库对应fork的项目下new pull request
+
+**pr之后自动关闭相应的issue**
+
+Github提供了自动关联功能，commit提交代码时只需要在注释中包含issue编号，#issue_id
+
+关闭相应的issue：在commit 的最后加上
+
+- `fixes #xxx`
+- `fixed #xxx`
+- `fix #xxx`
+- `closes #xxx`
+- `close #xxx`
+- `closed #xxx`
+
+```sh
+git commit -m "Fix screwup, fixes #12"
+```
+
+**pr之后自动删除 remote 分支**
+
+拥有仓库管理员权限的用户可以配置 PR 合并后自动删除相应的分支。
+
+1. 打开仓库主页面
+2. 打开 **Settings**
+3. 在 **Merge button** 下面，勾选 **Automatically delete head branches**
+
+
+
+##### README CHANGELOG CONTRIBUILDING
+
+如果将自述文件放在仓库隐藏的 `.github` 目录、根目录或 `docs` 目录中，GitHub 将会识别您的自述文件并自动向仓库访问者显示。
+
+如果仓库包含多个自述文件，则按以下顺序从位置中选择显示的文件：`.github` 目录，然后是仓库的根目录，最后是 `docs` 目录。
+
+如果将 README 文件添加到与用户名同名的公共仓库的根目录，则该 README 将自动显示在您的个人资料页面上。 您可以使用 GitHub Flavored Markdown 编辑您的个人资料以在您的个人资料 README，以在您的个人资料上创建个性化的区域。 更多信息请参阅“[管理个人资料自述文件](https://docs.github.com/cn/github/setting-up-and-managing-your-github-profile/managing-your-profile-readme)”。
+
+
+
+#### Gitlab 
+
+##### 请求合并
+
+https://blog.csdn.net/panjunnn/article/details/106388986

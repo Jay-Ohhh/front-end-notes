@@ -856,6 +856,10 @@ body{
 
 
 
+##### safari 父元素 overflow hidden 遮挡子元素 position z-index
+
+父元素（position relative）的 z-index 设置成与子元素一致。
+
 
 
 #### 现代布局
