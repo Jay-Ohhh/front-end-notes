@@ -6712,7 +6712,7 @@ tsc index.ts --allowJs
     "target": "es5" /* target用于指定编译后js文件里的语法应该遵循哪个JavaScript的版本的版本目标: 'ES3' (default), 'ES5', 'ES2015', 'ES2016', 'ES2017', 'ES2018', 'ES2019' or 'ESNEXT'. */,
     "module": "commonjs" /* 用来指定编译后的js要使用的模块标准: 'none', 'commonjs', 'amd', 'system', 'umd', 'es2015', or 'ESNext'. */,
     "lib": ["dom", "dom.iterable", "esnext"] /* 编译过程中需要引入的库文件的列表 */,
-    "allowJs": true /* allowJs设置的值为true或false，用来指定是否允许编译js文件，默认是false，即不编译js文件 */,
+    "allowJs": true /* allowJs设置的值为true或false，是否允许import js文件，默认是false，即不编译js文件 */,
     "checkJs": true /* checkJs的值为true或false，用来指定是否检查和报告js文件中的错误，默认是false */,
     "jsx": "preserve" /* 指定jsx代码用于的开发环境: 'preserve', 'react-native', or 'react'. */,
     "declaration": true /* declaration的值为true或false，用来指定是否在编译的时候生成相应的".d.ts"声明文件。如果设为true，编译每个ts文件之后会生成一个js文件和一个声明文件。 */,

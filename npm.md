@@ -53,6 +53,10 @@ https://juejin.cn/post/6987179395714646024#heading-5
 
 https://docs.npmjs.com/cli/v7/configuring-npm/package-json  
 
+##### Node.js `package.json` field definitions
+
+https://nodejs.org/api/packages.html#nodejs-packagejson-field-definitions
+
 ##### package.json 非官方字段集合
 
 https://segmentfault.com/a/1190000016365409
@@ -469,6 +473,9 @@ PM2是一个带有负载均衡功能的 Node 应用进程管理器。
 ```sh
 npm install serve -g
 serve folder_name
+# or
+npx serve folder_name
+yarn create serve folder_name
 ```
 
 默认获取 folder_name/index.html

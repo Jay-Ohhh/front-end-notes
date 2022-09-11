@@ -986,7 +986,7 @@ let a = 6
 let b = 9
 let sum = 15
 function tagTemplate(strings, aVariable, bVariable, sumVariable) {
-  console.log(strings)        // ‘ 67、，遍历strings，不会遍历raw
+  console.log(strings)        // ['', ' + ', ' = ', '', raw: Array(4)]，注意raw不会被遍历
   console.log(aVariable)      // 6
   console.log(bVariable)      // 9
   console.log(sumVariable)    // 15
@@ -6490,6 +6490,54 @@ exports.__esModule = true
 ```
 Object.defineProperty(exports, '__esModule', { value: true })
 ```
+
+
+
+##### Pure ESM package
+
+https://gist.github.com/sindresorhus/a39789f98801d908bbc7ff3ecc99d99c
+
+
+
+##### ESM FAQ
+
+###### How can I move my CommonJS project to ESM?
+
+- Add `"type": "module"` to your package.json.
+- Replace `"main": "index.js"` with `"exports": "./index.js"` in your package.json.
+- Update the `"engines"` field in package.json to Node.js 14: `"node": ">=14.16"`. (Excluding Node.js 12 as it's no longer supported)
+- Remove `'use strict';` from all JavaScript files.
+- Replace all `require()`/`module.export` with `import`/`export`.
+- Use only full relative file paths for imports: `import x from '.';` → `import x from './index.js';`.
+- If you have a TypeScript type definition (for example, `index.d.ts`), update it to use ESM imports/exports.
+- Optional but recommended, use the [`node:` protocol](https://nodejs.org/api/esm.html#esm_node_imports) for imports.
+
+Sidenote: If you're looking for guidance on how to add types to your JavaScript package, [check out my guide](https://github.com/sindresorhus/typescript-definition-style-guide).
+
+
+
+###### How can I make my TypeScript project output ESM?
+
+- Make sure you are using TypeScript 4.7 or later.
+- Add `"type": "module"` to your package.json.
+- Replace `"main": "index.js"` with `"exports": "./index.js"` in your package.json.
+- Update the `"engines"` field in package.json to Node.js 14: `"node": ">=14.16"`. (Excluding Node.js 12 as it's no longer supported)
+- Add [`"module": "node16", "moduleResolution": "node16"`](https://www.typescriptlang.org/tsconfig#module) to your tsconfig.json. *([Example](https://github.com/sindresorhus/tsconfig/blob/main/tsconfig.json))*
+
+> "module":"ESNext", "moduleResolution": "node" 也可以
+
+- Use only full relative file paths for imports: `import x from '.';` → `import x from './index.js';`.
+- Remove `namespace` usage and use `export` instead.
+- Optional but recommended, use the [`node:` protocol](https://nodejs.org/api/esm.html#esm_node_imports) for imports.
+- **You must use a `.js` extension in relative imports even though you're importing `.ts` files.**
+
+Also make sure to read the [official TypeScript guide](https://devblogs.microsoft.com/typescript/announcing-typescript-4-7-beta/#ecmascript-module-support-in-node-js).
+
+If you use `ts-node`, follow [this guide](https://github.com/TypeStrong/ts-node/issues/1007).
+
+
+
+
 
 
 

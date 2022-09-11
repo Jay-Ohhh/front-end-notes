@@ -1379,7 +1379,11 @@ https://www.cnblogs.com/feiquan/p/11538433.html
 
 - git config --global --unset user.email
 2. 配置两个不同邮箱下的ssh
-- 生成key命令  ssh-keygen - t rsa -C "your_email"
+- 生成key命令  ssh-keygen -t rsa -C "your_email"
+
+  > ```
+  > # 添加一条注释，说明是哪个用户何时在哪台机器上创建的密钥。
+  > ssh-keygen -t rsa -C "$(whoami)__$(uname -n)__$(date +"%Y-%m-%d %H:%M:%S")"
 
 - 会提示你输入文件名,可以输入对应的网址的名称，比如id_rsa_gitlab
 
@@ -1391,9 +1395,15 @@ https://www.cnblogs.com/feiquan/p/11538433.html
 
 工作中常见的使用就是把公钥配置到Github/Gitee/Coding/华为云等网站, 通过ssh来管理托管在这些平台上的项目和代码。
 
+ssh：
+
+https://wiki.archlinux.org/title/SSH_keys_(%E7%AE%80%E4%BD%93%E4%B8%AD%E6%96%87)
+
 主要配置项说明：
 
 https://www.ssh.com/academy/ssh/config
+
+https://man.archlinux.org/man/ssh_config.5
 
 https://www.lainme.com/doku.php/blog/2011/02/%E4%BD%BF%E7%94%A8ssh_config
 
@@ -1449,6 +1459,22 @@ PreferredAuthentications publickey
 IdentityFile ~/.ssh/id_rsagithub
 User git
 ```
+
+配置项
+
+**IdentitiesOnly**
+
+Specifies that ssh should only use the [identity keys](https://www.ssh.com/ssh/identity-key) configured in the `ssh_config` files, even if [ssh-agent](https://www.ssh.com/ssh/agent) offers more identities.
+
+只能用私钥访问，即使 ssh-agent 提供多种认证方式（密码...）。
+
+
+
+**User**
+
+Specifies the user to log in as. This can be useful when a different user name is used on different machines. This saves the trouble of having to remember to give the user name on the command line.
+
+
 
 添加密钥到ssh：
 
