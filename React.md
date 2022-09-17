@@ -8849,7 +8849,7 @@ React 按照深度优先遍历虚拟 DOM 树的方式，在一个虚拟 DOM 上�
 
 从 React 的声明式设计理念来看，如果子组件的 Props 和 State 都没有改变，那么其生成的 DOM 结构和副作用也不应该发生改变。当子组件符合声明式设计理念时，就可以忽略子组件本次的 Render 过程。
 
-PureComponent 和 React.memo 就是应对这种场景的，PureComponent 是对类组件的 Props 和 State 进行浅比较，React.memo 是对函数组件的 Props 进行浅比较。
+PureComponent 和 React.memo 就是应对这种场景的，PureComponent 是对类组件的 Props 和 State 进行浅比较（先比较props和state自身，然后再比较对象里的key值），React.memo 是对函数组件的 Props 进行浅比较。
 
 ##### shouldComponentUpdate
 
@@ -9190,7 +9190,23 @@ React 16 依赖集合类型 [Map](https://developer.mozilla.org/en-US/docs/Web/J
 
 React 同时还依赖于 `requestAnimationFrame`（甚至包括测试环境）。 
 
+
+
+#### setState的更新
+
+普通的 class 组件，setState 就会重新渲染
+继承 PureComponent 的 class 组件，setState 时会对比 state 本身变没变，还会对比 state 的每个 key 的值变没变，变了才会重新渲染。
+function 组件在用 useState 的 setXxx 时，会对比 state 本身变没变，变了就会重新渲染。
+
+为什么 function 组件里只对比了 state 没有对比每个 key 的值也很容易理解 ？
+
+因为本来每个 state就是用 useState 单独声明的了，而类组件的state是在同一个对象里。
+
+
+
 #### Hook的优缺点
+
+
 
 #### Test Render
 

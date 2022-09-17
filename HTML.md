@@ -216,3 +216,16 @@ https://www.runoob.com/http/mime-types.html
 ### 几个鲜为人知但很有用的 HTML 属性
 
 https://mp.weixin.qq.com/s/nF7PcpxuoY4a0ZQ2q4DNxw
+
+
+
+### 常见问题
+
+#### pseudo-element render inside a container
+
+**and <input> can not contain other elements.**
+
+https://stackoverflow.com/questions/2587669/can-i-use-a-before-or-after-pseudo-element-on-an-input-field
+
+Pseudo-elements can only be defined (or better said are only supported) on container elements. Because the way they are rendered is **within** the container itself as a child element. `input` can not contain other elements hence they're not supported. A `button` on the other hand that's also a form element supports them, because it's a container of other sub-elements.
+

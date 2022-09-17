@@ -15,10 +15,20 @@ TypeScript 是 JavaScript 的类型的超集，它可以编译成纯 JavaScript�
 **TypeScript 非常包容**
 
 - TypeScript 是 JavaScript 的超集，`.js` 文件可以直接重命名为 `.ts` 即可
+
 - 即使不显式的定义类型，也能够自动做出[类型推论](https://ts.xcatliu.com/basics/type-inference.html)
+
 - TypeScript 的类型系统是图灵完备的，可以定义从简单到复杂的几乎一切类型
+
 - 即使 TypeScript 编译报错，也可以生成 JavaScript 文件
+
 - 兼容第三方库，即使第三方库不是用 TypeScript 写的，也可以编写单独的类型文件供 TypeScript 读取
+
+- TS的类型是用到才计算
+
+  > 类型编程：编写一个字符串小驼峰格式化的类型
+  >
+  > https://mp.weixin.qq.com/s/hRcfw-bj6TwSPkzJg0G-QQ
 
 #### [搜索声明文件](https://microsoft.github.io/TypeSearch/)
 
@@ -6327,6 +6337,8 @@ function a(name: any): name is string {
 
 #### TS内置工具
 
+[Utility Types](https://www.typescriptlang.org/docs/handbook/utility-types.html)
+
 ##### `Partial<T>`
 
 `Partial<T>` 快速把某个接口类型中定义的属性变成可选的，实现原理：
@@ -6591,7 +6603,18 @@ type res = ThisParameterType<typeof dong.hello> // Dong
 
 
 
+##### Intrinsic String Manipulation Types
+
+- Uppercase<StringType>
+- Lowercase<StringType>
+- Capitalize<StringType>
+- Uncapitalize<StringType>
+
+
+
 #### Mixins
+
+
 
 ### 工具
 

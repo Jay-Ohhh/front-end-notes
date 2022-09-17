@@ -86,7 +86,9 @@ var不支持块级作用域。
 
 不能在同一作用域下用 let 重复声明变量。
 
-> let会不会变量提升，官方是没有明确说明的，也许底层机制上是提升了，但是形式是没有提升，无需纠结。
+> https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Grammar_and_types#variable_hoisting
+>
+> MDN：`let` and `const` **are hoisted but not initialized**. Referencing the variable in the block before the variable declaration results in a [`ReferenceError`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/ReferenceError), because the variable is in a "temporal dead zone" from the start of the block until the declaration is processed.
 
 ##### const
 

@@ -1385,7 +1385,9 @@ https://www.cnblogs.com/feiquan/p/11538433.html
   > # 添加一条注释，说明是哪个用户何时在哪台机器上创建的密钥。
   > ssh-keygen -t rsa -C "$(whoami)__$(uname -n)__$(date +"%Y-%m-%d %H:%M:%S")"
 
-- 会提示你输入文件名,可以输入对应的网址的名称，比如id_rsa_gitlab
+- 会提示你输入文件名,可以输入对应的网址的名称，比如~/.ssh/id_rsa_gitlab
+
+- 会提示你是否需要私钥密码
 
 - 这样,会生成两个文件，比如id_rsa_gitlab，id_rsa_gitlab.pub
 

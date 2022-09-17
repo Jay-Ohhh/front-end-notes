@@ -403,6 +403,8 @@ npm unlink common
 
 #### npm version 版本
 
+[规范升级npm包](https://mp.weixin.qq.com/s/ujWW6vTtwTcuiM8rj2vNTQ)
+
 方式一：修改版本号：使用 `npm version <update_type>` 进行修改，`update_type` 有三个参数
 
 - `major`: 当你发了一个含有 Breaking Change 的 API
