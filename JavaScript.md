@@ -624,7 +624,7 @@ Child.prototype.constructor = Child
 
 ##### 定义
 
-**「函数」和「函数内部能访问到的变量」（也叫环境）的总和，就是一个闭包。**
+**「子函数」和「子函数内部能访问到父函数的变量」捆绑在一起共同被外部引用，这时会产生闭包。**
 
 eg
 
@@ -641,7 +641,28 @@ function foo(local){
     console.log(local)
   }
 }
+// 共同被外部(a)引用
+const a = foo()
 ```
+
+```javascript
+// `子函数内部能访问到父函数的变量`
+let a = {}
+
+function b (){
+    let c = a
+    // 会形成闭包
+    return () => console.log(c)
+  	// 不会形成闭包
+    // return () => console.log(a)
+}
+
+let d = b()
+
+d()
+```
+
+
 
 ##### 作用
 
