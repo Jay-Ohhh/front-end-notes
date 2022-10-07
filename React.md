@@ -3830,6 +3830,62 @@ function withSubscription(WrappedComponent, selectData) {
 }
 ```
 
+or
+
+```typescript
+import React from "react"
+
+type ErrorBoundaryProps = React.PropsWithChildren<{
+    FallbackComponent?: React.ReactNode;
+}>
+
+type ErrorBoundaryState = {
+    hasError: boolean;
+}
+
+class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundaryState> {
+    constructor(props) {
+        super(props)
+
+        // Define a state variable to track whether is an error or not
+        this.state = { hasError: false }
+    }
+    static getDerivedStateFromError(error) {
+        // Update state so the next render will show the fallback UI
+
+        return { hasError: true }
+    }
+    componentDidCatch(error, errorInfo) {
+        // You can use your own error logging service here
+        console.log({ error, errorInfo })
+    }
+    render() {
+        // Check if the error is thrown
+        if (this.state.hasError) {
+            // You can render any custom fallback UI
+            return (
+                <div>
+                    <h2>Oops, there is an error!</h2>
+                    <button
+                        type="button"
+                        onClick={() => this.setState({ hasError: false })}
+                    >
+                        Try again?
+                    </button>
+                </div>
+            )
+        }
+
+        // Return children components in case of no error
+
+        return this.props.children
+    }
+}
+
+export default ErrorBoundary
+```
+
+
 被包装组件接收来自容器组件的所有 prop，同时也接收一个新的用于 render 的 data 属性。HOC 不需要关心数据的使用方式或原因，而被包装组件也不需要关心数据是怎么来的。
 
 ```jsx
@@ -8469,7 +8525,7 @@ export default function ImperativeHandleDemo() {
 
  `useEffect` 的回调函数会在浏览器绘制之后延迟执行。
 
- `useLayoutEffect` 的回调函数会在浏览器执行绘制之前同步执行，会阻塞浏览器的绘制。
+ `useLayoutEffect` 的回调函数会在浏览器执行绘制之前同步执行（but it fires synchronously after  React has performed all DOM mutations），会阻塞浏览器的绘制。
 
 `useLayoutEffect` 与 `componentDidMount`、`componentDidUpdate` 的调用阶段是一样的。
 
@@ -8517,14 +8573,38 @@ useDebugValue(date, date => date.toDateString());
 
 
 
+###### useInsertionEffect
+
+```
+useInsertionEffect(didUpdate);
+```
+
+The signature is identical to `useEffect`, but it fires synchronously *before* all DOM mutations. Use this to inject styles or DOM nodes  into the DOM before reading layout in [`useLayoutEffect`](https://reactjs.org/docs/hooks-reference.html#uselayouteffect). Since this hook is limited in scope, this hook does not have access to refs and cannot schedule updates.
+
+> Note:
+>
+> `useInsertionEffect` should be limited to css-in-js library authors. Prefer [`useEffect`](https://reactjs.org/docs/hooks-reference.html#useeffect) or [`useLayoutEffect`](https://reactjs.org/docs/hooks-reference.html#uselayouteffect) instead.
+>
+> `useInsertionEffect` effect does not fire on the server.
+
+
+
+
+
 ##### react-refresh 的简单原理
 
 https://ahooks.js.org/zh-CN/guide/blog/hmr
+
+https://nextjs.org/docs/basic-features/fast-refresh#error-resilience
 
 对于 Class 类组件，react-refresh 会一律重新刷新（remount），已有的 state 会被重置。而对于函数组件，react-refresh 则会保留已有的 state。所以 react-refresh 对函数类组件体验会更好。 本篇文章主要讲解 React Hooks 在 react-refresh 模式下的怪异行为，现在我来看下 react-refresh 对函数组件的工作机制。
 
 - 在热更新时为了保持状态，`useState` 和 `useRef` 的值不会更新。
 - 在热更新时，[为了解决某些问题](https://github.com/facebook/react/issues/21019#issuecomment-800650091)，`useEffect`、`useCallback`、`useMemo` 等会重新执行。
+
+> Hooks with dependencies—such as `useEffect`, `useMemo`, and `useCallback`—will *always* update during Fast Refresh. Their list of dependencies will be ignored while Fast Refresh is happening.
+>
+> For example, when you edit `useMemo(() => x * 2, [x])` to `useMemo(() => x * 10, [x])`, it will re-run even though `x` (the dependency) has not changed.
 
 
 
@@ -9087,6 +9167,20 @@ Context 是跨组件传值的一种方案，但我们需要知道，我们无法
 「声明式」直接描述**最终效果**，不关心如何实现。
 
 「命令式」关注如何实现，明确怎么一步步达到这个效果。
+
+
+
+并发(concurrent)、并行（parallel）
+
+![img](https://pic1.zhimg.com/80/v2-674f0d37fca4fac1bd2df28a2b78e633_1440w.jpg?source=1940ef5c)
+
+**并发**
+
+多条队列交叉使用一台咖啡机
+
+**并行**
+
+多条队列分别使用当前队列的咖啡机
 
 
 

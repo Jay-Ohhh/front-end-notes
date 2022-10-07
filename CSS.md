@@ -146,6 +146,10 @@ https://www.ruanyifeng.com/blog/2016/06/css_modules.html
 
 https://github.com/css-modules/css-modules
 
+:import、:export
+
+https://github.com/css-modules/icss
+
 作用：生成局部作用域的CSS样式
 
 下面是一个React组件`App.js`。
@@ -388,7 +392,7 @@ export default () => {
 
 原因：@keyframes 名称也被编译了，这样就获取不到 @keyframes 的名称了。
 
-结局：在调用@keyframes的元素后面添加 :local 就行了
+解决方法
 
 ```css
 :global {
@@ -405,7 +409,31 @@ export default () => {
     transform: rotate(360deg);
   }
 }
+
+/** Which compiles to */
+.selector {
+    animation: [hashOfYourAnimation] 0.5s linear infinite;
+}
 ```
+
+或
+
+```css
+.foo {
+    animation: spin 0.5s linear infinite;
+  }
+@keyframes :global(spin) {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+```
+
+
 
 ####  隐藏元素的方法有哪些
 
