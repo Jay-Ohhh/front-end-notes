@@ -2,6 +2,10 @@
 
 [发包步骤](https://juejin.cn/post/7052307032971411463)
 
+[创建现代npm包的最佳实践](https://mp.weixin.qq.com/s/YuxSv6TuWylxVNydny4mhg)
+
+
+
 ##### NPM发包文件黑/白名单
 
 当执行`npm publish`命令，默认包含的文件（不区分大小写）有
