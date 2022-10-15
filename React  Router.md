@@ -36,6 +36,12 @@ hash 通过监听浏览器 onhashchange 事件变化，查找对应路由应用�
 
 [http://www.test.com/#/]()就是 Hash URL，当#后面的哈希值发生变化时，可以通过hashchange事件来监听到 URL 的变化，从而进行跳转页面，并且无论哈希值如何变化，都不向服务器端请求，服务器端接收到的 URL 请求永远是[http://www.test.com]()。Hash 模式相对来说更简单，并且兼容性也更好。每一次改变#后的部分，都会在浏览器的访问历史中增加一个记录，使用"后退"按钮，就可以回到上一个位置。
 
+> http://www.test.com/index.html/#/  不需要后端路由返回 index.html
+>
+> http://www.test.com/#/  
+>
+> 需要后端路由返回根据 `/` 路由 返回 index.html 或者 nginx 配置`/` 路径返回 index.html
+
 2.history模式
 
 History模式是HTML5 新推出的功能，主要使用history.pushState和history.replaceState改变 URL。通过 History 模式改变 URL 同样不会引起页面的刷新，只会更新浏览器的历史记录。

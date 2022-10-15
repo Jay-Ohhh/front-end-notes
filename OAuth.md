@@ -56,6 +56,11 @@ http://www.ruanyifeng.com/blog/2019/04/github-oauth.html
 
 后端收到这个请求以后，就拿到了授权码（`code`参数）。
 
+- 非单页面情况下，由后端返回页面
+- 单页面：
+  - ssh、websocket 传输登录数据，client 保存数据（redux，dispatch 更新）
+  - 只由 client 处理 code 获取 token ，不需要 server 处理
+
 #### 后端实现
 
 示例的[后端](https://github.com/ruanyf/node-oauth-demo/blob/master/index.js)采用 Koa 框架编写，具体语法请看[教程](https://www.ruanyifeng.com/blog/2017/08/koa.html)。
@@ -113,12 +118,12 @@ http://www.ruanyifeng.com/blog/2019/04/github-oauth.html
 
 > ```javascript
 > const result = await axios({
->   method: 'get',
->   url: `https://api.github.com/user`,
->   headers: {
->     accept: 'application/json',
->     Authorization: `token ${accessToken}`
->   }
+>     method: 'get',
+>     url: `https://api.github.com/user`,
+>     headers: {
+>       accept: 'application/json',
+>       Authorization: `token ${accessToken}`
+>     }
 > });
 > ```
 
