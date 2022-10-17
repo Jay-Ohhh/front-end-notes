@@ -63,76 +63,100 @@ https://help.aliyun.com/document_detail/175896.html
 
 https://github.com/XD2Sketch/react-oauth-popup/blob/master/src/index.tsx
 
-**setInterval**
-
-```typescript
-//Authorization popup window code
-function ShowAuthWindow(options:{
-  path: string;
-  callback: ({code:string}) => void;
-  windowName = 'ConnectWithOAuth';
-  windowFeatures = 'location=0,status=0,width=800,height=400,centerscreen=yes'
-}) {
-  	const { path , callback, windowName, windowFeatures } = options
-    const start = +new Date();
-    const oauthWindow = window.open(path, windowName, windowOptions);
-    const timer = setInterval(() => {
-        // expire after 5 min
-        const isOver = (+new Date() - start) > 5 * 60 * 1000;
-        const { search } =  oauthWindow.window.location
-        const sch = new URLSearchParams(search.replace(/^\?/g, ''))
-        // or const sch = new URL(location.href).searchParams
-        const code = sch.get('code')
-        if (code || that._oauthWindow.closed || isOver) {
-            window.clearInterval(that._oauthInterval);
-            options.callback({code});
-            oauthWindow.window.close();
-        }
-    }, 700);
-  
-    return timer
-}
-
-//create new oAuth popup window and monitor it
-ShowAuthWindow({
-    path: "",
-    callback: function (params) {
-        if(params){
-          console.log('callback');
-        }
-    }
-});
-```
-
 **postMessage**
 
 ```typescript
-//Authorization popup window code
-function ShowAuthWindow(options:{
+type ShowAuthWindowOptions = {
   path: string;
-  callback: ({code:string}) => void;
-  windowName = 'ConnectWithOAuth';
-  windowFeatures = 'location=0,status=0,width=800,height=400,centerscreen=yes'
-}) {
-  	const { path , callback, windowName, windowFeatures } = options
+  callback: (props: { code: string | null; }) => void;
+  windowName?: string;
+  windowFeatures?: string;
+};
+
+//Authorization popup window code
+function ShowAuthWindow(options: ShowAuthWindowOptions) {
+  const {
+    path,
+    callback,
+    windowName = 'ConnectWithOAuth',
+    windowFeatures = 'location=0,status=0,width=800,height=400,centerscreen=yes'
+  } = options;
+    const oauthWindow = window.open(path, windowName, windowFeatures);
+    if (!oauthWindow)
+      return;
+  
     const start = +new Date();
-    let oauthWindow = window.open(path, windowName, windowOptions);
-  	const handleMessage = e => {
-      	console.log(e.data)
-      	// get access_token via e.data.code
-        oauthWindow.window.close()
-        oauthWindow = null
+    const handleMessage = e => {
+        console.log(e.data)
+        // get access_token via e.data.code
+        oauthWindow.onmessage = null
+        oauthWindow.close();
     }
-    oauthWindow.addEventListner('message', handleMessage)
+    // use `addEventListner` will throw errors: cors
+    oauthWindow.onmessage = handleMessage
 }
 
 // html
 <script>
-  	const sch = new URL(location.href).searchParams
-    const code = sch.get('code')
+    var sch = new URL(location.href).searchParams
+    var code = sch.get('code')
     if(sch.get('code')){
-     	top.opener.postMessage({code}, location.origin)
+      postMessage({authCode}, location.origin)
     }
 </script>
 ```
 
+
+
+**setInterval (deprecated)**
+
+error: cors
+
+```typescript
+type ShowAuthWindowOptions = {
+  path: string;
+  callback: (props: { code: string | null; }) => void;
+  windowName?: string;
+  windowFeatures?: string;
+};
+
+//Authorization popup window code
+function ShowAuthWindow(options: ShowAuthWindowOptions) {
+  const {
+    path,
+    callback,
+    windowName = 'ConnectWithOAuth',
+    windowFeatures = 'location=0,status=0,width=800,height=400,centerscreen=yes'
+  } = options;
+  const oauthWindow = window.open(path, windowName, windowFeatures);
+  if (!oauthWindow)
+    return;
+  
+	const start = +new Date();
+  const timer = setInterval(() => {
+    // expire after 5 min
+    const isOver = (+new Date() - start) > 5 * 60 * 1000;
+    const { search } = oauthWindow.window.location;
+    const sch = new URLSearchParams(search.replace(/^\?/g, ''));
+    // or const sch = new URL(location.href).searchParams
+    const code = sch.get('code');
+    if (code || oauthWindow.closed || isOver) {
+      window.clearInterval(timer);
+      callback?.({ code });
+      oauthWindow.window.close();
+    }
+  }, 700);
+
+  return timer;
+}
+
+//create new oAuth popup window and monitor it
+ShowAuthWindow({
+  path: "",
+  callback: function (params) {
+    if (params) {
+      console.log('callback');
+    }
+  }
+});
+```
