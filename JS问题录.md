@@ -75,13 +75,21 @@ type ShowAuthWindowOptions = {
 
 //Authorization popup window code
 function ShowAuthWindow(options: ShowAuthWindowOptions) {
-  const {
-    path,
-    callback,
-    windowName = 'ConnectWithOAuth',
-    windowFeatures = 'location=0,status=0,width=800,height=400,centerscreen=yes'
-  } = options;
+    const {
+      path,
+      callback,
+      windowName = 'ConnectWithOAuth',
+      windowFeatures = `
+      location=0,
+      status=0,
+      left=${window.screenLeft + window.outerWidth / 2 - 400},
+      top=${window.screenTop + window.outerHeight / 2 - 300},
+      width=800,
+      height=600
+      `
+    } = options;
     const oauthWindow = window.open(path, windowName, windowFeatures);
+  
     if (!oauthWindow)
       return;
   
@@ -126,9 +134,17 @@ function ShowAuthWindow(options: ShowAuthWindowOptions) {
     path,
     callback,
     windowName = 'ConnectWithOAuth',
-    windowFeatures = 'location=0,status=0,width=800,height=400,centerscreen=yes'
+    windowFeatures = `
+    location=0,
+    status=0,
+    left=${window.screenLeft + window.outerWidth / 2 - 400},
+    top=${window.screenTop + window.outerHeight / 2 - 300},
+    width=800,
+    height=600
+    `
   } = options;
   const oauthWindow = window.open(path, windowName, windowFeatures);
+  
   if (!oauthWindow)
     return;
   
