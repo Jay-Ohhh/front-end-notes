@@ -93,7 +93,6 @@ function ShowAuthWindow(options: ShowAuthWindowOptions) {
     if (!oauthWindow)
       return;
   
-    const start = +new Date();
     const handleMessage = e => {
         console.log(e.data)
         // get access_token via e.data.code
@@ -106,9 +105,9 @@ function ShowAuthWindow(options: ShowAuthWindowOptions) {
 
 // html
 <script>
-    var sch = new URL(location.href).searchParams
-    var code = sch.get('code')
-    if(sch.get('code')){
+    const sch = new URL(location.href).searchParams
+    const code = sch.get('code')
+    if(code){
       postMessage({authCode}, location.origin)
     }
 </script>

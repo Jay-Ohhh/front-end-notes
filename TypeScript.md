@@ -6777,7 +6777,7 @@ tsc index.ts --allowJs
     /* Module Resolution Options */
     "moduleResolution": "node" /* 用于选择模块解析策略，有'node'和'classic'两种类型' */,
     "resolveJsonModule": true /* 允许引入json */,
-    "baseUrl": "./" /* baseUrl用于设置解析非相对模块名称的基本目录，相对模块不会受baseUrl的影响 */,
+    "baseUrl": "." /* baseUrl用于设置解析非相对模块名称的基本目录，相对模块不会受baseUrl的影响，设置了`.`之后，编辑器的路径补全不会显示../../xxx，而是显示成 src/xx */,
     "paths": {} /* 用于设置模块名称到基于baseUrl的路径映射 */,
     "rootDirs": [] /* rootDirs可以指定一个路径列表，在构建时编译器会将这个路径列表中的路径的内容都放到一个文件夹中 */,
     "typeRoots": [] /* typeRoots用来指定声明文件或文件夹的路径列表，如果指定了此项，则只有在这里列出的声明文件才会被加载。在默认情况下，所有 node_modules/@types 中的任何包都被认为是可见的。如果手动指定了 typeRoots ，则仅会从指定的目录里查找类型文件。 */,
@@ -6828,7 +6828,7 @@ tsc index.ts --allowJs
     "noEmit": true, /* 不输出编译文件（js） */
     "noFallthroughCasesInSwitch": true, /* 用于检查switch中是否有case没有使用break跳出switch，默认为false */
     "noImplicitAny": false,   /* noImplicitAny的值为false时，如果我们没有为一些值设置明确的类型，编译器会默认认为这个值为any，如果noImplicitAny的值为true的话。则没有明确的类型会报错。默认值为false */
-    "baseUrl": ".",
+    // "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"],
       "@pages/*": ["./src/pages/*"],
