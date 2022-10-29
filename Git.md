@@ -288,7 +288,7 @@ git merge dev
 ##### branch 删除本地分支
 
 ```sh
-git branch -d 分支名 // 在其它分支才能删除该分支
+git branch -D 分支名 // 在其它分支才能删除该分支
 ```
 
 ##### branch 删除远程分支

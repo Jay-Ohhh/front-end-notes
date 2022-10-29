@@ -89,26 +89,28 @@ function ShowAuthWindow(options: ShowAuthWindowOptions) {
       `
     } = options;
     const oauthWindow = window.open(path, windowName, windowFeatures);
-  
-    if (!oauthWindow)
-      return;
-  
-    const handleMessage = e => {
-        console.log(e.data)
-        // get access_token via e.data.code
-        oauthWindow.onmessage = null
-        oauthWindow.close();
-    }
-    // use `addEventListner` will throw errors: cors
-    oauthWindow.onmessage = handleMessage
+    
+  	return oauthWindow
 }
+
+const oauthWindow = ShowAuthWindow({path:""})
+
+function handleMessage(e){
+  if(e.data.code){
+    // get access_token via code
+    window.removeEventListener("message", handleMessgae)
+    oauthWindow.close()
+  }
+}
+
+window.addEventListener("message", handleMessage)
 
 // html
 <script>
     const sch = new URL(location.href).searchParams
     const code = sch.get('code')
     if(code){
-      postMessage({authCode}, location.origin)
+      window.opener.postMessage({authCode}, location.origin + location.pathname)
     }
 </script>
 ```
