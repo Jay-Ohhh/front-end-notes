@@ -1984,6 +1984,16 @@ npm install @types/jquery --save-dev
 - [`declare namespace`]() 声明（含有子属性的）全局对象
 - [`interface` 和 `type`]() 声明全局类型
 
+
+
+##### declare
+
+declare 是声明一个变量和它的类型
+
+type 只是声明了类型
+
+
+
 ##### declare var
 
 在所有的声明语句中，`declare var` 是最简单的，如之前所学，它能够用来定义一个全局变量的类型。与其类似的，还有 `declare let` 和 `declare const`，使用 `let` 与使用 `var` 没有什么区别。

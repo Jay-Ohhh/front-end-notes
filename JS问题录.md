@@ -177,3 +177,16 @@ ShowAuthWindow({
   }
 });
 ```
+
+
+
+# keyup 、keydown
+
+在触屏设备上：
+
+event.keyCode always is 229
+
+event.key always is "Unidentified"
+
+可以通过 requestAnimationFrame 、 window.getSelection 、event.target 判断输入值
+

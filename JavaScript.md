@@ -4222,19 +4222,9 @@ var myForm = document.getElementById('myForm');
 formData = new FormData(myForm);
 ```
 
-##### 上传文件例子
 
-```html
-<input id="file" type="file">
-```
 
-```js
-//初始化实例
-var formData = new FormData();
-//通过append() 方法向对象中添加content键值对
-formData.append("file",document.getElementById('file').files[0]);
-axios.post(url,formData)
-```
+
 
 #### Blob
 
@@ -4459,7 +4449,7 @@ function previewFile() {
 
 上面代码中，用户选中图片文件以后，脚本会自动读取文件内容，然后作为一个 Data URL 赋值给`<img>`元素的`src`属性，从而把图片展示出来。
 
-#### AurrayBuffer
+#### ArrayBuffer
 
 https://wangdoc.com/es6/arraybuffer.html
 
@@ -4488,6 +4478,67 @@ new ArrayBuffer(length)
 返回值
 
 一个指定大小的 `ArrayBuffer` 对象，其内容被初始化为 0。
+
+
+
+#### 文件上传
+
+https://zhuanlan.zhihu.com/p/68271019?utm_id=0
+
+##### FormData
+
+```html
+<input id="file" type="file">
+```
+
+```js
+//初始化实例
+var formData = new FormData();
+//通过append() 方法向对象中添加content键值对
+formData.append("file",document.getElementById('file').files[0]);
+axios.post(url,formData);
+```
+
+
+
+##### 二进制
+
+##### 
+
+```html
+<input id="file" type="file">
+```
+
+```js
+const file = document.getElementById('file').files[0];
+const reader = new FileReader()
+
+function readBinary(text: string) {
+  const arrayBuffer = new ArrayBuffer(text.length);
+  const ui8a = new Uint8Array(arrayBuffer, 0);
+
+  for (let i = 0; i < text.length; i++) {
+    ui8a[i] = (text.charCodeAt(i) & 0xff);
+  }
+
+  return ui8a;
+}
+
+reader.onloadend = () => {
+  if (reader.error) {
+    reject(reader.error);
+  } else {
+   const binary = readBinary(reader.result as string);
+   console.log(binary);
+  }
+};
+
+reader.readAsBinaryString(file);
+```
+
+
+
+
 
 #### 垃圾回收机制
 

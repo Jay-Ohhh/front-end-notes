@@ -119,3 +119,17 @@ try {
   await fd.close();
 }
 ```
+
+#### console VS process.stdout
+
+**Difference between process.stdout.write and console.log in Node.js are:**
+
+| | **process.std.out**                                          | **console.log**                                              |
+| ------ | ------------------------------------------------------------ | ------------------------------------------------------------ |
+| 1      | It continuously prints the information as the data being retrieved and doesn’t add a new line. | It prints the information that was obtained at the point of retrieval and adds a new line. |
+| 2      | Using **process.stdout** for a variable that shows an object. | Using **console.log** for a variable shows a lot of unreadable characters. |
+| 3      | It only takes strings as arguments. Any other data type passed as a parameter will throw a TypeError. | It takes any JavaScript data type.                           |
+| 4      | If we don’t put the break line at the end we will get a weird character after our string. | We don’t need the break line here because it was already formatted and also that weird character did disappear |
+| 5      | It can be useful for printing patterns as it does not add a new line. | It is used when we want our result to be printed in a new line. |
+| 6      | We can not write more than one string. For example: `process.stdout.write("Hello","World");` Output: This will give a type error. | We can write more than one string. For example: `console.log("Hello", "World");` Output: This will print Hello World in the console. |
+| 7 | We can not make associations. For example:`process.stdout.write("Hello %s", "All");`Output: This will give a type error. | We can make associations. For example:`console.log("Hello %s", "All");`Output: This will print Hello All in the console. |
