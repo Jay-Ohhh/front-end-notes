@@ -1287,6 +1287,14 @@ export default () => {
 > 
 > 与 class 组件中 [`shouldComponentUpdate()`](https://react.docschina.org/docs/react-component.html#shouldcomponentupdate) 方法不同的是，如果 props 相等，`areEqual` 会返回 `true`；如果 props 不相等，则返回 `false`。这与 `shouldComponentUpdate` 方法的返回值相反。
 
+
+
+**使用场景**
+
+在props不变的情况下不重新渲染，应当在props对比运算的消耗小于渲染消耗时使用。
+
+
+
 ##### 创建 React 元素
 
 我们建议[使用 JSX](https://react.docschina.org/docs/introducing-jsx.html) 来编写你的 UI 组件。每个 JSX 元素都是调用 [`React.createElement()`](https://react.docschina.org/docs/react-api.html#createelement) 的语法糖。一般来说，如果你使用了 JSX，就不再需要调用以下方法。

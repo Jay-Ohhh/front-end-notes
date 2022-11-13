@@ -4487,6 +4487,10 @@ https://zhuanlan.zhihu.com/p/68271019?utm_id=0
 
 ##### FormData
 
+[what-is-the-boundary-in-multipart-form-data](https://stackoverflow.com/questions/3508338/what-is-the-boundary-in-multipart-form-data)
+
+> I want to ask a question about the `multipart/form-data`. In the HTTP header, I find that the `Content-Type: multipart/form-data; boundary=???`.
+
 ```html
 <input id="file" type="file">
 ```
@@ -4503,7 +4507,13 @@ axios.post(url,formData);
 
 ##### 二进制
 
-##### 
+上传时可能还需要注意 content-type
+
+例如图片：
+
+```
+content-type: image/png
+```
 
 ```html
 <input id="file" type="file">

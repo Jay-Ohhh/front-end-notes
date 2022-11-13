@@ -1088,3 +1088,9 @@ https://mp.weixin.qq.com/s/sm6cG98pqnYPniVXqL01TQ
 https://sass-lang.com/documentation/at-rules/function
 
 https://www.sass.hk/skill/sass14.html
+
+##### mixin
+
+https://sass-lang.com/documentation/at-rules/import
+
+https://sass-lang.com/documentation/at-rules/mixin
