@@ -140,6 +140,61 @@ margin-left: -100px;
 
 
 
+#### justify-items、align-items、justify-content、align-content
+
+1. **justify-items**
+
+   > 類似表格中的 "對齊設定"
+   > ![img](http://ithelp.ithome.com.tw/upload/images/20161224/20103812QJypEj26Lr.png)
+
+   預設值： `stretch`
+   可以接受的值： `start` / `end` / `center` / `stretch`
+
+   |                            start                             |                             end                              |                            center                            |                           stretch                            |
+   | :----------------------------------------------------------: | :----------------------------------------------------------: | :----------------------------------------------------------: | :----------------------------------------------------------: |
+   | ![img](http://ithelp.ithome.com.tw/upload/images/20161224/20103812eAfaMnbGjt.png) | ![img](http://ithelp.ithome.com.tw/upload/images/20161224/20103812FegPr5EIu0.png) | ![img](http://ithelp.ithome.com.tw/upload/images/20161224/20103812C0r4S0XzlL.png) | ![img](http://ithelp.ithome.com.tw/upload/images/20161224/2010381240fqw4MTK2.png) |
+
+2. **align-items**
+
+   > 類似表格中的 "垂直對齊設定"
+   > ![img](http://ithelp.ithome.com.tw/upload/images/20161224/201038129iGJuVGg47.png)
+
+   預設值： `stretch`
+   可以接受的值： `start` / `end` / `center` / `stretch`
+
+   |                            start                             |                             end                              |                            center                            |                           stretch                            |
+   | :----------------------------------------------------------: | :----------------------------------------------------------: | :----------------------------------------------------------: | :----------------------------------------------------------: |
+   | ![img](http://ithelp.ithome.com.tw/upload/images/20161224/201038121G6gPaUzYB.png) | ![img](http://ithelp.ithome.com.tw/upload/images/20161224/20103812t3bRiOebDW.png) | ![img](http://ithelp.ithome.com.tw/upload/images/20161224/20103812lnLZ25E9zS.png) | ![img](http://ithelp.ithome.com.tw/upload/images/20161224/20103812E26OmG7ZO0.png) |
+
+
+
+左右對齊方式：用 justify-content 設定
+上下對齊方式：用 align-content 設定
+
+1. justify-content
+
+   預設值： `start`
+   可以接受的值： `start` / `end` / `center` / `stretch` / `pace-around` / `space-between` / `space-evenly`
+
+   |                            start                             |                             end                              |                            center                            |                           stretch                            |
+   | :----------------------------------------------------------: | :----------------------------------------------------------: | :----------------------------------------------------------: | :----------------------------------------------------------: |
+   | ![img](http://ithelp.ithome.com.tw/upload/images/20161224/20103812W96gW7aLdS.png) | ![img](http://ithelp.ithome.com.tw/upload/images/20161224/20103812KSrSd2PcMC.png) | ![img](http://ithelp.ithome.com.tw/upload/images/20161224/20103812G4o9hDC8r3.png) | ![img](http://ithelp.ithome.com.tw/upload/images/20161224/20103812r66YE7N2Ob.png) |
+
+   |                         pace-around                          |                        space-between                         |                         space-evenly                         |
+   | :----------------------------------------------------------: | :----------------------------------------------------------: | :----------------------------------------------------------: |
+   | ![img](http://ithelp.ithome.com.tw/upload/images/20161224/20103812h2JA29nmIq.png) | ![img](http://ithelp.ithome.com.tw/upload/images/20161224/20103812UpvpOwSLe8.png) | ![img](http://ithelp.ithome.com.tw/upload/images/20161224/20103812UQAFtQSkog.png) |
+
+2. align-content
+
+   預設值： `start`
+   可以接受的值： `start` / `end` / `center` / `stretch` / `pace-around` / `space-between` / `space-evenly`
+
+   |                            start                             |                             end                              |                            center                            |                           stretch                            |                         pace-around                          |                        space-between                         |                         space-evenly                         |
+   | :----------------------------------------------------------: | :----------------------------------------------------------: | :----------------------------------------------------------: | :----------------------------------------------------------: | :----------------------------------------------------------: | :----------------------------------------------------------: | :----------------------------------------------------------: |
+   | ![img](http://ithelp.ithome.com.tw/upload/images/20161224/20103812jnI220q6av.png) | ![img](http://ithelp.ithome.com.tw/upload/images/20161224/20103812vlqf4UHMRS.png) | ![img](http://ithelp.ithome.com.tw/upload/images/20161224/201038121M9R0HdzzP.png) | ![img](http://ithelp.ithome.com.tw/upload/images/20161224/20103812W5cyX6Jd4m.png) | ![img](http://ithelp.ithome.com.tw/upload/images/20161224/20103812NNs0fxfqBr.png) | ![img](http://ithelp.ithome.com.tw/upload/images/20161224/20103812KSV5dJ0mW0.png) | ![img](http://ithelp.ithome.com.tw/upload/images/20161224/20103812hVda7XiphZ.png) |
+
+
+
 #### CSS Modules
 
 https://www.ruanyifeng.com/blog/2016/06/css_modules.html
@@ -887,6 +942,25 @@ body{
 ##### safari 父元素 overflow hidden 遮挡子元素 position z-index
 
 父元素（position relative）的 z-index 设置成与子元素一致。
+
+
+
+##### [Pure CSS drop shadow on scroll](https://codepen.io/StijnDeWitt/pen/LryNxa)
+
+
+
+##### 默认滚动条在底部
+
+https://stackoverflow.com/questions/72636816/scroll-to-bottom-when-new-message-added
+
+- flex-direction: column-reverse
+- container.scrollTop = container.scrollHeight
+
+
+
+##### z-index
+
+https://philipwalton.com/articles/what-no-one-told-you-about-z-index/
 
 
 

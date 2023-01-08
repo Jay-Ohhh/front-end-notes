@@ -2192,7 +2192,7 @@ async函数内return  xxx ，实际上是 return new Promise (resolve => resolve
 
 6、async函数外部如果要到用then(res=>{})，要在async函数内return res。async函数内部就是promise 和 then 的语法糖。
 
-7、async函数本身不是异步的，是它里面的代码可能是异步的，如果想要执行完async函数再执行其他操作（而这个操作不想写在async函数内，因为不想每次执行async都会执行这个操作），这时候要在async函数后使用then。
+7、async函数本身不是异步的，是它里面的代码可能是同步也可能异步的，如果想要执行完async函数再执行其他操作（而这个操作不想写在async函数内，因为不想每次执行async都会执行这个操作），这时候要在async函数后使用then。
 
 > 实际上，async / await 在底层转换成了 promise 和 then 回调函数。是基于promises的语法糖。每次我们使用 await, 解释器都创建一个 promise 对象，然后把剩下的 async 函数中的操作放到 then 回调函数中。
 
@@ -4548,6 +4548,45 @@ reader.readAsBinaryString(file);
 
 
 
+##### md5 切片
+
+```ts
+import SparkMD5 from "spark-md5";
+/**
+ * @param {File} file 
+ * @returns {Promise<string>}
+ */
+async md5File(file) {
+  return await new Promise((resolve, reject) => {
+    const spark = new SparkMD5.ArrayBuffer();
+    const reader = new FileReader();
+    const chunkSize = 1024 ** 2 * 2;
+    let offset = 0;
+
+    reader.onloadend = e => {
+      /** @type {any} */
+      const buf = e.target.result;
+      spark.append(buf);
+
+      offset += chunkSize;
+
+      if (offset < file.size) {
+        reader.readAsArrayBuffer(file.slice(offset, offset + chunkSize));
+      } else {
+        resolve(spark.end());
+      }
+    };
+    reader.onerror = () => {
+      reject(`Failed to read the file '${file.name}'`);
+    };
+
+    reader.readAsArrayBuffer(file.slice(offset, offset + chunkSize));
+  });
+}
+```
+
+
+
 
 
 #### 垃圾回收机制
@@ -5686,13 +5725,13 @@ document.domain = 'example.com';
 
 现在，A 网页通过脚本设置一个 Cookie。
 
-```
+```javascript
 document.cookie = "test1=hello";
 ```
 
 B 网页就可以读到这个 Cookie。
 
-```
+```javascript
 var allCookie = document.cookie;
 ```
 
@@ -5769,6 +5808,31 @@ parent.location.href = target + '#' + hash;
 ```
 
 ###### window.postMessage()
+
+```javascript
+// usage
+/** 
+ * windowAref 可以是
+ * 1.窗口A自身的window对象，
+ * 2.窗口A的一个引用，比如 iframe 的 contentWindow 属性
+ * 3.执行window.open返回的窗口对象(打开窗口A)、或是数值索引的window.frames[index](指向窗口A)。
+ */
+// A.html or other.html's script
+windowAref.postMessage(message, targetOrigin, [transfer])
+
+// A.html's script
+// 窗口A监听 message 事件
+function handleReceiveMessage (event){
+  var origin = event.origin
+  if (origin !== "http://example.org:8080")
+    return;
+}
+
+windowA.addEventListener("message", handleReceiveMessage)
+
+```
+
+
 
 上面的这种方法属于破解，HTML5 为了解决这个问题，引入了一个全新的API：跨文档通信 API（Cross-document messaging）。
 

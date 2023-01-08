@@ -190,3 +190,19 @@ event.key always is "Unidentified"
 
 可以通过 requestAnimationFrame 、 window.getSelection 、event.target 判断输入值
 
+
+
+# 光标移动到行后
+
+```javascript
+requestAnimationFrame(()=>{
+  const selection = window.getSelection();
+  const range = document.createRange();
+  // childNodes[0]: 文本
+  range.setStart(event.target as HTMLSpanElement).childNodes[0], text.length);
+  range.collapse(true);
+  selection.removeAllRanges();
+  selection.addRange(range);
+})
+```
+

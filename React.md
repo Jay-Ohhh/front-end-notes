@@ -8642,9 +8642,226 @@ useDebugValue(date, date => date.toDateString());
 
 
 
+###### useTransition
+
+```js
+const [isPending, startTransition] = useTransition();
+```
+
+返回一个状态值表示过渡任务的等待状态，以及一个启动该过渡任务的函数。
+
+有两个 setState，其中一个优先级高，另一个优先级低，那就把低的那个用 startTransition 包裹起来。
+
+```tsx
+import React, { useTransition, useState } from "react";
+
+export default function App() {
+  const [text, setText] = useState('guang');
+  const [text2, setText2] = useState('guang2');
+
+  const [isPending, startTransition] = useTransition()
+
+  const handleClick = () => {
+    startTransition(() => {
+      setText('dong');
+    });
+
+    setText2('dong2');
+  }
+
+  return (
+    <button onClick={handleClick}>{text}{text2}</button>
+  );
+}
+```
+
+
+
+###### useDeferredValue
+
+```js
+const deferredValue = useDeferredValue(value);
+```
+
+`useDeferredValue` 接受一个值，并返回该值的新副本，该副本将推迟到更紧急地更新之后。如果当前渲染是一个紧急更新的结果，比如用户输入，React 将返回之前的值，然后在紧急渲染完成后渲染新的值。
+
+该 hook 与使用防抖和节流去延迟更新的用户空间 hooks 类似。使用 `useDeferredValue` 的好处是，React 将在其他工作完成（而不是等待任意时间）后立即进行更新，并且像 [`startTransition`](https://zh-hans.reactjs.org/docs/react-api.html#starttransition) 一样，延迟值可以暂停，而不会触发现有内容的意外降级。
+
+`useDeferredValue` 仅延迟你传递给它的值。如果你想要在紧急更新期间防止子组件重新渲染，则还必须使用 React.memo 或 React.useMemo 记忆该子组件：
+
+比如这样一段代码：
+
+```tsx
+function App() {
+  const [text, setText] = useState("");
+
+  const handleChange = (e) => {
+    setText(e.target.value);
+  };
+
+  return (
+    <div>
+      <input value={text} onChange={handleChange}/>
+      <List text={text}/>
+    </div>
+  );
+};
+```
+
+List 里是根据输入的 text 来过滤结果展示的，现在每次输入都会触发渲染。
+
+我们希望在内容输入完了再处理通知 List 渲染，就可以这样：
+
+```tsx
+function App() {
+  const [text, setText] = useState("");
+  const deferredText = useDeferredValue(text);
+
+  const handleChange = (e) => {
+    setText(e.target.value);
+  };
+  
+  const list = useMemo(()=> <List text={deferredText} />, [deferredText])
+
+  return (
+    <div>
+      <input value={text} onChange={handleChange}/>
+      {list}
+    </div>
+  );
+};
+function 
+```
+
+
+
+###### useSyncExternalStore
+
+```javascript
+const state = useSyncExternalStore(subscribe, getSnapshot[, getServerSnapshot]);
+```
+
+`useSyncExternalStore` is a hook recommended for reading and subscribing from external data sources in a way that’s compatible with concurrent rendering features like selective hydration and time slicing.
+
+This method returns the value of the store and accepts three arguments:
+
+- `subscribe`: A function that takes a single `callback` argument and subscribes it to the store. When the store changes, it should invoke the provided `callback`. This will cause the component to re-render. The `subscribe` function should return a function that cleans up the subscription.
+
+- `getSnapshot`: function that returns the current value of the store.
+
+  While the store has not changed, repeated calls to `getSnapshot` must return the same value. If the store changes and the returned value is different (as compared by [`Object.is`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/is)), React will re-render the component.
+
+- `getServerSnapshot`: A function that returns the initial snapshot of the data in the store. It will be used only during server rendering and during hydration of server-rendered content on the client. The server snapshot must be the same between the client and the server, and is usually serialized and passed from the server to the client. If this function is not provided, rendering the component on the server will throw an error.
+
+
+
+**Returns** 
+
+The current snapshot of the store which you can use in your rendering logic.
+
+
+
+**Caveats** 
+
+- The store snapshot returned by `getSnapshot` must be immutable. If the underlying store has mutable data, return a new immutable snapshot if the data has changed. Otherwise, return a cached last snapshot.
+- If a different `subscribe` function is passed during a re-render, React will re-subscribe to the store using the newly passed `subscribe` function. You can prevent this by declaring `subscribe` outside the component.
+
+
+
+When possible, we recommend to use the built-in React state with [`useState`](https://beta.reactjs.org/reference/react/useState) and [`useReducer`](https://beta.reactjs.org/reference/react/useReducer) instead. The `useExternalSyncStore` API is mostly useful if you need to integrate with existing non-React code.
+
+
+
+**subscribe**
+
+subscribe 接受 callback 参数，由 useSyncExternalStore 内部逻辑传入，且应当返回一个清除订阅的函数。
+
+例子1:
+
+```jsx
+// todoStore.js
+let nextId = 0;
+let todos = [{ id: nextId++, text: 'Todo #1' }];
+let listeners = [];
+
+export const todosStore = {
+  addTodo() {
+    todos = [...todos, { id: nextId++, text: 'Todo #' + nextId }]
+    // 通过 Add todo 按钮触发事件，遍历并调用 listeners，然后触发 useSyncExternalStore 的 getSnapshot 函数，返回状态快照，通过 Object.is 对比前一次快照，改变则 re-render
+    emitChange();
+  },
+  subscribe(listener) {
+    // 传入 useSyncExternalStore 后，获取 listner 放入 listeners
+    listeners = [...listeners, listener];
+    return () => {
+      listeners = listeners.filter(l => l !== listener);
+    };
+  },
+  getSnapshot() {
+    return todos;
+  }
+};
+
+function emitChange() {
+  for (let listener of listeners) {
+    listener();
+  }
+}
+
+// App.js
+import { useSyncExternalStore } from 'react';
+import { todosStore } from './todoStore.js';
+
+export default function TodosApp() {
+  const todos = useSyncExternalStore(todosStore.subscribe, todosStore.getSnapshot);
+  return (
+    <>
+      <button onClick={() => todosStore.addTodo()}>Add todo</button>
+      <hr />
+      <ul>
+        {todos.map(todo => (
+          <li key={todo.id}>{todo.text}</li>
+        ))}
+      </ul>
+    </>
+  );
+}
+```
+
+
+
+例子2:
+
+```jsx
+import { useSyncExternalStore } from 'react';
+
+export default function ChatIndicator() {
+  const isOnline = useSyncExternalStore(subscribe, getSnapshot);
+  return <h1>{isOnline ? '✅ Online' : '❌ Disconnected'}</h1>;
+}
+
+function getSnapshot() {
+  return navigator.onLine;
+}
+
+function subscribe(callback) {
+  // 通过事件触发 callback ，再触发 useSyncExternalStore 的 getSnapshot 函数
+  window.addEventListener('online', callback);
+  window.addEventListener('offline', callback);
+  return () => {
+    window.removeEventListener('online', callback);
+    window.removeEventListener('offline', callback);
+  };
+}
+```
+
+
+
+
+
 ###### useInsertionEffect
 
-```
+```js
 useInsertionEffect(didUpdate);
 ```
 
@@ -9239,7 +9456,7 @@ Context 是跨组件传值的一种方案，但我们需要知道，我们无法
 
 
 
-并发(concurrent)、并行（parallel）
+##### 并发(concurrent)、并行（parallel）
 
 ![img](https://pic1.zhimg.com/80/v2-674f0d37fca4fac1bd2df28a2b78e633_1440w.jpg?source=1940ef5c)
 
@@ -9250,6 +9467,12 @@ Context 是跨组件传值的一种方案，但我们需要知道，我们无法
 **并行**
 
 多条队列分别使用当前队列的咖啡机
+
+
+
+并发和并行不一样，并行是同一时刻多件事情同时进行，而并发是只要一段时间内同时发生多件事情。
+
+并发是通过交替执行来实现的。
 
 
 
@@ -9357,9 +9580,9 @@ React 同时还依赖于 `requestAnimationFrame`（甚至包括测试环境）�
 
 #### setState的更新
 
-普通的 class 组件，setState 就会重新渲染
+普通的 class 组件，this.setState 就会重新渲染
 继承 PureComponent 的 class 组件，setState 时会对比 state 本身变没变，还会对比 state 的每个 key 的值变没变，变了才会重新渲染。
-function 组件在用 useState 的 setXxx 时，会对比 state 本身变没变，变了就会重新渲染。
+function 组件在用 useState 的 setXxx 时，会对比 state 本身变没变，变了就会重新渲染，如果没变的话，函数组件的逻辑不会重新执行。
 
 为什么 function 组件里只对比了 state 没有对比每个 key 的值也很容易理解 ？
 

@@ -351,6 +351,24 @@ axios 使用 post 发送数据时，默认是直接把 json 放到请求体中�
 
 ##### 一、取消请求
 
+Starting from `v0.22.0` Axios supports [`AbortController`](https://developer.mozilla.org/en-US/docs/Web/API/AbortController) to cancel requests in fetch API way:
+
+```js
+const controller = new AbortController();
+
+axios.get('/foo/bar', {
+   signal: controller.signal
+}).then(function(response) {
+   //...
+});
+// cancel the request
+controller.abort()
+```
+
+**下述使用cancelToken，是一样的逻辑。**
+
+
+
 axios需要取消令牌`cancelToken`才能取消请求，而取消令牌`cancelToken`是保存在config中。
 
 > 例如：axios.get(url[, config]) 的 config 参数。
@@ -510,7 +528,7 @@ axios.interceptors.response.use(
 // axios取消重复请求：
 // 两个版本重复则取消之前、重复则取消之后
 
-// 重复则取消之前:
+// 重复在取消之前:
 import qs from 'qs';
 import axios from 'axios';
 import type { AxiosRequestConfig, Canceler } from 'axios';
@@ -526,8 +544,7 @@ const pendingRequest = new Map<string, Canceler>();
 function addPendingRequest(config) {
 	const requestKey = generateReqKey(config);
   // 如果请求config含有cancelToken，则意味是开发者故意传进来的，因此取消请求则应该由开发者在适当时机去调用
-	config.cancelToken =
-		config.cancelToken ||
+	config.cancelToken = config.cancelToken ||
 		new axios.CancelToken((cancel) => {
 			if (!pendingRequest.has(requestKey)) {
 				pendingRequest.set(requestKey, cancel);
@@ -578,7 +595,7 @@ axios.interceptors.response.use(
 
 
 ```ts
-// 重复则取消之后:
+// 重复在取消之后:
 import qs from 'qs';
 import axios from 'axios';
 import type { AxiosRequestConfig } from 'axios';
