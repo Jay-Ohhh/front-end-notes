@@ -59,7 +59,7 @@ module.exports = {
     publicPath: '/assets/', // 相对于服务(server-relative)
     publicPath: 'assets/', // 相对于 HTML 页面
     publicPath: '../assets/', // 相对于 HTML 页面
-    publicPath: '', // 相对于 HTML 页面（目录相同）
+    publicPath: '', // 相对于 HTML 页面（目录相同） src="js/app.js"
   },
 };
 ```
@@ -2144,3 +2144,49 @@ https://mp.weixin.qq.com/s/xoYQeUhNSxXhAc3_l9xRJA
 #### 彻底搞懂 Webpack 的 sourcemap 配置原理
 
 https://mp.weixin.qq.com/s/0Sq9Z0i9Q3N0likFlZB0rQ
+
+
+
+#### 多入口打包
+
+https://blog.csdn.net/qq_40738077/article/details/115941437
+
+```javascript
+// webpack.config.js
+
+module.exports = {
+	// 省略了其他相关配置...
+	// entry 配置多个打包入口
+	entry: {
+        admin: path.resolve(__dirname, "../src/main.js"),
+        user: path.resolve(__dirname, "../src/user.js")
+    },
+    output: {
+        path: path.resolve(__dirname, '../dist'), // 打包输出文件路径(__dirname指向当前文件的`绝对路径`)
+        filename: '[name].[hash:8].js' // 打包输出文件的名字, 插入hash值
+    },
+    plugins: [
+    	// 主要是这里的配置，每个 new HtmlWebpackPlugin() 就根据html模板文件打包生成 html文件，这里我们有两个入口，也希望能分别打包生成不同的 html，就需要分别配置。
+    	// 还有就是 chunks 指定我们要引入的 js 文件，名字可以理解为 entry 中配置的名字。例子中两个入口使用的是同一个 index.html 文件进行打包的，使用 chunks 指定要引入的 js文件就不会导致代码重复混乱。
+        new HtmlWebpackPlugin({
+            template: path.join(__dirname, '../src/index.html'), // 指定模板文件
+            filename: 'index.html', // 生成文件名 - 这里生成index.html 便于 contentBase 中访问
+            chunks: ["user"], // 选择需要引入的js文件
+            minify: {
+                removeAttributeQuotes: true, // 删除双引号
+                collapseWhitespace: true // 折叠空行
+            } // 打包时的压缩配置
+        }),
+        new HtmlWebpackPlugin({
+            template: path.join(__dirname, '../src/index.html'), // 指定模板文件
+            filename: 'admin.html', // 生成文件名
+            chunks: ["admin"],
+            minify: {
+                removeAttributeQuotes: true, // 删除双引号
+                collapseWhitespace: true // 折叠空行
+            } // 打包时的压缩配置
+        }),
+    ],
+}
+```
+

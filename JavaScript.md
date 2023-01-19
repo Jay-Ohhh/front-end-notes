@@ -722,6 +722,18 @@ a = null // 不再引用时
 
 之所以有闭包会造成内存泄漏的谣言，是因为在IE中因为循环引用可能会导致内存泄露。
 
+
+
+#### 内存泄漏
+
+全局变量、闭包引用的变量、被移除的 dom 依然被引用、定时器用完了没清除、console.log（打开控制台） 都会发生代码执行完了，但是还占用着一部分内存的流氓行为，也就是内存泄漏。
+
+##### console.log 一定会导致内存泄漏？不打开 devtools 就不会
+
+https://mp.weixin.qq.com/s/5a9hHVc024Pl3c3Lyp08eg
+
+
+
 #### 立即执行函数
 
 ```js
@@ -5826,6 +5838,10 @@ function handleReceiveMessage (event){
   var origin = event.origin
   if (origin !== "http://example.org:8080")
     return;
+  
+  // 回信
+  // event.source 发送消息（postMessage）的来源窗口对象
+  event.source.postMessage("Hi!", event.origin);
 }
 
 windowA.addEventListener("message", handleReceiveMessage)

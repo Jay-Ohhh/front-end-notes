@@ -734,6 +734,8 @@ git stash
 git stash apply
 ```
 
+stash是本地的，不会通过 `git push` 命令上传到 git server 上。
+
 **相关命令**
 
 ```sh
@@ -1603,6 +1605,12 @@ A detailed explanation can be found in this [document](https://docs.google.com/d
 - 先把本地的 yarn.lock 剪切到项目以外的目录（相当于删除了该文件），然后提交到远程仓库
 - 其他协作者 git pull，也会删除掉 yarn.lock
 - 然后把 yarn.lock 拷贝回本项目
+
+
+
+##### 加速几十倍 git clone 速度的 --depth 1，它的后遗症怎么解决？
+
+https://mp.weixin.qq.com/s/6VaV70zbnfzWBRxHGbmTcw
 
 
 

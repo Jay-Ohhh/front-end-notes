@@ -1329,6 +1329,12 @@ https://create-react-app.bootcss.com/docs/running-tests
 
 请记住，`proxy` 只在开发环境中有效（使用 `npm start` ），并且你应该确保像 `/api/todos` 这样的 URL 在生产环境中指向正确的地址。你不必使用 `/api` 前缀。没有 `text/html` accept 标头的任何无法识别的请求都将被重定向到指定的 `proxy`（代理服务器）。
 
+> 采用proxy，axios 实例：
+>
+> baseUrl = isDev ? "" : serverUrl
+>
+> 以下面举例，当开发环境下，请求 /api1/todos 会通过本地的node服务器代理（不会跨域）到 `http://localhost:5000/todos`，然后返回数据到 node 服务器再返回给浏览器。
+
 **配置`proxy`多个代理**
 
 ```sh

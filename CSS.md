@@ -964,6 +964,34 @@ https://philipwalton.com/articles/what-no-one-told-you-about-z-index/
 
 
 
+##### table-cell 选中时边框样式
+
+- border 方案
+
+cell 的 border 可能会根据 border-collapse 会合并，当选中时渲染四条边框可能会使 cell 的内容向里面缩。
+
+- outline 方案
+
+  outline 不能单独设置上下左右
+
+- box-shadow 方案
+
+  ```css
+  {
+    position: relative;
+  	z-index: 1;
+    box-shadow: 
+      1px -1px black, // 右上角
+      1px 1px black,  // 右下角
+      -1.5px -1px black, // 左下角
+      -1.5px 1px black; // 左上角
+  }
+  ```
+
+- 伪元素方案
+
+
+
 #### 现代布局
 
 https://1linelayouts.glitch.me/
