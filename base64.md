@@ -67,4 +67,4 @@ data:image/x-icon;base64,base64编码的icon图片数据
 [data url 常见问题](https://developer.mozilla.org/zh-CN/docs/Web/HTTP/data_URIs)
 - HTML代码格式化
 一个 data URL 是一个文件中的文件，相对于文档来说这个文件可能就非常的长。因为 data URL 也是 URL，所以 data 会用空白符(换行符, 制表符, 空格)来对它进行格式化。但如果数据是经过 base64 编码的，就可能会遇到一些问题。
-- 不同浏览器对data URL的长度限制不同
+- **不同浏览器对data URL的长度限制不同**

@@ -4540,6 +4540,7 @@ function readBinary(text: string) {
   const ui8a = new Uint8Array(arrayBuffer, 0);
 
   for (let i = 0; i < text.length; i++) {
+    // 将字符对应的 ascII 编码转为8位二进制数
     ui8a[i] = (text.charCodeAt(i) & 0xff);
   }
 
@@ -4792,7 +4793,13 @@ family = null;
 
 cookie指某些网站为了辨别用户身份而储存在用户本地终端上的数据(通常经过加密)。**cookie是服务端生成，客户端进行维护和存储（保存在浏览器）**，存储在内存或者磁盘中。通过cookie,可以让服务器知道请求是来源哪个客户端，就可以进行客户端状态的维护，比如登陆后刷新，请求头就会携带登陆时response header中的Set-Cookie,Web服务器接到请求时也能读出cookie的值，根据cookie值的内容就可以判断和恢复一些用户的信息状态。
 
+
+
 **cookie 遵循同源政策**
+
+Cookie 中的同源只关注域名，忽略协议和端口
+
+
 
 ###### 使用场景
 
@@ -4833,8 +4840,41 @@ Other-header: other-header-value
 cookie在浏览器中是由以下参数构成的：
 
 - **name**：唯一标识cookie的名称。cookie名不区分大小写，因此myCookie和MyCookie是同一个名称。不过，实践中最好将cookie名当成区分大小写来对待，因为一些服务器软件可能这样对待它们。**cookie名必须经过URL编码**。
+
 - **value**：存储在cookie里的字符串值。**这个值必须经过URL编码**。
-- **Domain**：cookie有效的域。发送到这个域的所有请求都会包含对应的cookie。如果不指定，默认为文档来源（由协议、域名和端口共同定义），**不包含子域名**。如果指定了`Domain`，则一般包含子域名。因此，指定 `Domain` 比省略它的限制要少。但是，当子域需要共享有关用户的信息时，这可能会有所帮助。例如，如果设置 Domain=mozilla.org，则 Cookie 也包含在子域名中（如developer.mozilla.org）。
+
+- **Domain**：cookie有效的域，domain 决定了访问域的时候 cookie 是可以被发送或保存的。
+
+  https://stackoverflow.com/questions/1062963/how-do-browser-cookie-domains-work
+
+  发送到这个域的所有请求都会包含对应的cookie。如果不指定，默认为文档来源（由协议、域名和端口共同定义），**不包含子域名**。如果指定了`Domain`，则一般包含子域名。因此，指定 `Domain` 比省略它的限制要少。但是，当子域需要共享有关用户的信息时，这可能会有所帮助。例如，如果设置 Domain=mozilla.org，则 Cookie 也包含在子域名中（如developer.mozilla.org）。
+
+  - Cookie with `Domain=.example.com` **will** be available for `www.example.com`
+
+  - Cookie with `Domain=.example.com` **will** be available for `example.com`
+
+  - Cookie with `Domain=example.com` will be converted to `.example.com` and thus **will** also be available for `www.example.com`
+
+  - Cookie with `Domain=example.com` will **not** be available for `anotherexample.com`
+
+    > 即设置 domain 为 example.com 的 cookie，只有该域名或者其子域名才能获取到这个 cookie
+
+    以下 set 是对于 `document.cookie` 而言
+
+  - `www.example.com` **will** be able to set cookie for `example.com`
+
+  - `www.example.com` will **not** be able to set cookie for `www2.example.com`
+
+  - `www.example.com` will **not** be able to set cookie for `.com`
+
+  - `x.y.z.com` can set a cookie domain to itself or parents - `x.y.z.com`, `y.z.com`, `z.com`. But not `com`, which is a public suffix.
+
+    Examples of public suffixes - `com`, `edu`, `uk`, `co.uk`, `blogspot.com`, `compute.amazonaws.com`
+
+  - 同样在服务端上，如果制定你的 server 服务的域名为`y.z.com`，那么服务端生成的 cookie 的 domain 只能指定为自身域或父域或请求域 `y.z.com` 、`z.com`，其他 domain 都无法成功设置 cookie。
+
+  - 在 set-cookie 中省略 domain 参数，那么 domain 默认为当前请求的域名。
+
 - **Path**：请求URL中包含这个路径才会把cookie发送到服务器。
 
 ```
@@ -4878,6 +4918,12 @@ document.cookie = encodeURIComponent("name") + "=" +
 // 使用encodeURIComponent()对名称和值进行编码
 ```
 
+`document.cookie`设置 cookie 时，键和值必须使用`encodeURIComponent`进行 URL 编码。
+
+`document.cookie`返回当前页面可用的所有cookie的字符串，即一系列有分号分隔的键值对，并且所有键和值都是经过URL 编码的，所以必须使用`decodeURIComponent`来解码。
+
+
+
 ###### cookie缺陷
 
 - cookie 不够大
@@ -4916,6 +4962,26 @@ Set-Cookie: id=a3fWa; Expires=Wed, 21 Oct 2019 07:28:00 GMT; Secure; HttpOnly
 对cookie的限制及其特性决定了cookie并不是存储大量数据的理想方式，让“专业的人做专业的事情”，Web Storage 出现了。
 
 HTML5中新增了本地存储的解决方案----Web Storage，这样有了Web Storage后，cookie能只做它应该做的事情了—— 作为客户端与服务器交互的通道，保持客户端状态。
+
+
+
+###### 第一方和第三方 cookie
+
+**第一方 cookie**
+
+由主机域（用户正在访问的域）创建。
+
+
+
+**第三方 cookie**
+
+由用户当时所访问的域以外的域创建的 cookie，主要用于跟踪和在线广告目的，在访问的主域过程中夹在了第三方的资源所产生。
+
+
+
+比如，访问A这个网站，该网站设置了一个 cookie，这个 cookie 也只能被A这个域下的网页读取，这就是第一方 cookie。如果还是A网站，网页里引用了B网站的一张图片，浏览器向B请求图片的时候，B可以知道请求的来源等信息，并设置了一个 cookie ，保存在A域下，但这个 cookie 依然只能被B域访问。因为对于我们来说，实际是在访问A网站被设置了B域下的 cookie，所以叫第三方 cookie。
+
+
 
 ##### session
 
@@ -5130,12 +5196,12 @@ localStorage 与 sessionStorage 在 API 方面无异。
 
 ##### Web Storage 和 Cookie 和 IndexDB 的区别
 
-| 特性     | cookie                      | localStorage               | sessionStorage           | IndexedDB    |
-| ------ | --------------------------- | -------------------------- | ------------------------ | ------------ |
-| 数据生命周期 | 一般由服务器生成，可以设置过期时间           | 除非被清理，否则一直存在               | 页面关闭就清理                  | 除非被清理，否则一直存在 |
-| 数据存储大小 | 4K                          | 5M                         | 5M                       | 无限           |
-| 与服务端通信 | 每次请求都会自动携带在 header 中，影响请求性能 | 不参与                        | 不参与                      | 不参与          |
-| 作用域    | 在所有的同源标签页（不同页面但域名端口相同）都是共享  | 在所有的同源标签页（不同页面但域名端口相同）都是共享 | 不同标签页面的sessionStorage不共享 | /            |
+| 特性         | cookie                                               | localStorage                                         | sessionStorage                     | IndexedDB                |
+| ------------ | ---------------------------------------------------- | ---------------------------------------------------- | ---------------------------------- | ------------------------ |
+| 数据生命周期 | 一般由服务器生成，可以设置过期时间                   | 除非被清理，否则一直存在                             | 页面关闭就清理                     | 除非被清理，否则一直存在 |
+| 数据存储大小 | 4Kp                                                  | 5M                                                   | 5M                                 | 无限                     |
+| 与服务端通信 | 每次请求都会自动携带在 header 中，影响请求性能       | 不参与                                               | 不参与                             | 不参与                   |
+| 作用域       | 在所有的同源标签页（不同页面但域名端口相同）都是共享 | 在所有的同源标签页（不同页面但域名端口相同）都是共享 | 不同标签页面的sessionStorage不共享 | /                        |
 
 - 均遵循同源政策。
 - Cookie 的本职工作并非本地存储，而是“维持状态”。
@@ -5821,16 +5887,18 @@ parent.location.href = target + '#' + hash;
 
 ###### window.postMessage()
 
+从广义上讲，一个窗口可以获得对另一个窗口的引用（比如 `targetWindow = window.opener`），然后在窗口上调用 `targetWindow.postMessage()` 方法分发一个 [`MessageEvent`](https://developer.mozilla.org/zh-CN/docs/Web/API/MessageEvent) 消息。接收消息的窗口可以根据需要自由[处理此事件 (en-US)](https://developer.mozilla.org/en-US/docs/Web/Events)。传递给 window.postMessage() 的参数（比如 message）将[通过消息事件对象暴露给接收消息的窗口](https://developer.mozilla.org/zh-CN/docs/Web/API/Window/postMessage#The_dispatched_event)。
+
 ```javascript
 // usage
 /** 
- * windowAref 可以是
- * 1.窗口A自身的window对象，
- * 2.窗口A的一个引用，比如 iframe 的 contentWindow 属性
- * 3.执行window.open返回的窗口对象(打开窗口A)、或是数值索引的window.frames[index](指向窗口A)。
+ * windowRef 可以是
+ * 1.窗口自身的window对象，
+ * 2.其他窗口的一个引用，比如 iframe 的 contentWindow 属性
+ * 3.执行window.open返回的窗口对象、或是数值索引的window.frames[index]
  */
 // A.html or other.html's script
-windowAref.postMessage(message, targetOrigin, [transfer])
+windowRef.postMessage(message, targetOrigin, [transfer])
 
 // A.html's script
 // 窗口A监听 message 事件

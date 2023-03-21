@@ -1176,6 +1176,8 @@ https://www.yuque.com/jayohhh/uqef3e/pqhy90/edit#wrL2N
 
 ##### memo
 
+当父组件更新，而子组件没有使用 memo 包裹，即使子组件的 props 没有更新，子组件也会重新渲染。
+
 使用 React 组件可以将 UI 拆分为独立且复用的代码片段，每部分都可独立维护。你可以通过子类 `React.Component` 或 `React.PureComponent` 来定义 React 组件。
 
 - [`React.Component`](https://react.docschina.org/docs/react-api.html#reactcomponent)
@@ -8006,6 +8008,12 @@ useEffect(didUpdate);
 
 `useEffect`和 `useLayoutEffect`在服务端不会执行。
 
+> If your Effect wasn’t caused by an interaction (like a click), React will let the browser **paint the updated screen first before running your Effect.**
+>
+> 
+>
+> Even if your Effect was caused by an interaction (like a click), **the browser may repaint the screen before processing the state updates inside your Effect.** Usually, that’s what you want. However, if you must block the browser from repainting the screen, you need to replace `useEffect` with [`useLayoutEffect`.](https://react.dev/reference/react/useLayoutEffect)
+
 **清除 effect**
 
 通常，组件卸载时需要清除 effect 创建的诸如订阅或计时器 ID 等资源。要实现这一点，`useEffect` 函数需返回一个清除函数。以下就是一个创建订阅的例子：
@@ -8594,7 +8602,7 @@ export default function ImperativeHandleDemo() {
 
  `useEffect` 的回调函数会在浏览器绘制之后延迟执行。
 
- `useLayoutEffect` 的回调函数会在浏览器执行绘制之前同步执行（but it fires synchronously after  React has performed all DOM mutations），会阻塞浏览器的绘制。
+ `useLayoutEffect` 的回调函数以及函数内的状态更新会在浏览器执行绘制之前同步执行，会阻塞浏览器的绘制（but it fires synchronously after  React has performed all DOM mutations. Use this to read layout from the DOM and synchronously re-render. Updates scheduled inside `useLayouyEffect` will be flushed synchronously , before the browser has a chance to paint. The code inside `useLayoutEffect` and all state updates scheduled from it **block the browser from repainting the screen**）。
 
 `useLayoutEffect` 与 `componentDidMount`、`componentDidUpdate` 的调用阶段是一样的。
 
@@ -9383,6 +9391,16 @@ Context 是跨组件传值的一种方案，但我们需要知道，我们无法
 这个优化在业务中应该用不上，但还是非常值得学习的，将来可以应用到组件库中。
 
  [react-spring](https://github.com/pmndrs/react-spring) 库，当一个动画启动后，每次动画属性改变不会引起组件重新 Render ，而是直接修改了 dom 上相关属性值。
+
+
+
+##### 何时适用 useCallback 和 useMemo
+
+使用 useMemo 优化需要一定的计算成本。需要比较 useMemo 的计算成本和组件重新渲染的成本。
+
+由于最顶层的父组件的子组件树层级较深，可考虑在较顶层的组件使用 useMemo 和 React.memo，减少大量子组件的更新。
+
+
 
 #### 术语表
 

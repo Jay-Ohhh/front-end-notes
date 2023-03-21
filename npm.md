@@ -492,6 +492,13 @@ yarn create serve folder_name
 
 #### npm scripts hooks
 
+| 命令 | 说明                                                       |
+| ---- | ---------------------------------------------------------- |
+| `&&` | 顺序执行多条命令，当碰到执行出错的命令后将不执行后面的命令 |
+| `&`  | 并行执行多条命令                                           |
+| `||` | 顺序执行多条命令，当碰到执行正确的命令将不执行后面的命令   |
+| `|`  | 管道符                                                     |
+
 http://www.ruanyifeng.com/blog/2016/10/npm_scripts.html
 
 https://docs.npmjs.com/cli/v8/using-npm/scripts#npm-rebuild
