@@ -950,6 +950,12 @@ var fn=function(a){
 
 #### Symbol
 
+**原来 JS 中的 Symbol 还有这么多的妙用？**
+
+https://mp.weixin.qq.com/s/IC9qlNrZAqNEAE8uEWpOzA
+
+
+
 ES5 的对象属性名都是字符串，这容易造成属性名的冲突。比如，你使用了一个他人提供的对象，但又想为这个对象添加新的方法（mixin 模式），新方法的名字就有可能与现有方法产生冲突。如果有一种机制，保证每个属性的名字都是独一无二的就好了，这样就从根本上防止属性名的冲突。这就是 ES6 引入`Symbol`的原因。
 
 ES6 引入了一种新的原始数据类型`Symbol`，表示独一无二的值。Symbol 值通过`Symbol`函数生成。
@@ -1947,9 +1953,13 @@ new Promise((resolve, reject) => {
 
 失败状态的回调函数接受前一个promise reject的值作为参数。
 
+没有 return 且没有报错的情况下，默认 resolve/return undefined。
+
 ##### Promise.prototype.catch(onRejected)
 
 catch内的回调函数接受前一个promise reject的值或者错误作为参数。返回一个新的 promise。
+
+catch 内如果没 return，默认 reject/return undefined。
 
 ##### 如果 Promise 状态已经变成resolved，再抛出错误是无效的。
 
@@ -4604,6 +4614,8 @@ async md5File(file) {
 
 #### 垃圾回收机制
 
+https://mp.weixin.qq.com/s/rntFzV0_NCBg_9mC6zoSTA
+
 ##### 可达性
 
 JavaScript 中内存管理的主要概念是可达性。
@@ -6769,10 +6781,6 @@ If you use `ts-node`, follow [this guide](https://github.com/TypeStrong/ts-node/
 
 
 
-
-
-
-
 **Webpack 的处理方法**
 
 上面 ES 模块中导入 CommonJS 模块的例子，在 Webpack 4.43.0 打包后变成了这样（去掉所有注释）：
@@ -6888,6 +6896,17 @@ console.log(mod_2.default());
 ```
 
 开启 `esModuleInterop` （支持使用import d from 'cjs'的方式引入commonjs包）后，如果被导入的模块没有标识 `__esModule`，则默认导入将直接返回一个只含有 `default` 属性的对象。如果不开启 `esModuleInterop` 编译选项，则不能使用默认导入，必须用 `import * as mod from './mod'` 才能通过编译。
+
+
+
+##### 导入/导出所有
+
+```typescript
+import * as am from 'another-module'
+export * as am from 'another-module'
+```
+
+
 
 
 

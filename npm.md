@@ -628,3 +628,11 @@ $ npm install express --no-save
 
 
 
+#### 常见问题
+
+忽略某个包的脚本执行
+
+```
+npm install foo --ignore-scripts
+```
+
