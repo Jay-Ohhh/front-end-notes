@@ -4608,7 +4608,7 @@ async md5File(file) {
 }
 ```
 
-
+更多请查看 `前端功能.md`
 
 
 
@@ -7121,6 +7121,12 @@ resizeObserver.observe(document.querySelector('.box'));
 #### MutationObserver
 
 MutationObserver 可以监听对元素的属性的修改、对它的子节点的增删改。
+
+
+
+#### 字符编码
+
+https://mp.weixin.qq.com/s/Zh1jp_YvRr0RAE1fm4XbJw
 
 
 

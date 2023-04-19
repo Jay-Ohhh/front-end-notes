@@ -4,6 +4,8 @@ https://www.jianshu.com/p/dafc2052eedc
 
 https://www.jianshu.com/p/c10d0b8c5581
 
+[lerna 还是 pnpm + changesets？monorepo 工具核心就看这三个功能](https://mp.weixin.qq.com/s/AKoCqtUTDpkrrDwor3Kxlw)
+
 ### 什么是monorepo？
 
 Monorepo(monolithic repository) 是管理项目代码的一个方式，指在一个项目仓库 (repo) 中管理多个模块/包 (package)，不同于常见的每个模块建一个 repo。
