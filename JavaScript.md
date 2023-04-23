@@ -6677,6 +6677,14 @@ const Component = ()=>{
 统一AMD和CommonJS规范，解决跨平台问题。既可以在 node/webpack 环境中被 `require` 引用，也可以在浏览器中直接用 CDN 被 `script.src` 引入。
 
 ```js
+;(function (global, factory) {
+    typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
+    typeof define === 'function' && define.amd ? define(factory) :
+    global.moment = factory()
+}(this, (function () { 'use strict';
+```
+或者
+```js
 (function (root, factory) {
   if (typeof define === "function" && define.amd) {
     // AMD
@@ -6692,7 +6700,6 @@ const Component = ()=>{
   // ...
 });
 ```
-
 
 
 ###### ESM
