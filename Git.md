@@ -87,7 +87,7 @@ git push <远程主机名> <本地分支名>
 git push --force origin master
 ```
 
-某分支第一次push时可以使用 **- u** 选项：
+某分支第一次push时可以使用 **-u** 选项：
 
 如果当前分支与多个主机存在追踪关系，则可以使用 **- u**选项指定一个默认主机，这样后面可以直接用git push。
 
@@ -106,13 +106,21 @@ git push -u origin master
 ##### checkout 新建分支并切换到该分支
 
 ```sh
-git checkout -b [新分支名]
+git checkout -b 新分支名 [已存在的分支，可选，默认为当前分支]
 ```
+
+**基于远程分支创建本地分支**
+
+```bash
+git fetch origin foo:foo
+```
+
+
 
 ##### checkout 切换到指定分支
 
 ```sh
-git checkout [指定分支名]
+git checkout 指定分支名
 ```
 
 ##### checkout --orphan 清空commit历史
@@ -312,9 +320,30 @@ git push -u origin 新分支名
 
 ##### fetch 从远程获取代码库
 
+`git fetch` 是 Git 中用来从远程仓库下载代码更新并将其同步到本地仓库的命令，它只会将远程仓库中最新的代码更新下载到本地，并不会将这些更新自动合并到当前分支中。
+
 ```shell
 git fetch <远程主机名> <远程分支名>:<本地分支名> // 注意空格，本地分支名选项是可选项
 ```
+
+`<远程主机名>` 是您想要从中下载代码的远程仓库的名称，例如 "origin" 或 "upstream"。`<远程分支名>` 是您想要下载的远程分支的名称，例如 "master" 或 "dev"。`<本地分支名>` 是您想要将远程分支下载到的本地分支的名称，例如 "local-master" 或 "local-dev"。
+
+使用这个语法时，Git 将会将远程分支下载到本地，并使用 `<本地分支名>` 作为本地分支名称。例如，如果您运行以下命令：
+
+```bash
+git fetch origin master:local-master
+```
+
+
+
+下面是一些 `git fetch` 命令的使用例子：
+
+1. `git fetch`: 这个命令将从远程仓库下载当前分支代码更新（前提：当前分支已指定远程分支，`git branch --set-upstream master origin/master`），但不会将这些更新自动合并到当前分支中。如果您想查看远程分支的状态，可以使用 `git branch -r` 命令。
+2. `git fetch origin`: 这个命令将从名为 "origin" 的远程仓库下载代码更新。这是 Git 默认使用的远程仓库名称，通常用于与 GitHub 上的代码仓库进行交互。
+3. `git fetch upstream`: 这个命令将从名为 "upstream" 的远程仓库下载代码更新。这个命令通常用于与上游代码库进行交互，例如，如果您要将您的分支更新为上游分支的最新版本。
+4. `git fetch --all`: 这个命令将从所有已配置的远程仓库下载代码更新。这是一个很有用的命令，因为它可以帮助您保持所有远程仓库的最新状态。
+
+
 
 ##### pull 从远程获取代码并合并本地的版本
 
