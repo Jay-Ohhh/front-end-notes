@@ -4473,6 +4473,10 @@ function previewFile() {
 
 #### ArrayBuffer
 
+![img](https://zhangkai.pro/ass/img/binary-data-in-javascript.png)
+
+https://zhangkai.pro/2020/09/09/binary-data-in-javascript
+
 https://wangdoc.com/es6/arraybuffer.html
 
 **`ArrayBuffer`** 对象用来表示通用的、固定长度的原始二进制数据缓冲区。它是一个字节数组。
@@ -4500,6 +4504,16 @@ new ArrayBuffer(length)
 返回值
 
 一个指定大小的 `ArrayBuffer` 对象，其内容被初始化为 0。
+
+
+
+#### Binary String
+
+Binary String 与 Javascript 中普通的字符串无异， 都是使用 UTF-16 编码，每个字符至少占用 2 个字节。 唯一区别是 Binary String 中的字符码位（code point）不能超过 255 。 与 ASCII 字符集类似，也可以把 Binary String 理解为一个字符集，区别是 ASCII 码位不能超过 127， 而 Binary String 不能超过 255。
+
+Binary String：字符 -> UTF-16 编码值（表示二进制数据的值）
+
+Binary String 并不是用来展示文字的，而是用来表示原始的二进制数据。 在 TypedArray 出现之前，人们使用 Binary String 作为二进制流，然后通过 charCodeAt() 将每个字符转成一个字节的值。
 
 
 
@@ -4541,12 +4555,13 @@ content-type: image/png
 <input id="file" type="file">
 ```
 
-```js
+```javascript
 const file = document.getElementById('file').files[0];
 const reader = new FileReader()
 
-function readBinary(text: string) {
-  const arrayBuffer = new ArrayBuffer(text.length);
+function binaryToUint8(binaryString: string) {
+  // Binary String 与 Javascript 中普通的字符串无异， 都是使用 UTF-16 编码，每个字符至少占用 2 个字节。 唯一区别是 Binary String 中的字符码位（code point）是[0, 255], 即 uint8 的范围。
+  const arrayBuffer = new ArrayBuffer(binaryString.length);
   const ui8a = new Uint8Array(arrayBuffer, 0);
 
   // 针对每个字符，使用 charCodeAt() 方法获取其 Unicode 码点值，并将它与十六进制值 0xff 进行按位与运算，以确保结果只有一个字节（即低8位）。最后，函数将结果赋值给 Uint8Array 数组的相应位置，这样就将字符串转换为了一组二进制数据
@@ -4611,11 +4626,6 @@ async md5File(file) {
 更多请查看 `前端功能.md`
 
 
-#### Binary String
-Binary String 与 Javascript 中普通的字符串无异， 都是使用 UTF-16 编码，每个字符至少占用 2 个字节。 唯一区别是 Binary String 中的字符码位（code point）不能超过 255 。 与 ASCII 字符集类似，也可以把 Binary String 理解为一个字符集，区别是 ASCII 码位不能超过 127， 而 Binary String 不能超过 255。
-Binary String：字符 -> UTF-16 编码值（表示二进制数据的值）
-
-Binary String 并不是用来展示文字的，而是用来表示原始的二进制数据。 在 TypedArray 出现之前，人们使用 Binary String 作为二进制流，然后通过 charCodeAt() 将每个字符转成一个字节的值。
 
 
 #### 垃圾回收机制
@@ -5050,7 +5060,11 @@ String.length-字符串的长度：返回字符串中utf-16的编码单元的数
 "🔴".length // 2
 ```
 
-而根据 UTF-16编码规则，一个字符要么2个字节，要么4个字节，**`所以不如说是 10M 的字节数，更为合理。`**
+> UTF-16 编码使用 16 位（即 2 个字节）的代码单元来表示 Unicode 字符。这意味着任何一个 Unicode 字符都可以用一个或两个 UTF-16 代码单元来表示。
+>
+> 如果 Unicode 码点值在 U+0000 到 U+D7FF 范围内，那么该字符可以用一个 UTF-16 代码单元（即 16 位）表示。如果 Unicode 码点值在 U+D800 到 U+DFFF 范围内，那么该字符需要用两个 UTF-16 代码单元（即 32 位）表示，这种字符称为“代理对”（Surrogate Pair）。
+
+因此，一个字符要么2个字节，要么4个字节，**`所以不如说是 10M 的字节数，更为合理。`**
 
 **当然，2个字节作为一个utf-16的字符编码单元，也可以说是 5M 的utf-16的编码单元。**
 
