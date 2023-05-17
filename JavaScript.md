@@ -5636,6 +5636,8 @@ refresh token 是专用于刷新 access token 的 token。如果没有 refresh t
 
 ##### JWT（JSON Web Token）
 
+https://www.ruanyifeng.com/blog/2018/07/json_web_token-tutorial.html
+
 JWT 的原理是，服务器认证以后，生成一个 JSON 对象，发回给用户。以后，用户与服务端通信的时候，都要发回这个 JSON 对象。服务器完全只靠这个对象认定用户身份。为了防止用户篡改数据，服务器在生成这个对象的时候，会加上签名（详见后文）。
 
 服务器就不保存任何 session 数据了，也就是说，**服务器变成无状态了**，从而比较容易实现扩展。
@@ -5701,6 +5703,34 @@ HMACSHA256(
 ```
 
 算出签名以后，把 Header、Payload、Signature 三个部分拼成一个字符串，每个部分之间用"点"（`.`）分隔，就可以返回给用户。
+
+**验证 token 中间件**
+
+```javascript
+const jwt = require('jsonwebtoken');
+
+function authenticateToken(req, res, next) {
+  // 可以过滤掉部分路由，不进行校验
+  const authHeader = req.headers['authorization']
+  const token = authHeader && authHeader.split(' ')[1]
+
+  if (token == null) return res.sendStatus(401)
+
+  jwt.verify(token, process.env.TOKEN_SECRET as string, (err: any, user: any) => {
+    console.log(err)
+
+    if (err) return res.sendStatus(401)
+
+    req.user = user
+
+    next()
+  })
+}
+```
+
+也可以使用`express-jwt`中间件。
+
+
 
 ###### Base64URL
 

@@ -1385,6 +1385,8 @@ git subtree push --prefix=文件夹名 主机名 远程分支名
 
 #### git使用不同的邮箱配置不同的SSH
 
+https://docs.github.com/zh/authentication/connecting-to-github-with-ssh/about-ssh
+
 https://blog.csdn.net/wangcongcsdn/article/details/106661793
 
 https://www.pianshen.com/article/302848775/
@@ -1640,6 +1642,12 @@ A detailed explanation can be found in this [document](https://docs.google.com/d
 ##### 加速几十倍 git clone 速度的 --depth 1，它的后遗症怎么解决？
 
 https://mp.weixin.qq.com/s/6VaV70zbnfzWBRxHGbmTcw
+
+
+
+##### 用 git bisect 快速定位你想找的 commit
+
+https://mp.weixin.qq.com/s/vKi0nKlmrIvLP42aDdnKZg
 
 
 
