@@ -4611,6 +4611,12 @@ async md5File(file) {
 更多请查看 `前端功能.md`
 
 
+#### Binary String
+Binary String 与 Javascript 中普通的字符串无异， 都是使用 UTF-16 编码，每个字符至少占用 2 个字节。 唯一区别是 Binary String 中的字符码位（code point）不能超过 255 。 与 ASCII 字符集类似，也可以把 Binary String 理解为一个字符集，区别是 ASCII 码位不能超过 127， 而 Binary String 不能超过 255。
+Binary String：字符 -> UTF-16 编码值（表示二进制数据的值）
+
+Binary String 并不是用来展示文字的，而是用来表示原始的二进制数据。 在 TypedArray 出现之前，人们使用 Binary String 作为二进制流，然后通过 charCodeAt() 将每个字符转成一个字节的值。
+
 
 #### 垃圾回收机制
 
