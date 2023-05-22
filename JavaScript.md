@@ -4506,6 +4506,36 @@ new ArrayBuffer(length)
 一个指定大小的 `ArrayBuffer` 对象，其内容被初始化为 0。
 
 
+#### UTF-16
+https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/String#utf-16_%E5%AD%97%E7%AC%A6%E3%80%81unicode_%E7%A0%81%E4%BD%8D%E5%92%8C%E5%AD%97%E7%B4%A0%E7%B0%87%EF%BC%88grapheme_clusters%EF%BC%89
+
+UTF-16 编码使用 16 位（即 2 个字节）的代码单元（码元）来表示大部分 Unicode 字符。这意味着绝大多数字符只需要用一个 UTF-16 代码单元来表示，从而实现了较好的空间效率和处理效率。
+
+然而，整个 Unicode 字符集比 65536 大得多，UTF-16 编码引入了代理对（Surrogate Pair）的概念。额外的字符作为代理对存储在 UTF-16 中，代理对是表示单个字符的 16 位码元对。为了避免起义，该对的两个部分必须介于 0xD800 和 0xDFFF 之间。
+
+代理对是一种特殊的编码方式，用于表示 Unicode 码点值在 U+10000 到 U+10FFFF 范围内的字符。代理对由一个高位代理（High Surrogate）和一个低位代理（Low Surrogate）构成，每个代理都是一个 16 位的 UTF-16 代码单元。因此，一个代理对需要使用两个 UTF-16 代码单元（即 32 位）来表示。
+
+在 JavaScript 中，字符串表示为 UTF-16 码元的序列，字符串的 length 属性表示 UTF-16 代码单元的个数，因此一个字符要么占 2 个字节，要么占 4 个字节（代理对）。
+
+你必须小心迭代字符级别。例如，split("") 将按照 UTF-16 码元分割并强代理对分开。字符串索引也是指的每个 UTF-16 码元的索引。在另一方面，@@iterator() 按 Unicode 码位迭代。遍历字素簇将需要一些自定义代码。
+
+```javascript
+"😄".split(""); // ['\ud83d', '\ude04']; splits into two lone surrogates
+
+// "Backhand Index Pointing Right: Dark Skin Tone"
+[..."👉🏿"]; // ['👉', '🏿']
+// splits into the basic "Backhand Index Pointing Right" emoji and
+// the "Dark skin tone" emoji
+
+// "Family: Man, Boy"
+[..."👨‍👦"]; // [ '👨', '‍', '👦' ]
+// splits into the "Man" and "Boy" emoji, joined by a ZWJ
+
+// The United Nations flag
+[..."🇺🇳"]; // [ '🇺', '🇳' ]
+// splits into two "region indicator" letters "U" and "N".
+// All flag emojis are formed by joining two region indicator letters
+```
 
 #### Binary String
 
