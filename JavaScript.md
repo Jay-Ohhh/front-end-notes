@@ -4517,7 +4517,7 @@ UTF-16 编码使用 16 位（即 2 个字节）的代码单元（码元）来表
 
 在 JavaScript 中，字符串表示为 UTF-16 码元的序列，字符串的 length 属性表示 UTF-16 代码单元的个数，因此一个字符要么占 2 个字节，要么占 4 个字节（代理对）。
 
-你必须小心迭代字符级别。例如，split("") 将按照 UTF-16 码元分割并强代理对分开。字符串索引也是指的每个 UTF-16 码元的索引。在另一方面，@@iterator() 按 Unicode 码位迭代。遍历字素簇将需要一些自定义代码。
+你必须小心迭代字符级别。例如，split("") 将按照 UTF-16 码元分割并强代理对分开。字符串索引也是指的每个 UTF-16 码元的索引。在另一方面，String.prototype[@@iterator]() 按 Unicode 码位迭代。遍历字素簇将需要一些自定义代码。
 
 ```javascript
 "😄".split(""); // ['\ud83d', '\ude04']; splits into two lone surrogates
