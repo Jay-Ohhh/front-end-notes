@@ -3102,7 +3102,24 @@ function setAddress(...args: Address) {
 
 枚举（Enum）类型用于取值被限定在一定范围内的场景，比如一周只能有七天，颜色限定为红绿蓝等。 
 
-枚举还具有正向映射（ `name` -> `value`）和反向映射（ `value` -> `name`）的特点。  要注意的是不会为字符串枚举成员生成反向映射。 
+枚举还具有正向映射（ `name` -> `value`）和反向映射（ `value` -> `name`）的特点。
+可以为数字、symbol枚举成员生成反向映射，但不会为字符串、布尔等枚举成员生成反向映射。 
+
+```javascript
+const s = Symbol();
+
+enum Fruits {
+    // @ts-ignore
+    Apple = s as any,
+    Banana = 1,
+    Cantaloupe = "S", // you can mix numerical and string enums
+}
+
+console.log(Fruits.Apple); // s: Symbol()
+console.log(Fruits[s]); // Apple
+console.log(Fruits.Banana); // 1
+console.log(Fruits[1]); // Banana
+```
 
 **数字枚举**
 
