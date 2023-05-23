@@ -46,11 +46,13 @@ iframe.style.display = "none"
 iframe.onload = () => {
   iframe.contentWindow.print()
   iframe.onload = null
+  iframe = null
   URL.revokeObjectURL(url);
 }
 iframe.onerror = () => {
   iframe.contentWindow.print()
   iframe.onerror = null
+  iframe = null
   URL.revokeObjectURL(url);
 }
 ```
