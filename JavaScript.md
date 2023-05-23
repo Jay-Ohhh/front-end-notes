@@ -6652,7 +6652,7 @@ https://github.com/xxx/yyy/zzz 前端跳转，不刷新页面
 #### Server-Sent Events
 
 http://www.ruanyifeng.com/blog/2017/05/server-sent_events.html
-
+https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events/Using_server-sent_events
 **`EventSource`** 是服务器推送的一个网络事件接口。一个 EventSource 实例会对 HTTP 服务开启一个持久化的连接，以`text/event-stream` 格式发送事件，会一直保持开启直到被要求关闭（EventSource.close() 或 网页关闭）。
 
 SSE 与 WebSocket 作用相似，都是建立浏览器与服务器之间的通信渠道，然后服务器向浏览器推送信息。
@@ -6672,8 +6672,8 @@ SSE 也有自己的优点
 ##### 服务器实现
 
 ###### 数据格式
-
-服务器向浏览器发送的 SSE 数据，必须是 UTF-8 编码的文本，具有如下的 HTTP 头信息。
+The event stream（text/event-stream） is a simple stream of text data which must be encoded using UTF-8. 
+因此，服务器向浏览器发送的 SSE 数据，必须使用 UTF-8 编码的文本，具有如下的 HTTP 头信息。
 
 > ```markup
 > Content-Type: text/event-stream
