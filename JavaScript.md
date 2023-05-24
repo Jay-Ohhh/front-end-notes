@@ -732,7 +732,28 @@ a = null // 不再引用时
 
 https://mp.weixin.qq.com/s/5a9hHVc024Pl3c3Lyp08eg
 
+类似于 network，只要不打开 devtools，就会记录网络请求信息，毕竟需要消耗一定的资源。
 
+打印对象时，当打开  devtools，打印所引用的对象不会被销毁，会一直被 devtools 引用，因此每打印一个新的对象时，内存就会上升。
+
+当打开  devtools，打印字符串时，分两种情况：
+
+- console.log("foo") : "foo" 会存在字符串常量池中，同样的字符串只会创建一次，减少了相同字符串的内存占用，每次打印 "foo" 都是引用相同的地址，因此内存是稳定的。
+
+- console.log(new String("foo")) : 这时候创建的是一个堆中的对象，然后引用了常量池中的 string。每次打印 (new String("foo") 都会创建新的对象，导致内存上升。
+
+  ```javascript
+  typeof "foo" // string
+  typeof new String("foo") // object
+  ```
+
+**那 node.js 的 console.log 有没有内存泄漏呢？**
+
+node 打印的是序列化以后的对象，并不是对象引用，不会内存泄露。
+
+而且服务端的日志打印是常用功能，站在设计的角度，不能存在内存泄露的问题。
+
+ 
 
 #### 立即执行函数
 
