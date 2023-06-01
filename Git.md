@@ -1751,9 +1751,28 @@ git commit -m "Fix screwup, fixes #12"
 
 
 
+##### 跳过工作流程运行
+
+https://docs.github.com/zh/actions/managing-workflow-runs/skipping-workflow-runs
+
+如果将以下任何字符串添加到推送中的提交消息，或拉取请求的 HEAD 提交中，则不会触发原本使用 `on: push` 或 `on: pull_request` 进行触发的工作流：
+
+- `[skip ci]`
+- `[ci skip]`
+- `[no ci]`
+- `[skip actions]`
+- `[actions skip]`
+
+或者，可以用两个空行结束提交消息，后跟：
+
+- `skip-checks:true`
+- `skip-checks: true`
+
+
+
 ##### README CHANGELOG CONTRIBUILDING
 
-如果将自述文件放在仓库隐藏的 `.github` 目录、根目录或 `docs` 目录中，GitHub 将会识别您的自述文件并自动向仓库访问者显示。
+如果将 README.md 文件放在仓库隐藏的 `.github` 目录、根目录或 `docs` 目录中，GitHub 将会识别您的自述文件并自动向仓库访问者显示。
 
 如果仓库包含多个自述文件，则按以下顺序从位置中选择显示的文件：`.github` 目录，然后是仓库的根目录，最后是 `docs` 目录。
 

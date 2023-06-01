@@ -2643,17 +2643,32 @@ interface String {
 
 ##### declare global
 
-使用 `declare global` 可以在此库的 npm 包或者 UMD 库的声明文件中扩展全局变量的类型：
+使用 `declare global` 可以在此库的声明文件中扩展全局变量的类型：
+
+1. Create a `global.d.ts` file and declare types in the global namespace.
+2. Add types or interfaces that need to be globally accessible.
+3. Make the file a module by using `export {}`.
 
 ```ts
-// types/foo/index.d.ts
-
+// types/global.d.ts
 declare global {
-    interface String {
+  /**
+   * Now declare things that go in the global namespace,
+   * or augment existing declarations in the global namespace.
+   */
+  type Bar = {
+    name: string;
+    // 可以引入其他 ts, d.ts 文件所定义的类型
+    locale: import("./i18n").Locale;
+  };
+  
+  interface String {
+      	// 全局可访问
         prependHello(): string;
     }
 }
 
+// 必须 export，但此时该文件已经不是全局声明文件
 export {};
 ```
 
@@ -2733,7 +2748,9 @@ declare module 'moment' {
 类似于声明文件中的 `import`，它可以用来导入另一个声明文件。与 `import` 的区别是，当且仅当在以下任何一个场景下，我们才需要使用三斜线指令替代 `import`：
 
 - 当我们需要**书写**全局变量的声明文件
-- 当我们需要**依赖**全局变量的声明文件
+- 当我们需要**依赖** node_modules 全局变量的声明文件
+
+**在全局变量的声明文件中，最外层是不允许出现 `import`, `export` 关键字**
 
 ```ts
 // react-scripts会从模块中寻找
@@ -2747,7 +2764,7 @@ declare module 'moment' {
 
 ##### 书写一个全局变量的声明文件
 
-在全局变量的声明文件中，最外层是不允许出现 `import`, `export` 关键字的。一旦出现了，那么他就会被视为一个 npm 包或 UMD 库，就不再是全局变量的声明文件了。故当我们在书写一个全局变量的声明文件时，如果需要引用另一个库的类型，那么就必须用三斜线指令了： 
+在全局变量的声明文件中，最外层是不允许出现 `import`, `export` 关键字。一旦出现了，那么他就会被视为一个 npm 包或 UMD 库，就不再是全局变量的声明文件了。故当我们在书写一个全局变量的声明文件时，如果需要引用另一个库的类型，那么就必须用三斜线指令了： 
 
 ```ts
 // types/jquery-plugin/index.d.ts
@@ -2755,6 +2772,12 @@ declare module 'moment' {
 /// <reference types="jquery" />
 
 declare function foo(options: JQuery.AjaxSettings): string;
+// 可以引入其他 ts, d.ts 文件所export的类型
+declare type Locale = import("./i18n.config").Locale;
+
+interface PageParams {
+    bar: import("./i18n.config").Locale;
+}
 ```
 
 ```ts
@@ -2789,7 +2812,7 @@ foo(global.process); // global是node环境下的全局对象
 
 ###### js文件三斜杠注释///reference path用途
 
-编辑某个js文件时，要想这个js文件出现其他js成员的ide提示，可以再js文件开头使用3个斜杠注释和reference指令的path指向此 js/ts 文件路径，这样在编写这个 js/ts 文件时，ide就会自动出现path指向的js文件中的成员。
+编辑某个js文件时，要想这个js文件出现其他js成员的ide提示，可以在js文件开头使用3个斜杠注释和reference指令的path指向此 js/ts 文件路径，这样在编写这个 js/ts 文件时，ide就会自动出现path指向的js文件中的成员。
 
 
 
