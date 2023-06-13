@@ -1,7 +1,9 @@
 [搜索引擎优化 (SEO) 新手指南](https://developers.google.com/search/docs/fundamentals/seo-starter-guide?hl=zh-cn)
 [Search Engine Optimization](https://nextjs.org/learn/seo/introduction-to-seo)
 [Web 指标](https://web.dev/vitals/)
+[SEO Writing](https://backlinko.com/hub/seo/seo-writing)
 # meta seo 设置
+可使用 [https://smo.knowem.com/](https://smo.knowem.com/) 检查 SEO 评分
 ```jsx
 <title>Document</title>
   
@@ -15,22 +17,6 @@
 <meta name="author" content={author} />
 <meta name="creator" content={author} />
 <meta name="publisher" content={author} />
-
-<meta property="og:title" content={_title} />
-<meta property="og:description" content={_description} />
-<meta property="og:url" content={_url} />
-<meta property="og:site_name" content={_title} />
-<meta property="og:locale" content={"zh"} />
-<meta property="og:image" content={_image} />
-<meta property="og:image:width" content={800} />
-<meta property="og:image:height" content={600} />
-<meta property="og:image:alt" content={_description} />
-<meta property="og:image" content={_image} />
-<meta property="og:image:width" content={1800} />
-<meta property="og:image:height" content={1600} />
-<meta property="og:image:alt" content={_description} />
-<meta property="og:type" content="website" />
-
 
 <meta name="applicable-device" content="pc,mobile" />
 <meta name="application-name" content={applicationName} />
@@ -252,10 +238,15 @@ https://www.sitemaps.org/protocol.html
 [使用站点地图索引文件管理站点地图](https://developers.google.com/search/docs/crawling-indexing/sitemaps/large-sitemaps?hl=zh-cn)
 上传 sitemap 有助于搜索引擎缩短爬虫发现网站链接的时间，加快收录网站的速度
 
-- [谷歌站长工具](https://search.google.com/)
+- [谷歌站长工具](https://search.google.com/search-console)
 - [百度站长工具](https://ziyuan.baidu.com/linksubmit/index)
 - [必应站长工具](https://www.bing.com/webmasters/home)（可以关联谷歌站长工具）
 
+如果网站有更新可使用 URL 提交 API 主动向搜索引擎站长工具推送（建议每天都提交一遍）
+
+- 谷歌：[https://developers.google.com/webmaster-tools/v1/sitemaps/submit](https://developers.google.com/webmaster-tools/v1/sitemaps/submit)
+- 百度：[https://ziyuan.baidu.com/linksubmit/index](https://ziyuan.baidu.com/linksubmit/index)
+- 必应：[https://www.bing.com/webmasters/url-submission-api#APIs](https://www.bing.com/webmasters/url-submission-api#APIs)
 
 百度不支持索引型 sitemap： [https://ziyuan.baidu.com/linksubmit/index](https://ziyuan.baidu.com/linksubmit/index)
 ![image.png](https://cdn.nlark.com/yuque/0/2023/png/26428688/1686047971507-edf448e0-4ce7-4950-8455-2bb889ea30bb.png#averageHue=%23fafafa&clientId=uc1e014eb-28bd-4&from=paste&height=485&id=cK7Og&originHeight=485&originWidth=956&originalType=binary&ratio=1&rotation=0&showTitle=false&size=69916&status=done&style=none&taskId=u4536b93f-9156-4f19-a903-36d0edc62ba&title=&width=956)
@@ -395,7 +386,8 @@ useEffect(() => {
 ```
 
 
-# URL Structure
+# SEO Friendly URLs
+[https://backlinko.com/hub/seo/urls](https://backlinko.com/hub/seo/urls)
 [https://nextjs.org/learn/seo/rendering-and-ranking/url-structure](https://nextjs.org/learn/seo/rendering-and-ranking/url-structure)
 URL Structure is an important part of an SEO strategy. While Google doesn't disclose which weight each part of SEO has, great URLs are considered a best practice no matter if they are a big or small ranking factor in the end.
 You might want to follow some principles:

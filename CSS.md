@@ -998,6 +998,27 @@ https://segmentfault.com/a/1190000020887571
 
 
 
+多行文本省略
+
+```scss
+// mixin.scss
+@mixin ellipsis-line($line) {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: $line;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.ellipse-1{
+  
+}
+```
+
+
+
+
+
 #### 现代布局
 
 https://1linelayouts.glitch.me/
@@ -1202,3 +1223,9 @@ https://www.sass.hk/skill/sass14.html
 https://sass-lang.com/documentation/at-rules/import
 
 https://sass-lang.com/documentation/at-rules/mixin
+
+
+
+# 文字波浪动画
+
+https://mp.weixin.qq.com/s/tBG_o4knzmFjqVroqnqrPw

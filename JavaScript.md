@@ -4610,6 +4610,30 @@ content-type: image/png
 const file = document.getElementById('file').files[0];
 const reader = new FileReader()
 
+function bufferToUint8(buffer: ArrayBuffer) {
+  const ui8a = new Uint8Array(buffer, 0);
+  
+  return ui8a;
+}
+
+reader.onloadend = () => {
+  if (reader.error) {
+    reject(reader.error);
+  } else {
+   const uint8 = bufferToUint8(reader.result as string);
+   console.log(binary);
+  }
+};
+
+reader.readAsArrayBuffer(file);
+
+
+// 或
+
+
+const file = document.getElementById('file').files[0];
+const reader = new FileReader();
+
 function binaryToUint8(binaryString: string) {
   // Binary String 与 Javascript 中普通的字符串无异， 都是使用 UTF-16 编码，每个字符至少占用 2 个字节。 唯一区别是 Binary String 中的字符码位（code point）是[0, 255], 即 uint8 的范围。
   const arrayBuffer = new ArrayBuffer(binaryString.length);
@@ -4627,7 +4651,7 @@ reader.onloadend = () => {
   if (reader.error) {
     reject(reader.error);
   } else {
-   const binary = readBinary(reader.result as string);
+   const uint8 = binaryToUint8(reader.result as string);
    console.log(binary);
   }
 };
