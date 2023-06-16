@@ -294,6 +294,13 @@ Allow: /
 Disallow: /api/*
 ```
 
+
+## Google 站点地图扩展
+[图片站点地图](https://developers.google.com/search/docs/crawling-indexing/sitemaps/image-sitemaps?hl=zh-cn)
+[新闻站点地图](https://developers.google.com/search/docs/crawling-indexing/sitemaps/news-sitemap?hl=zh-cn)
+[视频站点地图和替代方案](https://developers.google.com/search/docs/crawling-indexing/sitemaps/video-sitemaps?hl=zh-cn)
+
+
 # Google Analytics / baidu Analytics
 [https://analytics.google.com/](https://analytics.google.com/)
 [https://tongji.baidu.com/](https://tongji.baidu.com/)
@@ -409,5 +416,18 @@ For a blog or e-commerce site you will likely want to use the product ID or blog
 - **Product:**https://www.example.com/products/nextjs-shirt → pages/products/[product].js
 - **Blog:**https://www.example.com/blog/seo-in-nextjs → pages/blog/[blog-name].js
 
+# 内链
+内链（Internal Link）是指在同一个网站中，将一个网页链接到该网站中的另一个网页的链接。
+内链可以帮助搜索引擎更好地理解网站的结构和内容，并提高网站的可用性和导航性。
+内链还可以提高网站的PageRank值，这是Google搜索引擎用于评估网站权威性和可信度的指标之一。如果一个网站的页面之间有很多内链，它们就会被认为是相关的，并且更可能被视为高质量的网站。
+在内链的使用上，需要注意以下几点：
 
+1. 内链应该是有意义和相关的。链接应该指向与当前页面相关的其他页面，而不是不相关的页面。
+2. 内链应该是自然且不过度的。过多的内链可能会被搜索引擎视为垃圾链接，并对网站排名产生负面影响。
+3. 内链应该具有一定的层次结构和逻辑顺序。网站的主要内容应该在主菜单或主页上，而次要内容则应该链接到相关的主要内容页面上。
+
+# 反向链接
+反向链接（Backlink）是指其他网站或网页链接到您的网站或网页。当其他网站链接到您的网站时，这些链接就称为反向链接。反向链接也被称为入站链接（Inbound Link）或外部链接（External Link）。
+反向链接是搜索引擎优化（SEO）的重要因素之一，因为它们可以帮助搜索引擎评估网站的权威性和可信度。如果其他网站链接到您的网站，搜索引擎就会认为您的网站内容有价值，并且更可能将您的网站排名提高到搜索结果页面的前面。
+反向链接的数量和质量也很重要。虽然拥有大量反向链接可能会有助于提高排名，但如果这些链接来自于低质量或垃圾网站，那么它们可能会对您的排名产生负面影响。因此，建立高质量的反向链接，并确保这些链接与您的网站内容相关和有价值，对于提高搜索引擎排名和网站流量非常重要。
 
