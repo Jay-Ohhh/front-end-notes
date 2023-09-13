@@ -228,8 +228,10 @@ Webpack 内部包含三种类型的 Chunk：
 
 - 字符串 `'all'` ：对 Initial Chunk 与 Async Chunk 都生效，如果一个模块既被异步引用，也被入口同步引用，那么只会生成一个共享包，建议优先使用该值
 - 字符串 `'initial'` ：只对 Initial Chunk 进行分离，不会将同步加载和异步加载一起处理，而是分开处理，如果一个模块既被异步引用，也被同步引用，那么会生成两个包
-- 字符串 `'async'` ：只对 Async Chunk 进行分离，webpack会在用到的时候通过webpack jsonp方法动态创建script标签加载相应的文件，我们在react和Vue的懒加载路由中使用的也是这种方式
+- 字符串 `'async'` ：只对 Async Chunk 进行分离，那么会生成两个包，webpack会在用到的时候通过webpack jsonp方法动态创建script标签加载相应的文件，我们在react和Vue的懒加载路由中使用的也是这种方式
 - 函数 `(chunk) => boolean` ：该函数返回 `true` 时生效
+
+Out of the box Webpack 4 only split “async chunks” based on this [default configuration](https://webpack.js.org/plugins/split-chunks-plugin/#defaults).
 
 具体可以参考这篇文章: [Webpack 4 Mysterious SplitChunks Plugin](https://link.juejin.cn/?target=https%3A%2F%2Fmedium.com%2Fdailyjs%2Fwebpack-4-splitchunks-plugin-d9fbbe091fd0)
 
@@ -948,6 +950,8 @@ module: {
 ```
 
 ##### package.json 中的 sideEffects
+
+https://sgom.es/posts/2020-06-15-everything-you-never-wanted-to-know-about-side-effects/
 
 在 Webpack 的 Tree Shaking 配置中，有一个可以在 `package.json` 中配置的叫 `sideEffects`，这个 `sideEffects` 的配置主要是让 Webpack 这种 bundler 知道此项目是否可以做 Tree Shaking 的动作。
 
@@ -2171,7 +2175,7 @@ module.exports = {
         new HtmlWebpackPlugin({
             template: path.join(__dirname, '../src/index.html'), // 指定模板文件
             filename: 'index.html', // 生成文件名 - 这里生成index.html 便于 contentBase 中访问
-            chunks: ["user"], // 选择需要引入的js文件
+            chunks: ["user", "vendor", "manifest"], // 选择需要引入的js文件
             minify: {
                 removeAttributeQuotes: true, // 删除双引号
                 collapseWhitespace: true // 折叠空行
@@ -2180,13 +2184,27 @@ module.exports = {
         new HtmlWebpackPlugin({
             template: path.join(__dirname, '../src/index.html'), // 指定模板文件
             filename: 'admin.html', // 生成文件名
-            chunks: ["admin"],
+            chunks: ["admin", "vendor", "manifest"],
             minify: {
                 removeAttributeQuotes: true, // 删除双引号
                 collapseWhitespace: true // 折叠空行
             } // 打包时的压缩配置
         }),
     ],
+    optimization: {
+        splitChunks: {
+            cacheGroups: {
+                vendor: {
+                    name: 'vendor',
+                    chunks: 'all',
+                    test: /[\\/]node_modules[\\/]/,
+                },
+            },
+        },
+        runtimeChunk: {
+          name: 'manifest',
+        },
+    },
 }
 ```
 

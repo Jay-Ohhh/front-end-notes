@@ -350,7 +350,7 @@ git fetch origin master:local-master
 取回远程主机的远程分支，与本地分支合并
 
 ```sh
-git pull <远程主机名> <远程分支名>:<本地分支名> // 注意空格，本地分支名选项是可选项
+git pull <远程主机名> <远程分支名>:<本地分支名> // 注意空格，本地分支名选项是可选项，默认为本地当前分支
 ```
 
 git pull = git fetch + git merge
