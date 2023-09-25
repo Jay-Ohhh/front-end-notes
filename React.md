@@ -8683,6 +8683,14 @@ export default function App() {
 }
 ```
 
+原理图：
+
+![React pauses the current render based on a user interaction that forces it to prioritize rendering another update](https://vercel.com/_next/image?url=https%3A%2F%2Fimages.ctfassets.net%2Fe5382hct74si%2F31pAf0E13ANPeDhn5kDtqB%2Ffbf036020467569fb018fe92cdf160a8%2FGroup_513858.png&w=3840&q=75&dpl=dpl_AaUEnqybhppjQpszxJXekHn3zn5g)
+
+React pauses the current render based on a user interaction that forces it to prioritize rendering another update
+
+Using concurrent features, React can pause and resume the rendering of components based on external events such as user interaction. When the user started interacting with `ComponentTwo`, React paused the current rendering, prioritized and render `ComponentTwo`, after which it resumed rendering `ComponentOne`.
+
 
 
 ###### useDeferredValue

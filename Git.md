@@ -109,10 +109,11 @@ git push -u origin master
 git checkout -b 新分支名 [已存在的分支，可选，默认为当前分支]
 ```
 
-**基于远程分支创建本地分支**
+##### 基于远程分支创建本地分支
 
 ```bash
-git fetch origin foo:foo
+git fetch origin 远程分支名
+git checkout -b 新的分支名 远程仓库别名/远程分支名
 ```
 
 

@@ -1226,6 +1226,12 @@ https://sass-lang.com/documentation/at-rules/mixin
 
 
 
-# 文字波浪动画
+#### 文字波浪动画
 
 https://mp.weixin.qq.com/s/tBG_o4knzmFjqVroqnqrPw
+
+
+
+#### CSS Grid repeat 函数
+
+https://mp.weixin.qq.com/s/Ff5e4SXSC_RPMst_GA1wHg
