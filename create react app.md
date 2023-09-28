@@ -1383,7 +1383,20 @@ serve -s build
 
 上面显示的最后一个命令将为端口 **5000** 上的静态站点提供服务。与许多 [serve](https://github.com/zeit/serve) 的内部设置一样，可以使用 `-p` 或 `--port` 标志调整端口。
 
-###### 其他方案
+###### nginx
+
+```yaml
+# 解决 history 路由模式为时刷新返回404的问题
+location / {
+  root /usr/share/nginx/html;
+  index /index.html;
+  try_files $uri $uri/ /index.html;
+}
+```
+
+
+
+###### node
 
 你不一定需要静态服务器才能在生产中运行 Create React App 项目。 它可以很好地集成到现有的动态服务器中。
 
@@ -1398,6 +1411,8 @@ const app = express();
 
 // 一定要写到静态资源托管之前
 app.use(compression())
+// 监听静态资源一定要写在下面路由的前面，且需要配置 publicPath 为绝对路径或者相对服务器的路径（'/'）,例如 
+// <link href="/vendor.88b4e668d1.css" rel="stylesheet"> 会获取 build 目录下的文件
 app.use(express.static(path.join(__dirname, 'build')));
 
 app.get('/', function(req, res) {
