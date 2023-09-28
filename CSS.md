@@ -724,16 +724,16 @@ body {
     position: relative;
 }
 #container[data-device="2"]::after{
-  		content:"";
-      position:absolute;
-      top: 0;
-      left: 0;
-      width: 200%;
-      height: 200%;  
-      transform: scale(0.5);
-      transform-origin: left top;
-      box-sizing: border-box;
-      border: 1px solid #333;
+        content:"";
+        position:absolute;
+        top: 0;
+        left: 0;
+        width: 200%;
+        height: 200%;  
+        transform: scale(0.5);
+        transform-origin: left top;
+        box-sizing: border-box;
+        border: 1px solid #333;
     }
 }
 ```
