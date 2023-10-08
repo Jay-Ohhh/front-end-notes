@@ -7,6 +7,12 @@ src和href都是**用来引用外部的资源**，它们的区别如下：
 
 
 
+### 探究网页资源究竟是如何阻塞浏览器加载的
+
+https://mp.weixin.qq.com/s/5hMt69-XbPbM5n2wrROlbA
+
+![img](http://taligarsiel.com/Projects/webkitflow.png)
+
 ### script标签
 
 defer和async属性异步加载脚本，文档解析过程不中断。
@@ -21,7 +27,12 @@ async：只要加载完脚本就会执行
 
 
 
-DOMContentLoaded **触发**定义：当初始的 **HTML** 文档被完全加载和解析完成之后，DOMContentLoaded 事件被触发，而无需等待样式表、图像和子框架的完全加载。另一个不同的事件 [load](https://developer.mozilla.org/en-US/docs/Mozilla_event_reference/load) 应该仅用于检测一个资源完全加载的页面。 
+- `onload`：当页面所有资源（包括 `CSS`、`JS`、图片、字体、视频等）都加载完成才触发，而且它是绑定到 `window` 对象上；
+- `DOMContentLoaded`：当 HTML 已经完成解析，并且构建出了 `DOM`，但此时外部资源比如样式和脚本可能还没加载完成，并且该事件需要绑定到 `document` 对象上；
+
+**动态插入的脚本不会阻塞页面解析**
+
+对于 `async` 脚本和动态脚本是不会阻塞 `DOMContentLoaded` 触发的
 
 
 
