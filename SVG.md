@@ -130,7 +130,7 @@ svg 元素的 class 标识，常用于css样式设置
 
 `class`属性用来指定对应的 CSS 类。
 
-```html
+```css
 .red {
   fill: red;
 }

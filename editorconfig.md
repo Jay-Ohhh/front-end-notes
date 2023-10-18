@@ -1,5 +1,7 @@
 vscode下载**EditorConfig for VS Code**插件
 
+https://editorconfig.org/
+
 通配符
 
 ```

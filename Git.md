@@ -811,9 +811,9 @@ pop，drop 同理。
 
 ##### reflog
 
-此命令管理重录中记录的信息。
+此命令管理记录的信息。
 
-如果说`reset --soft`是后悔药，那 **reflog** 就是强力后悔药。它记录了所有的 commit 操作记录，便于错误操作后找回记录。
+如果说`reset --soft`是后悔药，那 **reflog** 就是强力后悔药。它记录了所有的操作记录，便于错误操作后找回记录。
 
 **应用场景**
 
@@ -834,7 +834,7 @@ commit 111
 	update(a):a
 ```
 
-分支记录如上，本来想 reset --hard c，却 reset了b。
+分支记录如上，本来想 reset --hard c，却 reset 了 b。
 
 ```sh
 git reset --hard 222
@@ -1651,6 +1651,23 @@ https://mp.weixin.qq.com/s/vKi0nKlmrIvLP42aDdnKZg
 
 
 
+##### vscode解决 windows换行crlf与lf冲突
+
+vscode 点击文件 --》首选项 --》 设置 --》 搜索 eol，改变eol为\n(指lf)或者改为(\r\n)，有一个统一的标准就好了。
+
+git在维护版本库的时候统一使用的是LF，这样就可以保证文件跨平台的时候保持一致。
+在Linux下默认的换行符也是LF，那也就不存在什么问题。
+在Windows下默认的换行符是CRLF，那么我们需要保证在文件提交到版本库的时候文件的换行符是LF，通常来说就是上面的两种方法。
+
+如果你同事中有使用其它系统开发的
+你需要先执行上面的操作，再行 以下代码才能解决
+
+```bash
+git config --global core.autocrlf false
+```
+
+
+
 #### Github
 
 ##### Github 搜索技巧
@@ -1785,3 +1802,44 @@ https://docs.github.com/zh/actions/managing-workflow-runs/skipping-workflow-runs
 ##### 请求合并
 
 https://blog.csdn.net/panjunnn/article/details/106388986
+
+
+
+#### 设置代理了 github push 依旧很慢
+
+https://zhuanlan.zhihu.com/p/481574024
+
+**全局设置（不推荐）**
+
+```bash
+#使用http代理 
+git config --global http.proxy http://127.0.0.1:58591
+git config --global https.proxy https://127.0.0.1:58591
+#使用socks5代理
+git config --global http.proxy socks5://127.0.0.1:51837
+git config --global https.proxy socks5://127.0.0.1:51837
+```
+
+
+**只对Github代理（推荐）**
+
+```bash
+#使用socks5代理（推荐）
+git config --global http.https://github.com.proxy socks5://127.0.0.1:51837
+#使用http代理（不推荐）
+git config --global http.https://github.com.proxy http://127.0.0.1:58591
+```
+
+
+**取消代理**
+当你不需要使用代理时，可以取消之前设置的代理。
+
+```bash
+git config --global --unset http.proxy
+git config --global --unset https.proxy
+git config --global --unset http.https://github.com.proxy
+
+# 可以通过打开 .gitconfig 进行编辑
+open ~/.gitconfig
+```
+
