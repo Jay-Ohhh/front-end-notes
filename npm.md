@@ -628,6 +628,14 @@ $ npm install express --no-save
 
 
 
+#### npm ci
+
+`npm ci` 会忽略 `package.json` 中的版本范围，而直接安装 `package-lock.json`（或 `npm-shrinkwrap.json`）中指定的精确版本，从而跳过版本解析和冲突检查的过程。这使得 `npm ci` 在持续集成（CI）环境和自动化构建中更受欢迎。
+
+在使用 `npm ci` 命令时，它依然会自动安装项目的所有依赖项，包括 `dependencies` 和 `devDependencies` 中的依赖项。
+
+
+
 #### 常见问题
 
 忽略某个包的脚本执行
