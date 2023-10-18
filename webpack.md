@@ -56,6 +56,7 @@ module.exports = {
     publicPath: 'auto', // It automatically determines the public path from either `import.meta.url`, `document.currentScript`, `<script />` or `self.location`.
     publicPath: 'https://cdn.example.com/assets/', // CDN（总是 HTTPS 协议）
     publicPath: '//cdn.example.com/assets/', // CDN（协议相同）
+    publicPath: '/', // 相对于服务(server-relative)
     publicPath: '/assets/', // 相对于服务(server-relative)
     publicPath: 'assets/', // 相对于 HTML 页面
     publicPath: '../assets/', // 相对于 HTML 页面
@@ -213,25 +214,25 @@ __webpack_require__.e(/* import() | lib */ 201);
 
 **splitChunks.chunks**
 
+https://medium.com/dailyjs/webpack-4-splitchunks-plugin-d9fbbe091fd0
+
 https://mp.weixin.qq.com/s/HbgIXi0zpvU_-kdILHGi3A
 
-Webpack 内部包含三种类型的 Chunk：
+Webpack 内部包含两种类型的 Chunk：https://webpack.js.org/concepts/under-the-hood/#chunks
 
-- Initial Chunk：基于 Entry 配置项生成的 Chunk，此 chunk 包含为入口起点指定的所有模块及其依赖项
-
-> 因为是入口文件立即加载的模块，可以理解为同步引用，若不是立即加载，为异步引用
-
-- Async Chunk：异步模块引用，如 `import(xxx)` 语句对应的异步 Chunk
-- Runtime Chunk：只包含运行时代码的 Chunk
+- `initial` is the main chunk for the entry point. This chunk contains all the modules and their dependencies that you specify for an entry point.
+- `non-initial` is a chunk that may be lazy-loaded. It may appear when [dynamic import](https://webpack.js.org/guides/code-splitting/#dynamic-imports) or [SplitChunksPlugin](https://webpack.js.org/plugins/split-chunks-plugin/) is being used. （async）
 
 而 `SplitChunksPlugin` 默认只对 Async Chunk 生效，开发者也可以通过 `optimization.splitChunks.chunks`（默认 `async` ） 调整作用范围，该配置项支持如下值：
 
-- 字符串 `'all'` ：对 Initial Chunk 与 Async Chunk 都生效，如果一个模块既被异步引用，也被入口同步引用，那么只会生成一个共享包，建议优先使用该值
-- 字符串 `'initial'` ：只对 Initial Chunk 进行分离，不会将同步加载和异步加载一起处理，而是分开处理，如果一个模块既被异步引用，也被同步引用，那么会生成两个包
-- 字符串 `'async'` ：只对 Async Chunk 进行分离，webpack会在用到的时候通过webpack jsonp方法动态创建script标签加载相应的文件，我们在react和Vue的懒加载路由中使用的也是这种方式
+- 字符串 `'all'` ：对 Initial Chunk 与 Async Chunk 都进行分离，如果一个模块既被异步引用，也被入口同步引用，那么只会生成一个共享包，建议优先使用该值
+- 字符串 `'initial'` ：对 Initial Chunk 和  Async Chunk 都进行分离，不会将同步加载和异步加载一起处理，而是分开处理，如果一个模块既被异步引用，也被同步引用，那么会生成两个包
+- 字符串 `'async'` ：只对 Async Chunk 进行分离。webpack会在用到的时候通过webpack jsonp方法动态创建script标签加载相应的文件，我们在react和Vue的懒加载路由中使用的也是这种方式
 - 函数 `(chunk) => boolean` ：该函数返回 `true` 时生效
 
-具体可以参考这篇文章: [Webpack 4 Mysterious SplitChunks Plugin](https://link.juejin.cn/?target=https%3A%2F%2Fmedium.com%2Fdailyjs%2Fwebpack-4-splitchunks-plugin-d9fbbe091fd0)
+Out of the box Webpack 4 only split “async chunks” based on this [default configuration](https://webpack.js.org/plugins/split-chunks-plugin/#defaults).
+
+具体可以参考这篇文章: [Webpack 4 Mysterious SplitChunks Plugin](https://medium.com/dailyjs/webpack-4-splitchunks-plugin-d9fbbe091fd0)
 
 **最佳实践**
 
@@ -949,6 +950,8 @@ module: {
 
 ##### package.json 中的 sideEffects
 
+https://sgom.es/posts/2020-06-15-everything-you-never-wanted-to-know-about-side-effects/
+
 在 Webpack 的 Tree Shaking 配置中，有一个可以在 `package.json` 中配置的叫 `sideEffects`，这个 `sideEffects` 的配置主要是让 Webpack 这种 bundler 知道此项目是否可以做 Tree Shaking 的动作。
 
 假如设定为 `false` 就代表可以将所有的文件进行 Tree Shaking，若读者知道有哪些档案是不能做 Tree Shaking 的，这时候只要在 `sideEffects` 内用一个数组将不能做 Tree Shaking 的文件路径写上去，这时候 bundler 就只会针对这个数组以外的文件进行 Tree Shaking。
@@ -998,11 +1001,10 @@ chunk的修改才改变对应的hash值
 
 **module**：不同文件类型的模块。Webpack 就是用来对模块进行打包的工具，这些模块各种各样，比如：js 模块、css 模块、sass 模块、vue 模块等等不同文件类型的模块。这些文件都会被 loader 转换为有效的模块，然后被应用所使用并且加入到依赖关系图中。相对于一个完整的程序代码，模块化的好处在于，模块化将程序分散成小的功能块，这就提供了可靠的抽象能力以及封装的边界，让设计更加连贯、目的更加明确。而不是将所有东西都揉在一块，既难以理解也难以管理。
 
-**chunk**：数据块。
+**chunk**：https://webpack.js.org/concepts/under-the-hood/#chunks。
 
-a. 一种是非初始化的：例如在打包时，对于一些**动态导入的异步代码**，webpack 会帮你分割出共用的代码，可以是自己写的代码模块，也可以是第三方库（node_modules 文件夹里的），这些被分割的代码文件就可以理解为 chunk。
-
-b. 还有一种是初始化的：就是写在**入口文件处** (entry point) 的各种文件或者说模块依赖，就是 chunk ，它们最终会被捆在一起打包成一个 main.js （当然输出文件名你可以自己指定），这个 main.js 可以理解为 bundle，当然它其实也是 chunk。
+- `initial` is the main chunk for the entry point. This chunk contains all the modules and their dependencies that you specify for an entry point.
+- `non-initial` is a chunk that may be lazy-loaded. It may appear when [dynamic import](https://webpack.js.org/guides/code-splitting/#dynamic-imports) or [SplitChunksPlugin](https://webpack.js.org/plugins/split-chunks-plugin/) is being used.
 
 **bundle**：捆绑好的最终文件。如果说，chunk 是各种片段，那么 bundle 就是一堆 chunk 组成的“集大成者”，比如上面说的 main.js 就属于 bundle。它经历了加载和编译的过程，是源文件的最终版本。
 
@@ -2171,7 +2173,7 @@ module.exports = {
         new HtmlWebpackPlugin({
             template: path.join(__dirname, '../src/index.html'), // 指定模板文件
             filename: 'index.html', // 生成文件名 - 这里生成index.html 便于 contentBase 中访问
-            chunks: ["user"], // 选择需要引入的js文件
+            chunks: ["user", "vendor", "manifest"], // 选择需要引入的js文件
             minify: {
                 removeAttributeQuotes: true, // 删除双引号
                 collapseWhitespace: true // 折叠空行
@@ -2180,13 +2182,27 @@ module.exports = {
         new HtmlWebpackPlugin({
             template: path.join(__dirname, '../src/index.html'), // 指定模板文件
             filename: 'admin.html', // 生成文件名
-            chunks: ["admin"],
+            chunks: ["admin", "vendor", "manifest"],
             minify: {
                 removeAttributeQuotes: true, // 删除双引号
                 collapseWhitespace: true // 折叠空行
             } // 打包时的压缩配置
         }),
     ],
+    optimization: {
+        splitChunks: {
+            cacheGroups: {
+                vendor: {
+                    name: 'vendor',
+                    chunks: 'all',
+                    test: /[\\/]node_modules[\\/]/,
+                },
+            },
+        },
+        runtimeChunk: {
+          name: 'manifest',
+        },
+    },
 }
 ```
 

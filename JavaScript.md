@@ -229,7 +229,7 @@ console.log(a) // 10
 
 **eg3**
 
-var不支持块级作用域，同一作用域重复声明了两次，提升的第二次声明会被忽略，仅用于赋值。
+var不支持块级作用域，同一作用域下变量重复声明了两次，第二次声明会被忽略。
 
 ```js
 // 全局作用域
@@ -258,7 +258,7 @@ console.log(a); // 2
 
 ##### 函数提升
 
-函数声明式，会将函数的声明和定义一起提升到作用域的最顶上去。
+函数声明式，会将函数的声明和定义一起提升到作用域的顶部。
 
 ```js
 fn() // 1，此处可以正常调用
@@ -293,7 +293,7 @@ console.log(fn) // function fn(){}
 ```js
 console.log(fn) // function fn(){}
 function fn(){}
-var fn = 1 // 第二次声明会被忽略，仅用于赋值
+var fn = 1 // 同一作用域下变量重复声明了两次，第二次声明会被忽略
 console.log(fn) // 1
 ```
 
@@ -301,7 +301,7 @@ console.log(fn) // 1
 
 ```js
 function fn() {}
-var fn // 第二次声明会被忽略，
+var fn // 同一作用域下变量重复声明了两次，第二次声明会被忽略
 console.log(fn) // function fn(){}
 fn = 1 // 赋值
 console.log(fn) // 1
@@ -309,7 +309,7 @@ console.log(fn) // 1
 
 ##### 总结
 
-1、所有的声明都会提升到作用域的最顶上去。
+1、所有的声明都会提升到作用域的顶部。
 
 2、同一个变量只会声明一次，其他的声明（非赋值）会被忽略掉。
 
@@ -3410,7 +3410,11 @@ finally中的代码最后执行，其return优先级最高
 
 
 
-##### 浏览器是多进程的
+##### 浏览器是多进程，每个进程都是多线程
+
+https://chromium.googlesource.com/chromium/src/+/main/docs/threading_and_tasks.md#overview
+
+> Chrome has a **multi-process architecture** and each process is heavily multi-threaded.
 
 理解了进程与线程了区别后，接下来对浏览器进行一定程度上的认识：（先看下简化理解）
 
@@ -3452,24 +3456,20 @@ finally中的代码最后执行，其return优先级最高
 
 ##### 浏览器的渲染进程是多线程的
 
-1、GUI渲染线程
+https://www.cythilya.tw/2018/11/10/inside-look-at-modern-web-browser/
 
-- 负责渲染浏览器界面，解析HTML，CSS，构建DOM树和RenderObject树，布局和绘制等。
-- 当界面需要重绘（Repaint）或由于某种操作引发回流(reflow)时，该线程就会执行
-- 注意，**GUI渲染线程与JS引擎线程是互斥的**，当JS引擎执行时GUI线程会被挂起（相当于被冻结了），GUI更新会被保存在一个队列中**等到JS引擎空闲时**立即被执行。
+1、主线程
 
-> 由于JavaScript是可操纵DOM的，如果在修改这些元素属性同时渲染界面（即JS线程和UI线程同时运行），那么渲染线程前后获得的元素数据就可能不一致了。
+- 负责界面渲染，解析HTML，CSS，构建DOM树和RenderObject树，布局和绘制等。
+- 用户交互响应：主线程监听用户的输入事件（如点击、滚动、键盘输入等），并根据这些事件做出相应的响应。
+- 执行 JavaScript 
+- **GUI渲染线程与JS引擎线程是互斥的**
 
-
-
-2、JS引擎线程
-
-- 负责处理Javascript脚本程序。（例如V8引擎）
-- JS引擎一直等待着任务队列中任务的到来，然后加以处理，一个Tab页（renderer进程）中无论什么时候都只有一个JS线程在运行JS程序
+> 由于JavaScript是可操纵DOM的，如果在修改这些元素属性同时渲染界面，那么渲染前后获得的元素数据就可能不一致了。
 
 
 
-3、事件触发线程
+2、事件触发线程
 
 - 主要负责将准备好的事件交给 JS引擎线程执行。
 
@@ -3477,7 +3477,7 @@ finally中的代码最后执行，其return优先级最高
 
 
 
-4、定时触发器线程
+3、定时触发器线程
 
 - 负责执行异步定时器一类的函数的线程，如： setTimeout，setInterval。
 - 主线程依次执行代码时，遇到定时器，会将定时器交给该线程处理，当计数完毕后，事件触发线程会将计数完毕后的事件加入到任务队列的尾部，等待JS引擎线程执行。

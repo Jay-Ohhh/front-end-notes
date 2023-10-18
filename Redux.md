@@ -1750,3 +1750,9 @@ https://www.reduxjs.cn/introduction/examples
 #### 学习资源
 
 https://www.reduxjs.cn/introduction/learning-resources
+
+#### FQA
+
+##### What are the cases where Redux dispatch could change?
+
+https://stackoverflow.com/questions/56795607/what-are-the-cases-where-redux-dispatch-could-change

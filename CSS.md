@@ -724,16 +724,16 @@ body {
     position: relative;
 }
 #container[data-device="2"]::after{
-  		content:"";
-      position:absolute;
-      top: 0;
-      left: 0;
-      width: 200%;
-      height: 200%;  
-      transform: scale(0.5);
-      transform-origin: left top;
-      box-sizing: border-box;
-      border: 1px solid #333;
+        content:"";
+        position:absolute;
+        top: 0;
+        left: 0;
+        width: 200%;
+        height: 200%;  
+        transform: scale(0.5);
+        transform-origin: left top;
+        box-sizing: border-box;
+        border: 1px solid #333;
     }
 }
 ```
@@ -946,6 +946,8 @@ body{
 
 
 ##### [Pure CSS drop shadow on scroll](https://codepen.io/StijnDeWitt/pen/LryNxa)
+
+[CSS层级小技巧！如何在滚动时自动添加头部阴影？](https://mp.weixin.qq.com/s/xh2w0vRMk775zdtrB6sd6A)
 
 
 
@@ -1234,6 +1236,24 @@ https://sass-lang.com/documentation/at-rules/mixin
 
 
 
-# 文字波浪动画
+#### 文字波浪动画
 
 https://mp.weixin.qq.com/s/tBG_o4knzmFjqVroqnqrPw
+
+
+
+#### CSS Grid 布局
+
+https://mp.weixin.qq.com/s/WNvT3TO6HmlNSEorHwuB4Q
+
+#### CSS Grid repeat 函数
+
+https://mp.weixin.qq.com/s/Ff5e4SXSC_RPMst_GA1wHg
+
+
+
+#### 蛇形布局
+
+https://mp.weixin.qq.com/s/prh1YzeyNMm9Vhcc9Yl5TQ
+
+![图片](https://mmbiz.qpic.cn/mmbiz_png/xvBbEKrVNtKybt7O1PBuPE0R7aTVpAnJFiagCpSZo5MEiaTWmsYRQNtHELfX7ibKgOiccgDRQBq6h5KWsltYKQyVicQ/640?wx_fmt=png&wxfrom=5&wx_lazy=1&wx_co=1)

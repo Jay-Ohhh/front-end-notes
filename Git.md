@@ -109,10 +109,11 @@ git push -u origin master
 git checkout -b 新分支名 [已存在的分支，可选，默认为当前分支]
 ```
 
-**基于远程分支创建本地分支**
+##### 基于远程分支创建本地分支
 
 ```bash
-git fetch origin foo:foo
+git fetch origin 远程分支名
+git checkout -b 新的分支名 远程仓库别名/远程分支名
 ```
 
 
@@ -350,7 +351,7 @@ git fetch origin master:local-master
 取回远程主机的远程分支，与本地分支合并
 
 ```sh
-git pull <远程主机名> <远程分支名>:<本地分支名> // 注意空格，本地分支名选项是可选项
+git pull <远程主机名> <远程分支名>:<本地分支名> // 注意空格，本地分支名选项是可选项，默认为本地当前分支
 ```
 
 git pull = git fetch + git merge

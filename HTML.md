@@ -7,21 +7,111 @@ src和href都是**用来引用外部的资源**，它们的区别如下：
 
 
 
+### 探究网页资源究竟是如何阻塞浏览器加载的
+
+https://mp.weixin.qq.com/s/5hMt69-XbPbM5n2wrROlbA
+
+![img](http://taligarsiel.com/Projects/webkitflow.png)
+
 ### script标签
 
 defer和async属性异步加载脚本，文档解析过程不中断。
 
-defer：等文档解析结束之后，DOMContentLoaded 触发之前，defer 脚本执行。对 module script 无效。
+defer：
 
-async：只要加载完脚本就会执行
+- 对于 `defer` 的 `script`，浏览器会继续解析 `html`，且同时并行下载脚本，等 `DOM` 构建完成后，才会开始执行脚本，所以它不会造成阻塞；
+- `defer` 脚本下载完成后，执行时间一定是 `DOMContentLoaded` 事件触发之前执行；
+- 多个 `defer` 的脚本执行顺序严格按照定义顺序进行，而不是先下载好的先执行；
+
+- 对 module script 无效。
+
+async：
+
+- 对于 `async` 的 `script`，浏览器会继续解析 `html`，且同时并行下载脚本，一旦脚本下载完成会立刻执行；和 `defer` 一样，它在下载的时候也不会造成阻塞，但是如果它下载完成后 `DOM` 还没解析完成，则执行脚本的时候是会阻塞解析的；
+- `async` 脚本的执行 和 `DOMContentLoaded` 的触发顺序无法明确谁先谁后，因为脚本可能在 `DOM` 构建完成时还没下载完，也可能早就下载好了；
+- 多个 `async`，按照谁先下载完成谁先执行的原则进行，所以当它们之间有顺序依赖的时候特别容易出错。
 
 
 
 如果同时存在defer和async ，则defer 的优先级更高
 
+defer 和 async 都只能用于外部脚本，如果 script 没有 src 属性，则会忽略它们。
+
+![图片](https://mmbiz.qpic.cn/mmbiz_png/uBN8JVFZtDSpLKZoQNxCJwibgm7mj3Q8Vib6vJCwwR4jqOG3tYlspBrD6AP7JLlbjMaWXNhxibTxbdGwXJRPCo63g/640?wx_fmt=png&wxfrom=5&wx_lazy=1&wx_co=1)
+
+- `onload`：当页面所有资源（包括 `CSS`、`JS`、图片、字体、视频等）都加载完成才触发，而且它是绑定到 `window` 对象上；
+- `DOMContentLoaded`：当 HTML 已经完成解析，并且构建出了 `DOM`，但此时外部资源比如样式和脚本可能还没加载完成，并且该事件需要绑定到 `document` 对象上；
 
 
-DOMContentLoaded **触发**定义：当初始的 **HTML** 文档被完全加载和解析完成之后，DOMContentLoaded 事件被触发，而无需等待样式表、图像和子框架的完全加载。另一个不同的事件 [load](https://developer.mozilla.org/en-US/docs/Mozilla_event_reference/load) 应该仅用于检测一个资源完全加载的页面。 
+
+通过 `DOM API` （ `appendChild()`、`append()`、`before()` 等等）动态插入的 `src script` 元素的加载不会阻塞页面的解析和渲染。
+
+脚本在加载完成后会立即执行，这和 `async` 一致，所以如果需要保证多个插入的动态脚本的执行顺序，则可以设置 `script.async = false`，此时动态脚本的执行顺序将按照插入顺序执行。
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <title>Test</title>
+</head>
+
+<body>
+  <script>
+    function loadScript(src) {
+      let script = document.createElement('script');
+      script.src = src;
+      document.body.insertAdjacentElement('afterbegin', script);
+    }
+    loadScript('https://cdn.bootcss.com/jquery/2.1.4/jquery.min.js')
+  </script>
+  <h1>This is h1</h1>
+</body>
+
+</html>
+```
+
+
+
+通过 `DOM API` （ `appendChild()`、`append()`、`before()` 等等）插入的 `script` 元素，如果这个 `script` 元素没有 `src` 属性且 `type` 属性不是 `module`，则这个 `script` 立刻“同步”执行并会阻塞页面的解析和渲染。关于这一点`whatwg`的`html`文档中有详细说明[4.12.1 The script element](https://html.spec.whatwg.org/multipage/scripting.html#script-processing-model:immediately-2)，按照文档的理解，这个内联的脚本会立即被压到执行栈的顶部立即执行，相当于包含脚本内的函数一样
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Test</title>
+    <script defer src="js/test.js"></script>
+  </head>
+  <body>
+    <div id="test">test1</div>
+
+    <script>
+      let script = document.createElement("script");
+      script.text = "console.log(1)";
+      document.body.appendChild(script);
+      console.log(2);
+
+      window.onload = function() {
+        console.log("window load...");
+      };
+    </script>
+    <div>test2</div>
+  </body>
+</html>
+
+// test.js
+console.log('domcontentloaded');
+
+
+1
+2
+domcontentloaded
+window load...
+```
+
+
 
 
 

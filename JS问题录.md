@@ -15,6 +15,8 @@
 
 [jsPDF + html2canvas A4分页截断 完美解决方案](https://juejin.cn/post/7138370283739545613)
 
+https://gitee.com/liuloser/output_pdf_demo
+
 
 
 ## iframe print

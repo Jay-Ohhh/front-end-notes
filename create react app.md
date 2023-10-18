@@ -1383,7 +1383,24 @@ serve -s build
 
 上面显示的最后一个命令将为端口 **5000** 上的静态站点提供服务。与许多 [serve](https://github.com/zeit/serve) 的内部设置一样，可以使用 `-p` 或 `--port` 标志调整端口。
 
-###### 其他方案
+###### nginx
+
+```yaml
+# 解决 history 路由模式为时刷新返回404的问题
+location / {
+  root /usr/share/nginx/html;
+  index /index.html;
+  try_files $uri $uri/ /index.html;
+}
+```
+
+1. `$uri`：这是一个变量，表示当前请求的 URI（Uniform Resource Identifier），即客户端请求的 URL 路径。Nginx会首先尝试查找与该 URI 对应的文件。
+2. `$uri/`：这也是一个变量，表示当前请求 URI 后面添加斜杠后的路径。例如，如果请求的是 `/example`，那么 `$uri/` 将表示 `/example/`。这个部分用于尝试查找对应的目录。
+3. `/index.html`：这是一个具体的文件路径，表示当前请求无法找到对应的文件或目录时，Nginx 将返回的默认文件。在这种情况下，它将返回 `/index.html` 文件。这通常用于单页应用程序（SPA）的前端路由，其中所有的请求都应该指向同一个 HTML 文件。
+
+
+
+###### node
 
 你不一定需要静态服务器才能在生产中运行 Create React App 项目。 它可以很好地集成到现有的动态服务器中。
 
@@ -1398,6 +1415,8 @@ const app = express();
 
 // 一定要写到静态资源托管之前
 app.use(compression())
+// 监听静态资源一定要写在下面路由的前面，且需要配置 publicPath 为绝对路径或者相对服务器的路径（'/'）,例如 
+// <link href="/vendor.88b4e668d1.css" rel="stylesheet"> 会获取 build 目录下的文件
 app.use(express.static(path.join(__dirname, 'build')));
 
 app.get('/', function(req, res) {
