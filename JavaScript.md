@@ -4486,6 +4486,8 @@ function previewFile() {
 
 ![img](https://zhangkai.pro/ass/img/binary-data-in-javascript.png)
 
+![image-20231119202506528](/Users/jay/Library/Application Support/typora-user-images/image-20231119202506528.png)
+
 https://zhangkai.pro/2020/09/09/binary-data-in-javascript
 
 https://wangdoc.com/es6/arraybuffer.html
