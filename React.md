@@ -3540,6 +3540,33 @@ React 不需要错误边界来捕获事件处理器中的错误。与 render 方
 
 如果你需要在事件处理器内部捕获错误，使用普通的 JavaScript `try` / `catch` 语句。
 
+
+
+###### ErrorBoundary捕捉异步错误
+
+Dan Abramov与我们分享了一个很酷的黑客技术。正是为了实现这一点：Throwing Error from hook not caught in error boundary · Issue #14981 · facebook/react. （https://github.com/facebook/react/issues/14981#issuecomment-468460187）
+ 这里的技巧是先用try/catch捕捉这些错误，然后在catch语句中触发正常的React重渲染，然后把这些错误重新抛回重渲染的生命周期。这样，ErrorBoundary就可以像捕获其他错误一样捕捉它们。
+
+```javascript
+const Component = () => {
+  const [state, setState] = useState();
+
+  const onClick = () => {
+    try {
+      // something bad happened
+    } catch (e) {
+      setState(() => {
+        throw e;
+      })
+    }
+  }
+}
+```
+
+Alternatively, use the [`react-error-boundary`](https://github.com/bvaughn/react-error-boundary) package which does that.
+
+
+
 ##### Refs 转发
 
 Ref 转发是一项将 [ref](https://react.docschina.org/docs/refs-and-the-dom.html) 自动地通过组件传递到其一子组件的技巧。 
@@ -7983,6 +8010,10 @@ useEffect(()=>{
   setStateA(2)
 },[])
 ```
+
+> useRef 没有惰性初始
+
+
 
 **跳过 state 更新**
 

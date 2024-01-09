@@ -1,14 +1,16 @@
 ### WebSocket
 
 [WebSocket-阮一峰](http://www.ruanyifeng.com/blog/2017/05/websocket.html)
+
 [WebSocket-菜鸟教程](https://www.runoob.com/html/html5-websocket.html)
+
 [轮询](https://www.cnblogs.com/huchong/p/8595644.html)
 
 [短连接轮询、长连接、Websocket 横向对比](https://mp.weixin.qq.com/s/HXF_AO24WeiOoq4Q5G_pBw)
 
 #### 简介
 
-- WebSocket和http都是基于tcp协议的应用层协议，tcp是传输层协议。
+- WebSocket 和 http都是基于tcp协议的应用层协议，tcp是传输层协议。
   tcp传输层协议：连接建立以后，客户端和服务器端就可以通过 TCP 连接直接交换数据。
 - http和https协议的缺陷：
   通信只能由客户端发起，服务器不能主动向客户端推送信息。
@@ -570,3 +572,367 @@ function ajax(){
 ```
 
 > 长轮询和短轮询比起来，减少了很多不必要的http请求次数。
+
+
+
+
+
+### Server-Sent Events
+
+在线demo：https://www.esegece.com:2053/sse
+
+http://www.ruanyifeng.com/blog/2017/05/server-sent_events.html
+https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events/Using_server-sent_events
+**`EventSource`** 是服务器推送的一个网络事件接口。一个 EventSource 实例会对 HTTP 服务开启一个持久化的连接，以`text/event-stream` 格式发送事件，会一直保持开启直到被要求关闭（EventSource.close() 或 网页关闭）。
+
+SSE 与 WebSocket 作用相似，都是建立浏览器与服务器之间的通信渠道，然后服务器向浏览器推送信息。
+
+总体来说，WebSocket 更强大和灵活。因为它是全双工通道，可以双向通信；SSE 是单向通道，只能服务器向浏览器发送，因为流信息本质上就是下载。
+
+![img](https://www.ruanyifeng.com/blogimg/asset/2017/bg2017052702.jpg)
+
+SSE 也有自己的优点
+
+- SSE 使用 HTTP 协议
+- SSE 属于轻量级，使用简单；WebSocket 协议相对复杂。
+- SSE 默认支持断线重连，WebSocket 需要自己实现。
+- SSE 只能用来传送文本，因此二进制数据需要编码成二进制字符串（utf-8）后传送，WebSocket 默认支持传送二进制数据。
+- SSE 支持自定义发送的消息类型。
+
+#### 服务器实现
+
+##### 数据格式
+
+The event stream（text/event-stream） is a simple stream of text data which must be encoded using UTF-8. 
+因此，服务器向浏览器发送的 SSE 数据，必须使用 UTF-8 编码的文本，具有如下的 HTTP 头信息。
+
+> ```markup
+> Content-Type: text/event-stream
+> Cache-Control: no-cache
+> Connection: keep-alive
+> ```
+
+上面三行之中，第一行的`Content-Type`必须指定 MIME 类型为`event-steam`。
+
+每一次发送的信息，由若干个`message`组成，每个`message`之间用`\n\n`分隔。每个`message`内部由若干行组成，每一行都是如下格式。
+
+> ```markup
+> [field]: value\n
+> ```
+
+上面的`field`可以取四个值。
+
+> - data
+> - event
+> - id
+> - retry
+
+**注释**
+
+此外，还可以有冒号开头的行，表示注释。通常，服务器每隔一段时间就会向浏览器发送一个注释，保持连接不中断。
+
+> ```markup
+> : This is a comment
+> ```
+
+下面是一个例子。
+
+> ```markup
+> : this is a test stream\n\n
+> 
+> data: some text\n\n
+> 
+> data: another message\n
+> data: with two lines \n\n
+> ```
+
+**data 字段**
+
+数据内容用`data`字段表示。
+
+> ```markup
+> data:  message\n\n
+> ```
+
+如果数据很长，可以分成多行，最后一行用`\n\n`结尾，前面行都用`\n`结尾。
+
+> ```markup
+> data: begin message\n
+> data: continue message\n\n
+> ```
+
+下面是一个发送 JSON 数据的例子。
+
+> ```markup
+> data: {\n
+> data: "foo": "bar",\n
+> data: "baz", 555\n
+> data: }\n\n
+> ```
+
+**id 字段**
+
+数据标识符用`id`字段表示，相当于每一条数据的编号。
+
+> ```markup
+> id: msg1\n
+> data: message\n\n
+> ```
+
+浏览器用`lastEventId`属性读取这个值。一旦连接断线，浏览器会发送一个 HTTP 头，里面包含一个特殊的`Last-Event-ID`头信息，将这个值发送回来，用来帮助服务器端重建连接。因此，这个头信息可以被视为一种同步机制。
+
+**event 字段**
+
+`event`字段表示自定义的事件类型，默认是`message`事件。浏览器可以用`addEventListener()`监听该事件。
+
+> ```markup
+> event: foo\n
+> data: a foo event\n\n
+> 
+> data: an unnamed event\n\n
+> 
+> event: bar\n
+> data: a bar event\n\n
+> 
+> 
+> // client 
+> const sse = new EventSource(url);
+> sse.addEventListener("bar", (e)=>{
+> 	console.log(e);
+> })
+> ```
+
+
+
+**retry 字段**
+
+服务器可以用`retry`字段，指定浏览器重新发起连接的时间间隔。
+
+> ```markup
+> retry: 10000\n
+> ```
+
+两种情况会导致浏览器重新发起连接：一种是时间间隔到期，二是由于网络错误等原因，导致连接出错。
+
+
+
+#### express-sse
+
+https://github.com/dpskvn/express-sse/tree/master
+
+```javascript
+'use strict';
+
+/**
+ * Require the module dependencies
+ */
+
+const EventEmitter = require('events').EventEmitter;
+
+/**
+ * Server-Sent Event instance class
+ * @extends EventEmitter
+ */
+class SSE extends EventEmitter {
+  /**
+   * Creates a new Server-Sent Event instance
+   * @param [array] initial Initial value(s) to be served through SSE
+   * @param [object] options SSE options
+   */
+  constructor(initial, options) {
+    super();
+
+    if (initial) {
+      this.initial = Array.isArray(initial) ? initial : [initial];
+    } else {
+      this.initial = [];
+    }
+
+    if (options) {
+      this.options = options;
+    } else {
+      this.options = { isSerialized: true };
+    }
+
+    this.init = this.init.bind(this);
+  }
+
+  /**
+   * The SSE route handler
+   */
+  init(req, res) {
+    let id = 0;
+    // 设置为 0，禁用超时
+    req.socket.setTimeout(0);
+    // 创建 TCP 连接时，是否启用 Nagle 算法。Nagle 的算法会在数据通过网络发送之前延迟数据。 它试图以延迟为代价来优化吞吐量。
+    req.socket.setNoDelay(true);
+    // 启用/禁用保持活动功能
+    req.socket.setKeepAlive(true);
+    res.statusCode = 200;
+    res.setHeader('Content-Type', 'text/event-stream');
+    res.setHeader('Cache-Control', 'no-cache');
+    res.setHeader('X-Accel-Buffering', 'no');
+    if (req.httpVersion !== '2.0') {
+      res.setHeader('Connection', 'keep-alive');
+    }
+    if (this.options.isCompressed) {
+      res.setHeader('Content-Encoding', 'deflate');
+    }
+
+    // Increase number of event listeners on init
+    this.setMaxListeners(this.getMaxListeners() + 2);
+
+    const dataListener = data => {
+      if (data.id) {
+        res.write(`id: ${data.id}\n`);
+      } else {
+        res.write(`id: ${id}\n`);
+        id += 1;
+      }
+      if (data.event) {
+        res.write(`event: ${data.event}\n`);
+      }
+      res.write(`data: ${JSON.stringify(data.data)}\n\n`);
+      res.flush();
+    };
+
+    const serializeListener = data => {
+      const serializeSend = data.reduce((all, msg) => {
+        all += `id: ${id}\ndata: ${JSON.stringify(msg)}\n\n`;
+        id += 1;
+        return all;
+      }, '');
+      res.write(serializeSend);
+    };
+
+    this.on('data', dataListener);
+
+    this.on('serialize', serializeListener);
+
+    if (this.initial) {
+      if (this.options.isSerialized) {
+        this.serialize(this.initial);
+      } else if (this.initial.length > 0) {
+        this.send(this.initial, this.options.initialEvent || false);
+      }
+    }
+
+    // Remove listeners and reduce the number of max listeners on client disconnect
+    req.on('close', () => {
+      this.removeListener('data', dataListener);
+      this.removeListener('serialize', serializeListener);
+      this.setMaxListeners(this.getMaxListeners() - 2);
+    });
+  }
+
+  /**
+   * Update the data initially served by the SSE stream
+   * @param {array} data array containing data to be served on new connections
+   */
+  updateInit(data) {
+    this.initial = Array.isArray(data) ? data : [data];
+  }
+
+  /**
+   * Empty the data initially served by the SSE stream
+   */
+  dropInit() {
+    this.initial = [];
+  }
+
+  /**
+   * Send data to the SSE
+   * @param {(object|string)} data Data to send into the stream
+   * @param [string] event Event name
+   * @param [(string|number)] id Custom event ID
+   */
+  send(data, event, id) {
+    this.emit('data', { data, event, id });
+  }
+
+  /**
+   * Send serialized data to the SSE
+   * @param {array} data Data to be serialized as a series of events
+   */
+  serialize(data) {
+    if (Array.isArray(data)) {
+      this.emit('serialize', data);
+    } else {
+      this.send(data);
+    }
+  }
+}
+
+module.exports = SSE;
+```
+
+"X-Accel-Buffering" 是一个 HTTP 响应头，通常用于 Nginx 配置中。它的作用是控制 Nginx 是否启用响应缓存，以及缓存的大小。
+
+当 "X-Accel-Buffering" 的值为 "no" 时，Nginx 将禁用缓存，即使响应体中包含可缓存的内容。这通常用于实时流媒体等需要立即响应的场景，以避免将数据缓存起来导致延迟增加。
+
+当 "X-Accel-Buffering" 的值为 "yes" 或未设置时，Nginx 将启用缓存，以提高响应速度。在这种情况下，Nginx 会将响应体缓存到内存中，直到缓存达到一定大小或响应体完全被接收为止，然后再将缓存的响应发送给客户端。
+
+需要注意的是，"X-Accel-Buffering" 只影响 Nginx 对响应的处理方式，而不会直接影响客户端的行为。客户端仍然可以根据响应中的其他头部信息来决定是否缓存响应。
+
+#### 使用
+
+```javascript
+// Server:
+var SSE = require('express-sse');
+var sse = new SSE(["array", "containing", "initial", "content", "(optional)"]);
+
+const express = require('express');
+const bodyParser = require('body-parser');
+const cors = require('cors');
+
+const app = express();
+const PORT = 3000;
+
+app.use(cors());
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({extended: false}));
+
+
+app.get('/sse', sse.init);
+
+sse.send(content);
+sse.send(content, eventName);
+sse.send(content, eventName, customID);
+sse.updateInit(["array", "containing", "new", "content"]);
+sse.serialize(["array", "to", "be", "sent", "as", "serialized", "events"]);
+
+
+app.listen(PORT, () => {
+  console.log(`Facts Events service listening at http://localhost:${PORT}`)
+});
+
+
+// Client:
+var es = new EventSource('/stream');
+
+es.onmessage = function (event) {
+  ...
+};
+
+es.addEventListener(eventName, function (event) {
+  ...
+});
+```
+
+
+
+### WebSocket 和 SSE 的使用场景
+
+SSE 通常用于低频率的数据更新，例如推送新消息。
+
+ WebSocket 通常用于高频率的数据传输，例如在线游戏或实时协作。
+
+
+
+### 全双工 半双工 单工
+
+全双工（full-duplex）：允许数据在两个方向上同时进行传输。在全双工通信中，发送方和接收方可以同时发送和接收数据，互不干扰。
+
+半双工通信：数据只能在一个方向上传输，但每个方向的数据传输是双向的。例如，当一方向的数据发送时，另一方向必须先停止发送，等待数据接收完成后，才能开始发送数据。
+
+单工通信：数据只能在一个方向上传输，而另一个方向无法传输数据。

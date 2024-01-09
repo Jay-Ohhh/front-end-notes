@@ -152,6 +152,12 @@ let n: null = null;
 - 除never类型本身外，没有其他类型是never的子类型或能赋值给never， 即使 any也不可以赋值给never。 
 - 在有明确never返回类型注解的函数中，所有return语句（如果有的话）必须有never类型的表达式并且函数的终点必须是不可执行的。
 
+> let foo: never = never  // correct
+>
+> let foo: nerver = any  // error
+>
+> let foo: unknown = any // correct
+
 #### [unkonwn类型](https://blog.csdn.net/weixin_33716557/article/details/93177689)
 
 **unknown 和 any 的区别**
@@ -817,9 +823,8 @@ interface ObjectInterface {
 ##### 区别
 
 1. type可以声明 基本类型，联合类型，交叉类型，元组，interface不行
-2. type 语句中可以使用 typeof 获取类型实例
-3. type 支持类型映射，interface不支持
-4. `interface` 能够声明合并，`type`不能
+3. type 支持类型映射
+4. `interface` 能够声明合并
 5. `interface` 能用于多态this类型
 6. **由于interface可以进行声明合并**，所以总有可能将新成员添加到同一个interface定义的类型上。**在使用interface去声明变量时，它们在那一刻类型并不是最终的类型**。会导致索引签名问题。
 
@@ -2231,9 +2236,7 @@ declare namespace jQuery.fn {
 }
 ```
 
-##### declare global
 
-在 d.ts 声明文件中，任何的 declare 默认就是 global 的了，所以你在 d.ts 文件中是不能出现 `declare global` 的。只有在模块文件中的定义，如果想要全局就使用 `declare global`。
 
 
 
@@ -4314,7 +4317,7 @@ class Dong {
     constructor() {
         this.name = "dong";
     }
-
+		// this 必须是第一个参数
     hello(this: Dong) {
         return 'hello, I\'m ' + this.name;
     }
@@ -4562,7 +4565,7 @@ let a = new Animal('Jack');
 
 上面的例子中，我们定义了一个抽象类 `Animal`，并且定义了一个抽象方法 `sayHi`。在实例化抽象类的时候报错了。
 
-其次，抽象类中的抽象方法必须被子类实现：
+其次，抽象类中的抽象属性/方法必须被子类定义/实现：
 
 ```ts
 abstract class Animal {
@@ -5864,12 +5867,13 @@ let fn1!: (a: string, b: number) => string;
 let fn2!: (a: string, b: number) => string | number | boolean;
 
 // 第一种情况
-fn2 = fn1; // correct 
-let a = fn2(); // a的类型为string | number | boolean，而实际调用的是fn1，返回string
+fn1 = fn2 // error: 不可以将 string|number|boolean 赋给 string 类型
+let a = fn1(); // b的类型是string，实际调用的是fn2，返回 string|number|boolean
 
 // 第二种情况
-fn1 = fn2 // error: 不可以将 string|number|boolean 赋给 string 类型
-let b = fn1(); // b的类型是string，实际调用的是fn2，返回 string|number|boolean
+fn2 = fn1; // correct 
+let b = fn2(); // a的类型为string | number | boolean，而实际调用的是fn1，返回string
+
 // 结论：返回值选择类型更广的那个
 ```
 

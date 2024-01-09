@@ -469,6 +469,7 @@ ORDER BY c.customer_id
 ### Outer Join Between Multiple Tables（多表外连接）
 与内连接类似，我们可以对多个表（3个及以上）进行外连接
 最好同时只用 JOIN 和 LEFT JOIN。因为当你连接多表，并且同时使用左、右连接和内连接，其他人在看你的代码时，会很难想象你到底想怎么连接这些表。
+
 ```sql
 SELECT 
 	c.customer_id,
@@ -482,9 +483,9 @@ LEFT JOIN shippers sh
 	ON o.shipper_id = sh.shipper_id
 ORDER BY c.customer_id
 ```
-### 
-Self Outer Joins（自外连接）
+### Self Outer Joins（自外连接）
 上面内连接的例子，用LEFT JOIN让得到的 员工-上级 合并表也包括老板本人（老板没有上级，即 reports_to 字段为空，如果用 JOIN 会被筛掉，用 LEFT JOIN 才能保留）
+
 ```sql
 SELECT 
 	e.employee_id,
@@ -1275,7 +1276,7 @@ create table user(
 
 #### 为什么字段建议设置为 NOT NULL
 
-1. 对于 MySQL 而言，如果不主动设置为 NOT NULL 的话，那么默认值就是 NULL。使用 NULL ，程序容易造成必入空指针的问题（这是程序的问题）。
+1. 开发友好性，提高查询性能，不需要额外处理空值情况
 2. 使用 NULL，聚合函数会忽略 NULL 值，会造成统计结果不准确
 3. 等于号 `=` 失效，必须使用 **IS NULL** 和 **IS NOT NULL** 判断
 4. NULL 和其他任何值进行运算都是 NULL，包括表达式的值也是 NULL
@@ -1888,7 +1889,7 @@ CALL sql_invoicing.get_clients([参数])
 ```sql
 SELECT* FROM INFORMATION_SCHEMA.ROUTINES WHERE ROUTINE_SCHEMA = 'database_name';
 ```
- 
+
 存储过程名称；--查询某个存储过程的定义
 ```sql
 SHOW CREATE PROCEDURE procedure_name;
