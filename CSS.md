@@ -1019,6 +1019,10 @@ https://segmentfault.com/a/1190000020887571
 
 
 
+##### visibility 为 hidden 时 元素点击事件可触发吗
+
+visibility 为 hidden 时 ，元素仍然会占据空间，但不会触发点击事件。
+
 
 
 #### 现代布局
@@ -1249,3 +1253,36 @@ https://mp.weixin.qq.com/s/Ff5e4SXSC_RPMst_GA1wHg
 https://mp.weixin.qq.com/s/prh1YzeyNMm9Vhcc9Yl5TQ
 
 ![图片](https://mmbiz.qpic.cn/mmbiz_png/xvBbEKrVNtKybt7O1PBuPE0R7aTVpAnJFiagCpSZo5MEiaTWmsYRQNtHELfX7ibKgOiccgDRQBq6h5KWsltYKQyVicQ/640?wx_fmt=png&wxfrom=5&wx_lazy=1&wx_co=1)
+
+
+
+
+
+#### Ordering of vendor-specific CSS declarations
+
+https://stackoverflow.com/questions/7080605/ordering-of-vendor-specific-css-declarations
+
+后面会覆盖前面的值
+
+Ordering is important. To future proof your code you need to make the W3C spec come last, so the cascade favors it above the vendor prefixed versions.
+
+顺序很重要。为了未来使您的代码具备良好的兼容性，您需要将 W3C 规范放在最后，以使级联选择器优先选择它而不是供应商前缀版本。
+
+```css
+// 推荐这种写法
+// 在 chrome，border-radius 覆盖 -webkit-border-radius
+.foo {
+    -moz-border-radius: 10px;    /* Mozilla */
+    -webkit-border-radius: 10px; /* Webkit */
+    border-radius: 10px;         /* W3C */
+}
+
+// 不推荐这种写法
+// 在 chrome，-webkit-border-radius 覆盖 border-radius 
+.foo {
+    border-radius: 10px;         /* W3C */
+    -moz-border-radius: 10px;    /* Mozilla */
+    -webkit-border-radius: 10px; /* Webkit */
+}
+```
+
