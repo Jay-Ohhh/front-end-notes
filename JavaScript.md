@@ -2339,6 +2339,25 @@ test();
 // ccc
 ```
 
+8、forEach 中的 async/await
+
+```javascript
+['a','b','c'].forEach(async(item,index)=>{
+    console.log(item);
+    await new Promise(res=>{
+        setTimeout(res, 2000)
+    });
+    console.log(index);
+})
+
+// a
+// b
+// c
+// 0
+// 1
+// 2
+```
+
 
 
 #### 动态import
