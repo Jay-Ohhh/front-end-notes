@@ -1033,6 +1033,24 @@ box-shadow: 0 0 0 2px #fff, 0 0 0 calc(2px + 2px) #94a3b8;
 
 
 
+##### 多行水平分布元素
+
+```css
+{
+    display: grid;
+    grid-template-columns: repeat(auto-fill, 200px);
+    // 最小行间距
+    column-gap: 10px;
+    row-gap: 10px;
+    // 水平分布
+    justify-content: space-between;
+}
+```
+
+
+
+
+
 #### 现代布局
 
 https://1linelayouts.glitch.me/

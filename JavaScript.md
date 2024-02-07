@@ -3358,7 +3358,7 @@ function handle(e: MouseEvent){
 
 **总结**
 
-finally中的代码最后执行，其return优先级最高
+finally中的代码最后执行（但先于 try catch 的 return 或 throw），finally 的 return优先级最高
 
 
 
@@ -4168,6 +4168,21 @@ function() {
 
 https://mp.weixin.qq.com/s/OLUN9mHw3S3oBsfd6SONcw
 
+```
+const myWorker = new Worker(aURL, options);
+```
+
+options 可选: 包含可在创建对象实例时设置的选项属性的对象。可用属性如下：
+
+- type：用以指定 worker 类型的 DOMString 值。该值可以是 classic 或 module. 如果未指定，将使用默认值 classic.
+
+  在 JavaScript 中，有两种类型的 Web Workers，分别是 "classic"（传统模式）和 "module"（模块模式）。
+
+  - 传统模式下，Worker 脚本文件是一个独立的 JavaScript 文件，无法使用模块导入/导出语法。
+  - 模块模式下，Worker 脚本文件是一个 ES 模块，可以使用模块导入/导出语法。
+
+  
+
 #### FormData
 
 ##### FormData对象的作用
@@ -4213,15 +4228,11 @@ https://developer.mozilla.org/zh-CN/docs/Web/API/FormData
 
 ##### multipart/form-data
 
-使用FormData时，请求头设置：
-
 ```js
 headers: {
     'Content-Type': 'multipart/form-data;charset=UTF-8'
 }
 ```
-
-**multipart/form-data：**
 
 以消息的形式发送给服务器：会将表单的每个数据处理为一条消息，用分隔符分开。
 
@@ -4230,6 +4241,12 @@ headers: {
 既可以上传键值对，也可以上传文件。
 
 上传文件是以二进制（binary）的形式提交。
+
+**如果你使用 fetch API，不需要手动设置 Content-Type，浏览器会自动添加 'Content-Type': 'multipart/form-data; boundary=foo'**
+
+https://stackoverflow.com/a/46640744/16847756
+
+https://stackoverflow.com/a/40714217/16847756
 
 ##### 例子
 
