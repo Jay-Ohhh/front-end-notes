@@ -9410,7 +9410,7 @@ const MyComponent = () => (
 
 Context 是跨组件传值的一种方案，但我们需要知道，我们无法阻止 Context 触发的 render。
 
-不像 props 和 state，React 提供了 API 进行浅比较，避免无用的 render，Context 完全没有任何方案可以避免无用的渲染。
+React **automatically re-renders** all the children that use a particular context starting from the provider that receives a different `value`. The previous and the next values are compared with the [`Object.is`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/is) comparison. Skipping re-renders with [`memo`](https://react.dev/reference/react/memo) does not prevent the children receiving fresh context values.
 
 有几点关于 Context 的建议：
 

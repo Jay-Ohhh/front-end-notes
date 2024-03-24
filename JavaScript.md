@@ -2339,6 +2339,36 @@ test();
 // ccc
 ```
 
+8、forEach、filter中的 async/await
+
+```javascript
+['a','b','c'].forEach(async(item,index)=>{
+    console.log(item);
+    await new Promise(res=>{
+        setTimeout(res, 2000)
+    });
+    console.log(index);
+})
+
+// a
+// b
+// c
+// 0
+// 1
+// 2
+
+
+
+['a','b','c'].filter(async(item,index)=>{
+    await new Promise(res=>{
+        setTimeout(res, 2000)
+    });
+    return false
+})
+// async 函数返回 Promise
+// ['a','b','c'] 
+```
+
 
 
 #### 动态import
@@ -3339,7 +3369,7 @@ function handle(e: MouseEvent){
 
 **总结**
 
-finally中的代码最后执行，其return优先级最高
+finally中的代码最后执行（但先于 try catch 的 return 或 throw），finally 的 return优先级最高
 
 
 
@@ -4149,6 +4179,21 @@ function() {
 
 https://mp.weixin.qq.com/s/OLUN9mHw3S3oBsfd6SONcw
 
+```
+const myWorker = new Worker(aURL, options);
+```
+
+options 可选: 包含可在创建对象实例时设置的选项属性的对象。可用属性如下：
+
+- type：用以指定 worker 类型的 DOMString 值。该值可以是 classic 或 module. 如果未指定，将使用默认值 classic.
+
+  在 JavaScript 中，有两种类型的 Web Workers，分别是 "classic"（传统模式）和 "module"（模块模式）。
+
+  - 传统模式下，Worker 脚本文件是一个独立的 JavaScript 文件，无法使用模块导入/导出语法。
+  - 模块模式下，Worker 脚本文件是一个 ES 模块，可以使用模块导入/导出语法。
+
+  
+
 #### FormData
 
 ##### FormData对象的作用
@@ -4194,15 +4239,11 @@ https://developer.mozilla.org/zh-CN/docs/Web/API/FormData
 
 ##### multipart/form-data
 
-使用FormData时，请求头设置：
-
 ```js
 headers: {
     'Content-Type': 'multipart/form-data;charset=UTF-8'
 }
 ```
-
-**multipart/form-data：**
 
 以消息的形式发送给服务器：会将表单的每个数据处理为一条消息，用分隔符分开。
 
@@ -4211,6 +4252,12 @@ headers: {
 既可以上传键值对，也可以上传文件。
 
 上传文件是以二进制（binary）的形式提交。
+
+**如果你使用 fetch API，不需要手动设置 Content-Type，浏览器会自动添加 'Content-Type': 'multipart/form-data; boundary=foo'**
+
+https://stackoverflow.com/a/46640744/16847756
+
+https://stackoverflow.com/a/40714217/16847756
 
 ##### 例子
 
@@ -6029,6 +6076,8 @@ parent.location.href = target + '#' + hash;
 从广义上讲，一个窗口A可以获得对另一个窗口B的引用（比如 `targetWindow = window.opener`），然后在窗口A上调用 `窗口B.postMessage()` 方法分发一个 [`MessageEvent`](https://developer.mozilla.org/zh-CN/docs/Web/API/MessageEvent) 消息。接收消息的窗口B可以根据需要自由[处理此事件 (en-US)](https://developer.mozilla.org/en-US/docs/Web/Events)。传递给 window.postMessage() 的参数（比如 message）将[通过消息事件对象暴露给接收消息的窗口](https://developer.mozilla.org/zh-CN/docs/Web/API/Window/postMessage#The_dispatched_event)。
 
 > postMessage 要通过窗口自身发送（该窗口可以被其他窗口引用并调用 postMessage ），窗口自身接收
+>
+> 即两个窗口必须建立联系，拿到对应的引用
 
 ```javascript
 // usage
@@ -6550,19 +6599,32 @@ https://www.cnblogs.com/sdcs/p/8484905.html
 
 4. location.hash + iframe
 
-5. postMassage，html5新增接口，多窗口中的信息传递；
+5. postMassage
 
 6. 跨域资源共享CORS，服务器端Access-Control-Allow-Origin设置可以通过的源，前端页面如果需要接收服务器带回的Cookie信息，需要打开`xhr.withCredentials = true;`确定请求是否携带Cookie；
-   
+
    > https://developer.mozilla.org/zh-CN/docs/Web/API/Fetch_API/Using_Fetch
    >
    > 普通跨域请求：只服务端设置Access-Control-Allow-Origin即可，前端无须设置，若要带cookie请求：前后端都需要设置。
-   
+
 7. nginx反向代理；
 
 8. nodejs中间件代理跨域；
 
 9. WebSocket协议跨域
+
+
+
+#### 同源的不同窗口通信
+
+1. postMassage
+
+2. StorageEvent 同源
+3. Broadcast Channel 同源
+4. MessageChannel
+5. SharedWork 同源
+
+
 
 #### null和undefined区别
 
