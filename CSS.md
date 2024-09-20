@@ -263,6 +263,10 @@ CSS Modules 允许使用`:global(.className)`的语法，声明一个全局规�
 :global(.title) {
   color: green;
 }
+
+.provider:global(.ant-divider) {
+    // ...
+}
 ```
 
 ```css
@@ -309,7 +313,7 @@ CSS Modules 还提供一种显式的局部作用域语法`:local(.className)`，
           color:red;
         }
       }
-        }
+    }
   }
 }
 ```
@@ -1048,6 +1052,12 @@ box-shadow: 0 0 0 2px #fff, 0 0 0 calc(2px + 2px) #94a3b8;
 ```
 
 
+
+##### when css position sticky stops sticking
+
+This question: https://stackoverflow.com/a/45530506 answers the problem.
+
+Once the "sticky div" reaches the edge of the screen, it is at the end of the viewport of the parent element. This causes the sticky element to stop and stay at the end of parent's viewport. This code pen provides an example: https://codepen.io/anon/pen/JOOBxg
 
 
 

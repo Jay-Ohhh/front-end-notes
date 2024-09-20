@@ -3275,7 +3275,7 @@ async function foo(){
 此时我们直接运行`outputName()`是没有结果的，我们需要通过`next`方法调用，如下：
 
 ```js
-const asyncGenerator=outputName();
+const asyncGenerator = outputName();
 asyncGenerator.next()
 ```
 

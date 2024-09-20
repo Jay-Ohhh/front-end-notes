@@ -885,19 +885,26 @@ axios.interceptors.response.use((response) => {
             })) // 要使用最新的token
           )
       })
-    if (!isRefresh) {
-      isRefresh = true
-      try {
-        await _reflashToken() // 记得更改token
-      } finally {
-        isRefresh = false
-        while (reTryRequestList.length > 0) {
-          const cb = reTryRequestList.shift()
-          cb?.(access_token)
+      if (!isRefreshing) {
+        isRefreshing = true;
+
+        try {
+          const token = await refreshToken();
+
+          while (reTryRequestList.length > 0) {
+            const cb = reTryRequestList.shift();
+            cb?.(token);
+          }
+        } catch (e) {
+          logout({ redirectPath: "/login" });
+
+          return Promise.reject(e);
+        } finally {
+          isRefreshing = false;
         }
       }
-    }
-    return promise
+
+      return promise;
   }
   
   return Promise.reject(error)

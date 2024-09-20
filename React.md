@@ -1858,6 +1858,8 @@ componentDidCatch(error, info)
 
 ##### 执行顺序
 
+父组件的 useEffect 会比子组件的 useEffect 先执行
+
 **组件挂载的过程**
 
 ```

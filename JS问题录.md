@@ -87,3 +87,23 @@ requestAnimationFrame(()=>{
 })
 ```
 
+
+
+# noreferrer
+
+window.open(url, target, 'noreferrer') 在 Safari 无效
+
+可以采取以下方法，在 Google，Safari，FireFox 上均可以有效
+
+```javascript
+const newWindow = window.open('/loading', '_blank');
+
+if (newWindow) {
+    const a = newWindow.document.createElement('a');
+    a.rel = 'noopener noreferrer';
+    a.href = 'https://deepsweet.ai';
+    newWindow.document.body.appendChild(a);
+    a.click();
+}
+```
+

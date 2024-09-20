@@ -216,7 +216,7 @@ git rebase --contine
 ###### 将dev分支多个commit合并到主分支，并形成一个新commit
 
 ```sh
-git rebase [startpoint]  [endpoint] --onto <newbase>
+git rebase [startpoint] [endpoint] --onto <newbase>
 ```
 
 其中，`[startpoint]` `[endpoint]`仍然和上一个命令一样指定了一个编辑区间(前开后开)，`--onto`的意思是以谁为基点。
@@ -509,6 +509,18 @@ git reset 分为三种：软 --soft，中 ---mixed，硬 --hard 对应着三种�
 **commit-id** 可以通过 git log 查看本地的所有提交
 
 > commit-id 就是 commit 的哈希值
+
+
+
+将当前分支强制重置到远程仓库（通常是`origin`）的最新状态
+
+```bash
+git reset --hard origin/branch_name
+```
+
+ 这里的`branch_name`是你想要重置到的远程分支的名称，最常见的是`master`或`main`。
+
+
 
 ##### revert 反做版本
 
@@ -1666,6 +1678,17 @@ git在维护版本库的时候统一使用的是LF，这样就可以保证文件
 ```bash
 git config --global core.autocrlf false
 ```
+
+
+
+##### 如果提交文件太大
+
+```bash
+git config --global http.postBuffer 524288000
+# 然后使用 SSH 推送
+```
+
+
 
 
 
