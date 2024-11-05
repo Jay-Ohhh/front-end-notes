@@ -15,6 +15,20 @@
 | 后代选择器   | li a         | 拆分计算       |
 | 通配符选择器 | \*           | 0              |
 
+[Attribute Selectors Part II](https://meyerweb.com/eric/articles/webrev/200008b.html)
+
+The only way to select only `<p class="red white blue">` is to use a non-tilde attribute selector, like this:
+
+```css
+P[class="red white blue"]
+```
+
+This would not match `<p class="blue red white">` because the values are in a different order. If you want to match any element with only those three values, but with the values in any order, and you have to use attribute selectors, then you would need to write:
+
+```css
+P[class~="red"][class~="white"][class~="blue"]
+```
+
 #### display 的 block、inline 和 inline-block 的区别
 
 （1）**block：** 会独占一行，多个元素会另起一行，可以设置 width、height、margin 和 padding 属性；

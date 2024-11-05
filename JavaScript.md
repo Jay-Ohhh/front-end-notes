@@ -14,7 +14,7 @@ https://wangdoc.com/es6/index.html
 
 但判断 typeof(null) 时值为 'object'; 判断数组和对象时值均为 'object'，判断函数为'function'
 
-`a === undefined` vs. `typeof a === 'undefined'` 这两种判断中，谁更好？先说结论，使用 typeof 的方法更好。最主要的原因有两点：
+`a === undefined` vs `typeof a === 'undefined'` 这两种判断中，谁更好？先说结论，使用 typeof 的方法更好。最主要的原因有两点：
 
 -   `a === undefined` 的形式，你不能确保 a 被声明过，当 a 没声明过时，程序直接报错，而使用 typeof 可以用来判定一个变量是否声明过，这也是我们常用的 typeof window ... typeof global ... typeof self ... this 这个办法来搞定不同运行时环境下的处理。
 -   undefined 竟然是 window 的属性，按理来说作为 js 语言的基础类型，提供和 null 一样的关键字应该由语言解释器来做吧，但是在运行时中（浏览器），undefined 和 null 完全是两个层面的东西，null 是内置于解析器的空指针符号，而 undefined 是挂在 window 上的全局变量，竟然是挂在 window 上的变量，那么每次使用 var === undefined 时，实际上会去 window 上读取变量，读取的多了，也就让我们开始遐想有没有办法通过不断调用 undefined 变量使系统崩溃。不过值得庆幸的是，undefined 是不能重新赋值的，undefined = 1 虽然不会报错，但是没效果。而执行 null = 1 则会直接报错。就是这么奇妙。
@@ -357,6 +357,8 @@ obj.b(); // 打印1
 即使是在严格模式下，setTimeout()的 function 里面的 this 仍然默认指向 window 对象， 并不是 undefined。
 
 7、箭头函数本身是没有 this 的，它的 this 是根据外层非箭头函数的 this 来决定的，它的外层函数可以这样找，向上找到( ){ }这样的函数体结构。
+
+与函数不同的是，不管是谁调用箭头函数或者通过 bind 去绑定，箭头函数的 this 都是指向运行时所在的作用域所关联的对象。
 
 8、嵌套函数的 this 指向，嵌套的函数不会从调用它的函数中继承 this。
 
@@ -756,6 +758,8 @@ ES6 标准新增了一种新的函数：Arrow Function（箭头函数）
 > **new.target**属性允许你检测函数或构造方法是否是通过[new](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Operators/new)运算符被调用的。即箭头函数不能用作构造器，和 new 一起用会抛出错误。
 >
 > 箭头函数不能用作函数生成器 Generator 。
+>
+> 箭头函数 bind call apply 无效
 
 ```js
 x => x * x
@@ -5031,7 +5035,7 @@ HTML5 中新增了本地存储的解决方案----Web Storage，这样有了 Web 
 
 如果将 session 保存到服务器内存，会有以下缺点
 
-1. 默如果服务器重启，数据将会丢失掉
+1. 如果服务器重启，数据将会丢失掉
 2. 占用大量内存
 3. 多实例运行时，可能会获取不到对应的数据
 
@@ -5670,6 +5674,10 @@ IndexedDB 数据库的各种操作，一般是按照下面的流程进行的。�
 
 ##### Refresh Token
 
+为什么需要 Refresh Token ？
+
+想提供一个有效时间较长的 token，不需要让用户频繁登录，同时又要 token 的有效时间不能过长，因此设计成 Refresh Token + access token 的形式。
+
 refresh token 是专用于刷新 access token 的 token。如果没有 refresh token，也可以刷新 access token，但每次刷新都要用户输入登录用户名与密码，会很麻烦。有了 refresh token，可以减少这个麻烦，客户端直接用 refresh token 去更新 access token，无需用户进行额外的操作。
 
 ###### Refresh Token 验证流程
@@ -5732,7 +5740,7 @@ Payload 部分也是一个 JSON 对象，用来存放实际需要传递的数据
 }
 ```
 
-注意，JWT 默认是不加密的，任何人都可以读到，所以不要把秘密信息放在这个部分。
+注意，JWT 的 header 和 payload 默认是不加密的，任何人都可以读到，所以不要把秘密信息放在这个部分。
 
 这个 JSON 对象也要使用 Base64URL 算法转成字符串。
 
@@ -5810,6 +5818,36 @@ Bearer：https://developer.mozilla.org/zh-CN/docs/Web/HTTP/Authentication
 （5）JWT 本身包含了认证信息，一旦泄露，任何人都可以获得该令牌的所有权限。为了减少盗用，JWT 的有效期应该设置得比较短。对于一些比较重要的权限，使用时应该再次对用户进行认证。
 
 （6）为了减少盗用，JWT 不应该使用 HTTP 协议明码传输，要使用 HTTPS 协议传输。
+
+#### fetch
+
+https://byby.dev/js-fetch-cors-credentials
+
+##### mode
+
+This option defines how CORS requests are handled.
+
+The default value is “cors”, which means that the browser will check the response headers for CORS compliance.
+
+In 'no-cors' mode, the browser does not include the Origin header in the request and the server's response is opaque, meaning that its contents cannot be accessed by JavaScript code. This mode is intended for cases where the response from the server is not needed, such as when making a request to a third-party analytics service. The request method is limited to GET, POST, and HEAD, and cannot add cross domain request headers.
+
+If you set it to “same-origin”, the browser will only allow requests to the same origin as the current page.
+
+##### credentials
+
+This option defines whether cookies and other authentication data are sent with the request.
+
+The default value is “same-origin”, which means that credentials are only sent for requests to the same origin as the current page. （同域名，不同端口，不会携带凭证）
+
+If you set it to “include”, credentials are sent for all requests, even cross-origin ones（与请求同域名的 cookie）.
+
+If you set it to “omit”, credentials are not sent for any requests.
+
+**What are user credentials?**
+
+https://developer.mozilla.org/en-US/docs/Web/API/fetch#credentials
+
+Cookies, authorization headers, and TLS client certificates are different types of credentials that can be used to identify the user or the client when making requests to a web server. Here is a brief explanation of each type:
 
 #### 同源限制
 
@@ -6494,7 +6532,7 @@ https://www.cnblogs.com/sdcs/p/8484905.html
 
 4. location.hash + iframe
 
-5. postMassage
+5. postMessage
 
 6. 跨域资源共享 CORS，服务器端 Access-Control-Allow-Origin 设置可以通过的源，前端页面如果需要接收服务器带回的 Cookie 信息，需要打开`xhr.withCredentials = true;`确定请求是否携带 Cookie；
 

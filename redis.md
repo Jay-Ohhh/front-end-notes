@@ -2,10 +2,7 @@
 
 ## key 的命名规范
 
--   全部大写
 -   key 单词与单词之间以 ：分开
-
--
 
 > 1. 第一段放置数据库名 如 PRO
 >
@@ -24,3 +21,8 @@
 # [亿级系统的 Redis 缓存如何设计](https://mp.weixin.qq.com/s/mc1zzjy5fEbXCxwhJoWA2Q)
 
 # [Redis 缓存那点破事 | 绝杀面试官 25 问](https://mp.weixin.qq.com/s/RRVCJS_X60ugA_52h38TBA)
+
+# [过期删除策略和内存淘汰策略 ](https://www.cnblogs.com/ysocean/p/12422635.html)
+
+
+

@@ -1,6 +1,6 @@
 ### Git
 
-#### git常用命令
+#### git 常用命令
 
 ##### clone 克隆仓库
 
@@ -15,8 +15,8 @@ git add . 将当前目录下的所有文件添加到暂存区
 git add 文件/文件夹相对路径  将指定文件/文件夹添加到暂存区
 ```
 
-- If you are located directly at the *working directory*, then `git add -A` and `git add .` work without the difference.
-- If you are in any subdirectory of the *working directory*, `git add -A` will add all files from the entire *working directory*, and `git add .` will add files from your *current directory*.
+-   If you are located directly at the _working directory_, then `git add -A` and `git add .` work without the difference.
+-   If you are in any subdirectory of the _working directory_, `git add -A` will add all files from the entire _working directory_, and `git add .` will add files from your _current directory_.
 
 ##### commit 将暂存区内容添加到本地仓库中
 
@@ -42,13 +42,13 @@ git commit -a
 git commit -a
 ```
 
-**如果新建了文件，还是需要** 
+**如果新建了文件，还是需要**
 
 ```sh
 git add .
 ```
 
-使用 **git commit -am** 可以省略使用git add 命令将已跟踪文件（不包括新建文件）放到暂存区的功能。
+使用 **git commit -am** 可以省略使用 git add 命令将已跟踪文件（不包括新建文件）放到暂存区的功能。
 
 我们先修改 hello.php 文件为以下内容：
 
@@ -81,15 +81,15 @@ git push <远程主机名> <本地分支名>
 
 如果本地版本与远程版本有差异，但又要强制推送可以使用 --force 参数：
 
-> 会把之前的push记录覆盖掉
+> 会把之前的 push 记录覆盖掉
 
 ```sh
 git push --force origin master
 ```
 
-某分支第一次push时可以使用 **-u** 选项：
+某分支第一次 push 时可以使用 **-u** 选项：
 
-如果当前分支与多个主机存在追踪关系，则可以使用 **- u**选项指定一个默认主机，这样后面可以直接用git push。
+如果当前分支与多个主机存在追踪关系，则可以使用 **- u**选项指定一个默认主机，这样后面可以直接用 git push。
 
 执行 **git push -u origin master** 相当于执行了 **git push origin master** 和 **git branch --set-upstream master origin/master**
 
@@ -98,10 +98,10 @@ git push -u origin 远程分支名 // 同时会创建远程新分支
 ```
 
 ```sh
-git push -u origin master 
+git push -u origin master
 ```
 
-上面命令将本地的master分支推送到origin主机，同时指定origin为默认主机。
+上面命令将本地的 master 分支推送到 origin 主机，同时指定 origin 为默认主机。
 
 ##### checkout 新建分支并切换到该分支
 
@@ -116,15 +116,13 @@ git fetch origin 远程分支名
 git checkout -b 新的分支名 远程仓库别名/远程分支名
 ```
 
-
-
 ##### checkout 切换到指定分支
 
 ```sh
 git checkout 指定分支名
 ```
 
-##### checkout --orphan 清空commit历史
+##### checkout --orphan 清空 commit 历史
 
 它会基于当前所在分支新建一个赤裸裸的分支，没有任何的提交历史。
 
@@ -145,7 +143,7 @@ git push -f origin master
 
 ##### merge 合并指定分支到当前分支
 
-在 Git 中整合来自不同分支的修改主要有两种方法：`merge` 以及 `rebase`。 
+在 Git 中整合来自不同分支的修改主要有两种方法：`merge` 以及 `rebase`。
 
 先切换到当前分支，然后
 
@@ -153,7 +151,7 @@ git push -f origin master
 git merge [指定分支名]
 ```
 
-合并后可以直接进行push，不需git add . 和 git commit
+合并后可以直接进行 push，不需 git add . 和 git commit
 
 **git merge --no-ff**
 
@@ -163,24 +161,22 @@ https://www.cnblogs.com/phpper/p/8034480.html
 
 优点
 
-- rebase最大的好处是你的项目历史会非常整洁
-- rebase 导致最后的项目历史呈现出完美的线性——你可以从项目终点到起点浏览而不需要任何的 fork。这让你更容易使用 git log、git bisect 和 gitk 来查看项目历史
+-   rebase 最大的好处是你的项目历史会非常整洁
+-   rebase 导致最后的项目历史呈现出完美的线性——你可以从项目终点到起点浏览而不需要任何的 fork。这让你更容易使用 git log、git bisect 和 gitk 来查看项目历史
 
 缺点
 
-- 安全性，`如果你在公共分支上使用rebase`，重写项目历史可能会给你的协作工作流带来灾难性的影响。**不要在master等公共分支使用rebase**。
-  
-  
+-   安全性，`如果你在公共分支上使用rebase`，重写项目历史可能会给你的协作工作流带来灾难性的影响。**不要在 master 等公共分支使用 rebase**。
 
 https://www.jianshu.com/p/4a8f4af4e803
 
-###### 同分支内合并多个commit为一个新commit使用：
+###### 同分支内合并多个 commit 为一个新 commit 使用：
 
 ```sh
 git rebase -i [startpoint] [endpoint]
 ```
 
-其中`-i`的意思是`--interactive`，即弹出交互式的界面让用户编辑完成合并操作，`[startpoint]`  `[endpoint]`则指定了一个编辑区间，如果不指定`[endpoint]`，则该区间的终点默认是当前分支`HEAD`所指向的`commit`(注：该区间指定的是一个前开后开的区间)。
+其中`-i`的意思是`--interactive`，即弹出交互式的界面让用户编辑完成合并操作，`[startpoint]` `[endpoint]`则指定了一个编辑区间，如果不指定`[endpoint]`，则该区间的终点默认是当前分支`HEAD`所指向的`commit`(注：该区间指定的是一个前开后开的区间)。
 
 例如 把最后三个提交合并为一个提交：
 
@@ -202,7 +198,7 @@ drop：我要丢弃该commit（缩写:d）
 
 点击**start**开始变基
 
-点击**abort**，退出rebase，处于未rebase之前的状态。
+点击**abort**，退出 rebase，处于未 rebase 之前的状态。
 
 有冲突就解决冲突，然后
 
@@ -213,7 +209,7 @@ git rebase --contine
 
 直至解决所有冲突。
 
-###### 将dev分支多个commit合并到主分支，并形成一个新commit
+###### 将 dev 分支多个 commit 合并到主分支，并形成一个新 commit
 
 ```sh
 git rebase [startpoint] [endpoint] --onto <newbase>
@@ -221,15 +217,15 @@ git rebase [startpoint] [endpoint] --onto <newbase>
 
 其中，`[startpoint]` `[endpoint]`仍然和上一个命令一样指定了一个编辑区间(前开后开)，`--onto`的意思是以谁为基点。
 
-把dev分支最后三个提交合并到主分支，并形成一个新commit：
+把 dev 分支最后三个提交合并到主分支，并形成一个新 commit：
 
-切换到dev分支，然后
+切换到 dev 分支，然后
 
 ```sh
 git rebase HEAD~3 --onto master
 ```
 
-当前HEAD处于游离状态，master分支是没有任何变化，需要：
+当前 HEAD 处于游离状态，master 分支是没有任何变化，需要：
 
 ```sh
 git checkout master
@@ -238,7 +234,7 @@ git merge dev
 
 ###### 代码冲突
 
-rebase 和 merge的另一个区别是rebase 的冲突是一个一个解决，如果有十个冲突，先解决第一个，然后用命令
+rebase 和 merge 的另一个区别是 rebase 的冲突是一个一个解决，如果有十个冲突，先解决第一个，然后用命令
 
 ```sh
 git add -u  // 提交所有被删除和修改的文件到数据暂存区
@@ -246,26 +242,26 @@ git add -u  // 提交所有被删除和修改的文件到数据暂存区
 git rebase --continue // 会弹窗让你修改提交信息，默认是原始的提交信息
 ```
 
-在解决git rebase的冲突后不需要commit，如果你愿意，也可以commit。最后push之前，可以先看看 git status。
+在解决 git rebase 的冲突后不需要 commit，如果你愿意，也可以 commit。最后 push 之前，可以先看看 git status。
 
-继续后才会出现第二个冲突，直到所有冲突解决完，而merge 是所有的冲突都会显示出来需要一起解决。
-另外如果rebase过程中，你想中途退出，恢复rebase前的代码则可以用命令
+继续后才会出现第二个冲突，直到所有冲突解决完，而 merge 是所有的冲突都会显示出来需要一起解决。
+另外如果 rebase 过程中，你想中途退出，恢复 rebase 前的代码则可以用命令
 
 ```sh
 git rebase --abort
 ```
 
-所以rebase的工作流就是
+所以 rebase 的工作流就是
 
 ```sh
-git rebase 
+git rebase
 while(存在冲突) {
     git status
     找到当前冲突文件，编辑解决冲突
     git add -u
     git rebase --continue
     if( git rebase --abort )
-        break; 
+        break;
 }
 ```
 
@@ -282,9 +278,9 @@ git checkout master
 git merge dev
 ```
 
-###### merge和rebase区别
+###### merge 和 rebase 区别
 
-> merge命令不会保留merge的分支的commit，rebase会保留所有的commit（除非使用 rebase 修改提交）
+> merge 命令不会保留 merge 的分支的 commit，rebase 会保留所有的 commit（除非使用 rebase 修改提交）
 
 **merge**
 
@@ -335,16 +331,12 @@ git fetch <远程主机名> <远程分支名>:<本地分支名> // 注意空格�
 git fetch origin master:local-master
 ```
 
-
-
 下面是一些 `git fetch` 命令的使用例子：
 
 1. `git fetch`: 这个命令将从远程仓库下载当前分支代码更新（前提：当前分支已指定远程分支，`git branch --set-upstream master origin/master`），但不会将这些更新自动合并到当前分支中。如果您想查看远程分支的状态，可以使用 `git branch -r` 命令。
 2. `git fetch origin`: 这个命令将从名为 "origin" 的远程仓库下载代码更新。这是 Git 默认使用的远程仓库名称，通常用于与 GitHub 上的代码仓库进行交互。
 3. `git fetch upstream`: 这个命令将从名为 "upstream" 的远程仓库下载代码更新。这个命令通常用于与上游代码库进行交互，例如，如果您要将您的分支更新为上游分支的最新版本。
 4. `git fetch --all`: 这个命令将从所有已配置的远程仓库下载代码更新。这是一个很有用的命令，因为它可以帮助您保持所有远程仓库的最新状态。
-
-
 
 ##### pull 从远程获取代码并合并本地的版本
 
@@ -360,11 +352,11 @@ git pull = git fetch + git merge
 
 常见问题
 
-- refusing to merge unrelated histories，通常出现于两个远程仓库拉pull到本地仓库的情况
-  
-  出现这个问题的最主要原因还是在于本地仓库和远程仓库实际上是独立的两个仓库。
-  
-  解决：在git pull 或 git merge 命令后加上--allow-unrelated-histories
+-   refusing to merge unrelated histories，通常出现于两个远程仓库拉 pull 到本地仓库的情况
+
+    出现这个问题的最主要原因还是在于本地仓库和远程仓库实际上是独立的两个仓库。
+
+    解决：在 git pull 或 git merge 命令后加上--allow-unrelated-histories
 
 ##### 查看本地工作区、暂存区中文件的修改状态
 
@@ -378,7 +370,7 @@ git status
 git log
 ```
 
-退出 git log：英文状态下按Q
+退出 git log：英文状态下按 Q
 
 ```sh
 git log --graph // 分支合并图
@@ -394,8 +386,8 @@ git log --graph // 分支合并图
 
 ##### Tag
 
-tag 对应某次commit, 是一个点，是不可移动的。  
-branch 对应一系列commit，是很多点连成的一根线，有一个HEAD 指针，是可以依靠 HEAD 指针移动的。  
+tag 对应某次 commit, 是一个点，是不可移动的。  
+branch 对应一系列 commit，是很多点连成的一根线，有一个 HEAD 指针，是可以依靠 HEAD 指针移动的。  
 所以，两者的区别决定了使用方式，改动代码用 branch ,不改动只查看用 tag。  
 tag 和 branch 的相互配合使用，有时候起到非常方便的效果，例如：已经发布了 v1.0 v2.0 v3.0 三个版本，这个时候，我突然想不改现有代码的前提下，在 v2.0 的基础上加个新功能，作为 v4.0 发布。就可以检出 v2.0 的代码作为一个 branch ，然后作为开发分支。
 
@@ -405,22 +397,22 @@ tag 和 branch 的相互配合使用，有时候起到非常方便的效果，�
 v<major>.<minor>.<patch>
 ```
 
-- major：重大修改或向后不兼容
-- minor: 以向后兼容的方式添加新功能
-- patch: 以向后兼容的方式修复bug
+-   major：重大修改或向后不兼容
+-   minor: 以向后兼容的方式添加新功能
+-   patch: 以向后兼容的方式修复 bug
 
-###### tag类型
+###### tag 类型
 
 一共有两种`tag`类型：
 
-- 附注标签（Annonated）
-- 轻量标签（Lightweight）
+-   附注标签（Annonated）
+-   轻量标签（Lightweight）
 
 **附注标签**
 
-附注标签存储一个额外的信息，比如作者、发行说明、tag 信息存储为Git仓库中完整的数据，这些数据对于一个公开的项目是非常重要的
+附注标签存储一个额外的信息，比如作者、发行说明、tag 信息存储为 Git 仓库中完整的数据，这些数据对于一个公开的项目是非常重要的
 
-`-a`表示该tag是附注标签
+`-a`表示该 tag 是附注标签
 
 ```sh
 git tag -a [tag_name] -m [msg]
@@ -429,7 +421,7 @@ git tag -a [tag_name] [commit_id] -m [msg]
 
 **轻量标签**
 
-轻量标签时最简单的打tag的方式，它只存储tag name和关联的commit的hash值，不包含额外的信息，就类似于一个书签
+轻量标签时最简单的打 tag 的方式，它只存储 tag name 和关联的 commit 的 hash 值，不包含额外的信息，就类似于一个书签
 
 ```sh
 git tag v2.1-lw
@@ -478,7 +470,7 @@ git push [主机名] [branch] --delete <tag_name>
 git pull [主机名] [branch] --tags
 ```
 
-###### 检出tag
+###### 检出 tag
 
 ```shell
 git checkout -b <new_branch> <tag_name>
@@ -486,11 +478,11 @@ git checkout -b <new_branch> <tag_name>
 
 ##### releases
 
-**tag是 Git 中的概念，而 releases 则是 Github、码云等源码托管商所提供的更高层的概念。Git 本身是没有 releases 这个概念，只有 tag。两者之间的关系则是，release 基于 tag，为 tag 添加更丰富的信息，一般是编译好的文件。**
+**tag 是 Git 中的概念，而 releases 则是 Github、码云等源码托管商所提供的更高层的概念。Git 本身是没有 releases 这个概念，只有 tag。两者之间的关系则是，release 基于 tag，为 tag 添加更丰富的信息，一般是编译好的文件。**
 
 ##### reset 回退版本
 
-有时候，进行了错误的提交，但是还没有push到远程分支，想要撤销本次提交，可以使用命令：
+有时候，进行了错误的提交，但是还没有 push 到远程分支，想要撤销本次提交，可以使用命令：
 
 ```sh
 git reset [--soft | --mixed | --hard] [HEAD]
@@ -510,17 +502,13 @@ git reset 分为三种：软 --soft，中 ---mixed，硬 --hard 对应着三种�
 
 > commit-id 就是 commit 的哈希值
 
-
-
 将当前分支强制重置到远程仓库（通常是`origin`）的最新状态
 
 ```bash
 git reset --hard origin/branch_name
 ```
 
- 这里的`branch_name`是你想要重置到的远程分支的名称，最常见的是`master`或`main`。
-
-
+这里的`branch_name`是你想要重置到的远程分支的名称，最常见的是`master`或`main`。
 
 ##### revert 反做版本
 
@@ -532,17 +520,14 @@ https://blog.csdn.net/yxlshk/article/details/79944535
 
 当讨论 revert 时，需要分两种情况，因为 commit 分为两种：
 
-- 一种是常规的 commit，也就是使用 git commit 提交的 commit；
-- 另一种是 merge commit，在使用 git merge 合并两个分支之后，你将会得到一个新的 merge commit
+-   一种是常规的 commit，也就是使用 git commit 提交的 commit；
+-   另一种是 merge commit，在使用 git merge 合并两个分支之后，你将会得到一个新的 merge commit
 
 merge commit 和普通 commit 的不同之处在于 merge commit 包含两个 parent commit，代表该 merge commit 是从哪两个 commit 合并过来的。
-
 
 **应用场景**
 
 应用场景：有一天测试突然跟你说，你开发上线的功能有问题，需要马上撤回，否则会影响到系统使用。这时可能会想到用 reset 回退，可是你看了看分支上最新的提交还有其他同事的代码，用 reset 会把这部分代码也撤回了。由于情况紧急，又想不到好方法，还是任性的使用 reset，然后再让同事把他的代码合一遍（同事听到想打人），于是你的技术形象在同事眼里一落千丈。
-
-
 
 ![clipboard.png](https://img-blog.csdnimg.cn/img_convert/d7b9511fe5093a0de33e9cf65360eb34.png)
 
@@ -563,8 +548,6 @@ Merge: ba25a9d 1c7036f
 commit 3e853bdcb2d8ce45be87d4f902c0ff6ad00f240a
 ```
 
-
-
 ###### revert 常规 commit
 
 使用 `git revert <commit id>` 即可，git 会生成一个新的 commit，将指定的 commit 内容从当前分支上撤除。
@@ -579,7 +562,7 @@ evert merge commit 有一些不同，这时需要添加 -m 选项以代表这次
 
 但如果直接使用 git revert <commit id>，git 也不知道到底要撤除哪一条分支上的内容，这时需要指定一个 parent number 标识出"主线"，主线的内容将会保留，而另一条分支的内容将被 revert。
 
-如上面的例子中，从 git show 命令的结果中可以看到，merge commit 的 parent 分别为 ba25a9d 和 1c7036f，其中 ba25a9d 代表 master 分支（从图中可以看出），1c7036f 代表 will-be-revert 分支。需要注意的是 -m 选项接收的参数是一个数，此选项指定主线的父编号（从1开始），数字取值为 1 和 2，也就是 Merge 行里面列出来的第一个还是第二个。
+如上面的例子中，从 git show 命令的结果中可以看到，merge commit 的 parent 分别为 ba25a9d 和 1c7036f，其中 ba25a9d 代表 master 分支（从图中可以看出），1c7036f 代表 will-be-revert 分支。需要注意的是 -m 选项接收的参数是一个数，此选项指定主线的父编号（从 1 开始），数字取值为 1 和 2，也就是 Merge 行里面列出来的第一个还是第二个。
 
 -m 后面要跟一个 parent number 标识出"主线"，一般使用 1 保留主分支代码，操作如下：
 
@@ -587,11 +570,9 @@ evert merge commit 有一些不同，这时需要添加 -m 选项以代表这次
 git revert -m 1 bd86846
 ```
 
+###### revert 合并 commit 后，再次合并分支会失效
 
-
-###### revert 合并commit后，再次合并分支会失效
-
-假设tom在自己分支 tom/feature 上开发了一个功能，并合并到了 master 上，之后 master 上又提交了一个修改 h，这时提交历史如下：
+假设 tom 在自己分支 tom/feature 上开发了一个功能，并合并到了 master 上，之后 master 上又提交了一个修改 h，这时提交历史如下：
 
 ```
 a -> b -> c -> f -- g -> h (master)
@@ -599,7 +580,7 @@ a -> b -> c -> f -- g -> h (master)
             d -> e   (tom/feature)
 ```
 
-突然，大家发现tom的分支存在严重的 bug，需要 revert 掉，于是大家把 g 这个 merge commit revert 掉了，记为 G，如下：
+突然，大家发现 tom 的分支存在严重的 bug，需要 revert 掉，于是大家把 g 这个 merge commit revert 掉了，记为 G，如下：
 
 ```
 a -> b -> c -> f -- g -> h -> G (master)
@@ -607,7 +588,7 @@ a -> b -> c -> f -- g -> h -> G (master)
             d -> e   (tom/feature)
 ```
 
-然后tom回到自己的分支进行 bugfix，修好之后想重新合并到 master，直觉上只需要再 merge 到 master 即可，像这样：
+然后 tom 回到自己的分支进行 bugfix，修好之后想重新合并到 master，直觉上只需要再 merge 到 master 即可，像这样：
 
 ```
 a -> b -> c -> f -- g -> h -> G -> i (master)
@@ -624,8 +605,7 @@ a -> b -> c -> f -- g -> h -> G -> G' -> i (master)
             d -> e -> j -> k ----------    (tom/feature)
 ```
 
-其中 G’ 是对 G 的 revert 操作生成的 commit，把之前撤销合并时丢弃的代码恢复了回来，然后再把tom的分支merge到master分支上，把解决 bug 写的新代码合并到 master 分支。
-
+其中 G’ 是对 G 的 revert 操作生成的 commit，把之前撤销合并时丢弃的代码恢复了回来，然后再把 tom 的分支 merge 到 master 分支上，把解决 bug 写的新代码合并到 master 分支。
 
 ##### cherry-pick
 
@@ -638,7 +618,7 @@ git cherry-pick <branchName>
 git cherry-pick <commitHash>
 ```
 
-上面命令就会将指定的提交commitHash，应用于当前分支。
+上面命令就会将指定的提交 commitHash，应用于当前分支。
 
 举例来说，代码仓库有`master`和`feature`两个分支。
 
@@ -685,7 +665,7 @@ git cherry-pick A..B // 前开后闭的区间
 注意，使用上面的命令，提交 A 将不会包含在 Cherry pick 中。如果要包含提交 A，可以使用下面的语法。
 
 ```bash
-git cherry-pick A^..B 
+git cherry-pick A^..B
 ```
 
 ###### 配置项
@@ -718,9 +698,9 @@ git cherry-pick A^..B
 git cherry-pick -m 1 <commitHash>
 ```
 
-上面命令表示，Cherry pick 采用提交`commitHash`来自编号1的父分支的变动。
+上面命令表示，Cherry pick 采用提交`commitHash`来自编号 1 的父分支的变动。
 
-一般来说，1号父分支是接受变动的分支（the branch being merged into），2号父分支是作为变动来源的分支（the branch being merged from）。 
+一般来说，1 号父分支是接受变动的分支（the branch being merged into），2 号父分支是作为变动来源的分支（the branch being merged from）。
 
 ###### 代码冲突
 
@@ -742,11 +722,9 @@ git cherry-pick --continue
 
 发生代码冲突后，退出 Cherry pick，但是不回到操作前的样子。即保留已经`cherry-pick`成功的 commit，并退出`cherry-pick`流程。
 
+##### stash 藏匿未 commit 的代码
 
-
-##### stash 藏匿未commit的代码
-
-官方解释：当您想记录工作目录和索引的当前状态，但又想返回一个干净的工作目录时，请使用git stash。该命令将保存本地修改，并恢复工作目录以匹配头部提交。
+官方解释：当您想记录工作目录和索引的当前状态，但又想返回一个干净的工作目录时，请使用 git stash。该命令将保存本地修改，并恢复工作目录以匹配头部提交。
 
 stash 命令能够将还未 commit 的代码存起来，让你的工作目录变得干净。
 
@@ -754,11 +732,11 @@ stash 命令能够将还未 commit 的代码存起来，让你的工作目录变
 
 我猜你心里一定在想：为什么要变干净？
 
-应用场景：某一天你正在 feature 分支开发新需求，突然产品经理跑过来说线上有bug，必须马上修复。而此时你的功能开发到一半，于是你急忙想切到 master 分支，然后你就会看到以下报错：
+应用场景：某一天你正在 feature 分支开发新需求，突然产品经理跑过来说线上有 bug，必须马上修复。而此时你的功能开发到一半，于是你急忙想切到 master 分支，然后你就会看到以下报错：
 
 ![图片](https://mmbiz.qpic.cn/mmbiz/pfCCZhlbMQQwiaxAEIbdrMvBwOGz381Mt5ywg0EvhAy2QEusE1YXBth0wSBiabZJ5soiclTkWs7YUVtLRYdvzSIyw/640?wx_fmt=jpeg&wxfrom=5&wx_lazy=1&wx_co=1)
 
-因为当前有文件更改了，需要提交commit保持工作区干净才能切分支。由于情况紧急，你只有急忙 commit 上去，commit 信息也随便写了个“暂存代码”，于是该分支提交记录就留了一条黑历史…(真人真事，看过这种提交)。
+因为当前有文件更改了，需要提交 commit 保持工作区干净才能切分支。由于情况紧急，你只有急忙 commit 上去，commit 信息也随便写了个“暂存代码”，于是该分支提交记录就留了一条黑历史…(真人真事，看过这种提交)。
 
 **命令使用**
 
@@ -776,7 +754,7 @@ git stash
 git stash apply
 ```
 
-stash是本地的，不会通过 `git push` 命令上传到 git server 上。
+stash 是本地的，不会通过 `git push` 命令上传到 git server 上。
 
 **相关命令**
 
@@ -803,7 +781,7 @@ git stash pop
 git stash drop
 ```
 
-当有多条 stash，可以指定操作stash，首先使用stash list 列出所有记录：
+当有多条 stash，可以指定操作 stash，首先使用 stash list 列出所有记录：
 
 ```sh
 $ git stash list
@@ -819,8 +797,6 @@ $ git stash apply stash@{1}
 ```
 
 pop，drop 同理。
-
-
 
 ##### reflog
 
@@ -873,12 +849,10 @@ git reflog
 ```
 
 ```sh
-git reset --hard 错误的commitHash 
+git reset --hard 错误的commitHash
 ```
 
 再次 reset 回去，就会发现 b 回来了。
-
-
 
 ##### config
 
@@ -912,8 +886,6 @@ git config --list --global # 查看配置
 	email = weijian.ou@ecoflow.com
 ```
 
-
-
 #### 设置 git 短命令
 
 ###### 方式一
@@ -933,7 +905,7 @@ vim ~/.gitconfig
 写入内容
 
 ```
-[alias] 
+[alias]
         co = checkout
         ps = push
         pl = pull
@@ -948,23 +920,21 @@ vim ~/.gitconfig
 git cp <commitHash>
 ```
 
-
-
 #### 初始化仓库
 
-在没有仓库（.git文件夹）的情况下
+在没有仓库（.git 文件夹）的情况下
 
-**方法1：**
+**方法 1：**
 
 在码云创建仓库后，
 
 git clone 远程仓库地址
 
-然后将克隆下来的.git文件夹放到项目的根目录，完成初始化
+然后将克隆下来的.git 文件夹放到项目的根目录，完成初始化
 
-**方法2：**
+**方法 2：**
 
-在码云创建仓库后，项目根目录执行（有README.md）：
+在码云创建仓库后，项目根目录执行（有 README.md）：
 
 ```sh
 git add .
@@ -973,7 +943,7 @@ git remote add origin 远程仓库地址
 git push -u origin master
 ```
 
-（无README.md）：
+（无 README.md）：
 
 ```sh
 git add README.md
@@ -982,14 +952,14 @@ git remote add origin 远程仓库地址
 git push -u origin master
 ```
 
-已有仓库（.git文件夹）的情况下：
+已有仓库（.git 文件夹）的情况下：
 
 ```sh
 git remote add origin 远程仓库地址
 git push -u origin master
 ```
 
-#### git修改本地和远程分支名称
+#### git 修改本地和远程分支名称
 
 1、修改本地分支名称
 
@@ -1009,9 +979,9 @@ git push --delete origin 旧分支名 // 简写:  git push -d origin 旧分支�
 git push -u origin 新分支名
 ```
 
-#### git删除中间某次提交
+#### git 删除中间某次提交
 
-git log获取commit信息
+git log 获取 commit 信息
 
 ```sh
 commit 58211e7a5da5e74171e90d8b90b2f00881a48d3a
@@ -1033,38 +1003,38 @@ Date:   Fri Sep 22 20:31:39 2017 +0800
     init
 ```
 
-假如要删除备注为add c.txt commit为0fb295fe0e0276f0c81df61c4fd853b7a000bb5c的这次提交
+假如要删除备注为 add c.txt commit 为 0fb295fe0e0276f0c81df61c4fd853b7a000bb5c 的这次提交
 
-1、首先找到此次提交之前的一次提交的commit 7753f40d892a8e0d14176a42f6e12ae0179a3210
+1、首先找到此次提交之前的一次提交的 commit 7753f40d892a8e0d14176a42f6e12ae0179a3210
 2、执行如下命令
 git rebase -i (commit-id)
-commit-id 为要删除的commit的下一个commit号
+commit-id 为要删除的 commit 的下一个 commit 号
 
 ```sh
 git rebase -i 7753f40
 ```
 
-3、编辑文件，将要删除的commit之前的单词改为drop ，然后按照提示保存退出
+3、编辑文件，将要删除的 commit 之前的单词改为 drop ，然后按照提示保存退出
 
-4、此已经删除了指定的commit，可以使用git log查看下
+4、此已经删除了指定的 commit，可以使用 git log 查看下
 
 #### HEAD 说明
 
-- HEAD 表示当前版本
+-   HEAD 表示当前版本
 
-- HEAD^、HEAD^1 第一次提交
+-   HEAD^、HEAD^1 第一次提交
 
-- HEAD^^、HEAD^2 第二次提交
+-   HEAD^^、HEAD^2 第二次提交
 
-- 以此类推...
+-   以此类推...
 
-- HEAD~0 表示当前版本
+-   HEAD~0 表示当前版本
 
-- HEAD~1 前一次提交
+-   HEAD~1 前一次提交
 
-- HEAD~2 前两次提交
+-   HEAD~2 前两次提交
 
-- 以此类推...
+-   以此类推...
 
 ```
 B和C都是提A的父节点
@@ -1093,13 +1063,13 @@ J = F^2  = B^3^2   = A^^3^2
 
 > ^和~也可以用在 commit-id 后面
 
-#### git只提交部分修改的文件（提交指定文件）
+#### git 只提交部分修改的文件（提交指定文件）
 
 1、 git status -s 查看仓库状态
 
-2、 git add src/components/文件名 添加需要提交的文件名（加路径--参考git status 打印出来的文件路径）
+2、 git add src/components/文件名 添加需要提交的文件名（加路径--参考 git status 打印出来的文件路径）
 
-3、 git stash -u -k 忽略其他文件，把现修改的隐藏起来，这样提交的时候就不会提交未被add的文件
+3、 git stash -u -k 忽略其他文件，把现修改的隐藏起来，这样提交的时候就不会提交未被 add 的文件
 
 4、 git commit -m "哪里做了修改可写入..."
 
@@ -1109,8 +1079,6 @@ J = F^2  = B^3^2   = A^^3^2
 
 7、 git stash pop 恢复之前忽略的文件（非常重要的一步）
 
-
-
 #### 入职公司拉取代码
 
 1、先拉取代码
@@ -1119,23 +1087,23 @@ J = F^2  = B^3^2   = A^^3^2
 git clone 项目的地址
 ```
 
-2、拉取你要开发的初始版本，比如develop分支的最新代码
+2、拉取你要开发的初始版本，比如 develop 分支的最新代码
 
 > 也有可能是这样的顺序：
-> 
+>
 > ```
 > git clone 项目的地址
 > git branch -a 查看所有分支，分支命名规范，远程主机名
 > git log 查看commit规范
 > git checkout -b wyn
-> git push -u origin wyn  
+> git push -u origin wyn
 > // or git push --set-upstream origin feat-wyn
 > git pull origin develop
 > git add .
 > git commit -m ‘描述’
 > git pull origin yyy （拉取要合并的分支代码，通常是dev分支）
 > 有冲突的话跟同事协商解决冲突，然后 add commit push
-> 
+>
 > git clone 项目的地址
 > git branch -a 查看所有分支，分支命名规范，远程主机名
 > git log 查看commit规范
@@ -1155,7 +1123,7 @@ git clone 项目的地址
 git pull origin develop
 ```
 
-3、创建自己的分支，编写代码(我创建了wyn分支)
+3、创建自己的分支，编写代码(我创建了 wyn 分支)
 
 ```sh
 git checkout -b wyn
@@ -1193,30 +1161,30 @@ git clone 项目的地址
 2、本地创建 devlop 分支
 
 ```sh
-git checkout -b devlop 
+git checkout -b devlop
 ```
 
 3、拉取 devlop 分支代码
 
 ```sh
-git pull origin devlop 
+git pull origin devlop
 ```
 
 #### 覆盖分支
 
-1.我想将test分支上的代码完全覆盖dev分支，首先切换到dev分支
+1.我想将 test 分支上的代码完全覆盖 dev 分支，首先切换到 dev 分支
 
 ```sh
 git checkout dev
 ```
 
-2.然后直接设置为远程的test分支上的代码
+2.然后直接设置为远程的 test 分支上的代码
 
 ```sh
 git reset --hard origin/test
 ```
 
-3.执行上面的命令后dev分支上的代码就完全被test分支上的代码覆盖了，注意只是本地分支，这时候还需要将本地分支强行推到远程分支。
+3.执行上面的命令后 dev 分支上的代码就完全被 test 分支上的代码覆盖了，注意只是本地分支，这时候还需要将本地分支强行推到远程分支。
 
 ```sh
 git push -f
@@ -1224,17 +1192,15 @@ git push -f
 
 #### 解决冲突
 
-当Git无法自动合并分支时，就必须首先解决冲突。解决冲突后，再add 、commit、merge。
+当 Git 无法自动合并分支时，就必须首先解决冲突。解决冲突后，再 add 、commit、merge。
 
-解决冲突就是把Git合并失败的文件手动编辑为协商好的版本，再提交。需要与领导同事协商。
+解决冲突就是把 Git 合并失败的文件手动编辑为协商好的版本，再提交。需要与领导同事协商。
 
-
-
-#### git远程操作
+#### git 远程操作
 
 https://www.ruanyifeng.com/blog/2014/06/git_remote.html
 
-有时我们push完之后，发现代码写错了，于是回退，回退修改完代码后，在push时会报错（non-fast-forward），因为回退，我们本地库HEAD指向的版本比远程库的要旧，这时可以使用 git push -f 。
+有时我们 push 完之后，发现代码写错了，于是回退，回退修改完代码后，在 push 时会报错（non-fast-forward），因为回退，我们本地库 HEAD 指向的版本比远程库的要旧，这时可以使用 git push -f 。
 
 ##### 查看远程分支
 
@@ -1284,8 +1250,8 @@ https://blog.csdn.net/lqlqlq007/article/details/78983879
 项目仓库是根据根目录下的文件类型进行判断，哪种类型多，仓库就在仓库列表界面显示哪种语言类型
 
 1. 添加文件 `.gitattributes`
-   
-   > 注意 .gitattributes 中内容的路径都是相对于.gitattributes的路径
+
+    > 注意 .gitattributes 中内容的路径都是相对于.gitattributes 的路径
 
 2. 输入以下内容（重置识别类型）：
 
@@ -1299,12 +1265,12 @@ https://github.com/github/linguist/blob/master/docs/overrides.md
 | `linguist-language`=name | [`languages.yml`](https://github.com/github/linguist/blob/master/lib/linguist/languages.yml)         | Highlighted and classified as name                              |
 | `linguist-vendored`      | [`vendor.yml`](https://github.com/github/linguist/blob/master/lib/linguist/vendor.yml)               | Excluded from stats                                             |
 
-除了 linguist-language，其余Git attribute后面可跟 `=false`
+除了 linguist-language，其余 Git attribute 后面可跟 `=false`
 
 ##### linguist-detectable 可检索
 
 ```sh
-*.js linguist-detectable  
+*.js linguist-detectable
 *.css linguist-detectable=false
 ```
 
@@ -1357,37 +1323,37 @@ https://blog.csdn.net/Z_kenshou/article/details/103407521
 
 https://leehao.blog.csdn.net/article/details/47789419?utm_medium=distribute.wap_relevant.none-task-blog-2%7Edefault%7EBlogCommendFromMachineLearnPai2%7Edefault-1.wap_baidujs&depth_1-utm_source=distribute.wap_relevant.none-task-blog-2%7Edefault%7EBlogCommendFromMachineLearnPai2%7Edefault-1.wap_baidujs
 
-#### 基于gitlab的团队工作流程
+#### 基于 gitlab 的团队工作流程
 
 https://www.jianshu.com/p/709d425f7f8f?tt_from=copy_link
 
-#### gitlab管理
+#### gitlab 管理
 
 https://www.cnblogs.com/busigulang/articles/11224401.html
 
-#### gitlab权限说明
+#### gitlab 权限说明
 
-- Guest(匿名用户) - 创建项目、写留言薄
+-   Guest(匿名用户) - 创建项目、写留言薄
 
-- Reporter（报告人）- 创建项目、写留言薄、拉项目、下载项目、创建代码片段
+-   Reporter（报告人）- 创建项目、写留言薄、拉项目、下载项目、创建代码片段
 
-- Developer（开发者）- 创建项目、写留言薄、拉项目、下载项目、创建代码片段、创建合并请求、创建新分支、推送不受保护的分支、移除不受保护的分支 、创建标签、编写wiki
+-   Developer（开发者）- 创建项目、写留言薄、拉项目、下载项目、创建代码片段、创建合并请求、创建新分支、推送不受保护的分支、移除不受保护的分支 、创建标签、编写 wiki
 
-- Master（管理者）- 创建项目、写留言薄、拉项目、下载项目、创建代码片段、创建合并请求、创建新分支、推送不受保护的分支、移除不受保护的分支 、创建标签、编写wiki、增加团队成员、推送受保护的分支、移除受保护的分支、编辑项目、添加部署密钥、配置项目钩子
+-   Master（管理者）- 创建项目、写留言薄、拉项目、下载项目、创建代码片段、创建合并请求、创建新分支、推送不受保护的分支、移除不受保护的分支 、创建标签、编写 wiki、增加团队成员、推送受保护的分支、移除受保护的分支、编辑项目、添加部署密钥、配置项目钩子
 
-- Owner（所有者）- 创建项目、写留言薄、拉项目、下载项目、创建代码片段、创建合并请求、创建新分支、推送不受保护的分支、移除不受保护的分支 、创建标签、编写wiki、增加团队成员、推送受保护的分支、移除受保护的分支、编辑项目、添加部署密钥、配置项目钩子、开关公有模式、将项目转移到另一个名称空间、删除项目
+-   Owner（所有者）- 创建项目、写留言薄、拉项目、下载项目、创建代码片段、创建合并请求、创建新分支、推送不受保护的分支、移除不受保护的分支 、创建标签、编写 wiki、增加团队成员、推送受保护的分支、移除受保护的分支、编辑项目、添加部署密钥、配置项目钩子、开关公有模式、将项目转移到另一个名称空间、删除项目
 
-#### Gitee权限说明
+#### Gitee 权限说明
 
 在 Gitee 平台，仓库成员权限可以以下几种：
 
-| 成员角色     | 权限                                                                                                                                           |
-| -------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
-| 访客（登录用户） | 对于公有仓库：创建 Issue、评论、Clone 和 Pull 仓库、打包下载代码、Fork 仓库、 Fork 仓库提交 Pull Request、下载附件                                                               |
-| 报告者      | 继承访客的权限。 私有仓库：不能查看代码、不能下载代码、不能 Push 、不能 Fork 、 不能提交 Pull Request、可下载附件，不能上传附件，不能删除附件                                                         |
-| 观察者      | 继承报告者权限 私有仓库：创建 Wiki、可以 Clone 下载代码、可以 Pull、不能 Fork                                                                                           |
-| 开发者      | 创建 Issue、评论、Clone 和 Pull 仓库、Fork 仓库、打包下载代码、创建 Pull Request、 创建分支、推送分支、删除分支、创建标签（里程碑）、 创建 Wiki、可上传附件，可删除自己上传的附件，不能删除他人上传的附件、                  |
-| 管理员      | 创建 Issue、评论、Clone 和 Pull 仓库、打包下载代码、创建 Pull Request、 创建分支、推送分支、删除分支、创建标签（里程碑）、创建 Wiki、 添加仓库成员、强制推送分支、编辑仓库属性、可上传附件，可删除自己或他人上传的附件、 不能转移/清空/删除仓库 |
+| 成员角色         | 权限                                                                                                                                                                                                                                            |
+| ---------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 访客（登录用户） | 对于公有仓库：创建 Issue、评论、Clone 和 Pull 仓库、打包下载代码、Fork 仓库、 Fork 仓库提交 Pull Request、下载附件                                                                                                                              |
+| 报告者           | 继承访客的权限。 私有仓库：不能查看代码、不能下载代码、不能 Push 、不能 Fork 、 不能提交 Pull Request、可下载附件，不能上传附件，不能删除附件                                                                                                   |
+| 观察者           | 继承报告者权限 私有仓库：创建 Wiki、可以 Clone 下载代码、可以 Pull、不能 Fork                                                                                                                                                                   |
+| 开发者           | 创建 Issue、评论、Clone 和 Pull 仓库、Fork 仓库、打包下载代码、创建 Pull Request、 创建分支、推送分支、删除分支、创建标签（里程碑）、 创建 Wiki、可上传附件，可删除自己上传的附件，不能删除他人上传的附件、                                     |
+| 管理员           | 创建 Issue、评论、Clone 和 Pull 仓库、打包下载代码、创建 Pull Request、 创建分支、推送分支、删除分支、创建标签（里程碑）、创建 Wiki、 添加仓库成员、强制推送分支、编辑仓库属性、可上传附件，可删除自己或他人上传的附件、 不能转移/清空/删除仓库 |
 
 #### 将某个文件夹下的文件上传到远程仓库
 
@@ -1396,7 +1362,7 @@ https://www.cnblogs.com/busigulang/articles/11224401.html
 git subtree push --prefix=文件夹名 主机名 远程分支名
 ```
 
-#### git使用不同的邮箱配置不同的SSH
+#### git 使用不同的邮箱配置不同的 SSH
 
 https://docs.github.com/zh/authentication/connecting-to-github-with-ssh/about-ssh
 
@@ -1412,36 +1378,40 @@ https://www.cnblogs.com/feiquan/p/11538433.html
 
 首先,介绍一下配置背景:
 
-1. 有两个邮箱A@mail.com  , B@mail.com
+1. 有两个邮箱A@mail.com , B@mail.com
 
-2. 两个git账号,一个公司gitlab上的A@mail ,另一个github上的B@mail
+2. 两个 git 账号,一个公司 gitlab 上的 A@mail ,另一个 github 上的 B@mail
 
-3. 目标:提交公司任务到gitLab 上,自己写的代码提交到github上
+3. 目标:提交公司任务到 gitLab 上,自己写的代码提交到 github 上
 
 介绍配置过程:
 
-1. 检查是否设置了全局user.name ，user.email ，如果设置了就取消，取消步骤:
-- git config -- global --unset user.name
+1. 检查是否设置了全局 user.name ，user.email ，如果设置了就取消，取消步骤:
 
-- git config --global --unset user.email
-2. 配置两个不同邮箱下的ssh
-- 生成key命令  ssh-keygen -t rsa -C "your_email"
+-   git config -- global --unset user.name
 
-  > ```
-  > # 添加一条注释，说明是哪个用户何时在哪台机器上创建的密钥。
-  > ssh-keygen -t rsa -C "$(whoami)__$(uname -n)__$(date +"%Y-%m-%d %H:%M:%S")"
+-   git config --global --unset user.email
 
-- 会提示你输入文件名,可以输入对应的网址的名称，比如~/.ssh/id_rsa_gitlab
+2. 配置两个不同邮箱下的 ssh
 
-- 会提示你是否需要私钥密码
+-   生成 key 命令 ssh-keygen -t rsa -C "your_email"
 
-- 这样,会生成两个文件，比如id_rsa_gitlab，id_rsa_gitlab.pub
+    > ```
+    > # 添加一条注释，说明是哪个用户何时在哪台机器上创建的密钥。
+    > ssh-keygen -t rsa -C "$(whoami)__$(uname -n)__$(date +"%Y-%m-%d %H:%M:%S")"
+    > ```
 
-- 重复以上步骤，生成id_rsa_github，id_rsa_github.pub
+-   会提示你输入文件名,可以输入对应的网址的名称，比如~/.ssh/id_rsa_gitlab
 
-在.ssh文件下新建并配置config 文件：
+-   会提示你是否需要私钥密码
 
-工作中常见的使用就是把公钥配置到Github/Gitee/Coding/华为云等网站, 通过ssh来管理托管在这些平台上的项目和代码。
+-   这样,会生成两个文件，比如 id_rsa_gitlab，id_rsa_gitlab.pub
+
+-   重复以上步骤，生成 id_rsa_github，id_rsa_github.pub
+
+在.ssh 文件下新建并配置 config 文件：
+
+工作中常见的使用就是把公钥配置到 Github/Gitee/Coding/华为云等网站, 通过 ssh 来管理托管在这些平台上的项目和代码。
 
 ssh：
 
@@ -1463,7 +1433,7 @@ PreferredAuthentications　　认证方式  // publickey | password
 User　　用户名
 ```
 
-注意，github的Host必须写成“github.com”。你可以会有其他要求，比如指定端口号、绑定本地端口，这些都可以通过man来查询，比如
+注意，github 的 Host 必须写成“github.com”。你可以会有其他要求，比如指定端口号、绑定本地端口，这些都可以通过 man 来查询，比如
 
 ```
 Port 端口号
@@ -1482,7 +1452,7 @@ PreferredAuthentications publickey
 IdentityFile ~/.ssh/id_rsa_gitlab
 ```
 
- 当前我的配置
+当前我的配置
 
 ```
 #Default gitee user Self
@@ -1516,19 +1486,15 @@ Specifies that ssh should only use the [identity keys](https://www.ssh.com/ssh/i
 
 只能用私钥访问，即使 ssh-agent 提供多种认证方式（密码...）。
 
-
-
 **User**
 
 Specifies the user to log in as. This can be useful when a different user name is used on different machines. This saves the trouble of having to remember to give the user name on the command line.
 
+添加密钥到 ssh：
 
+ssh-agent 是用来控制保存公钥身份证所使用的私钥的程序，其实 ssh-agent 就是一个密钥管理器,运行 ssh-agent 以后，使用 ssh-add 将私钥交给 ssh-agent 保管,其他程序需要身份验证的，时候,可以将验证申请交给 ssh-agent 来完成整个认证过程.
 
-添加密钥到ssh：
-
-ssh-agent 是用来控制保存公钥身份证所使用的私钥的程序，其实ssh-agent 就是一个密钥管理器,运行ssh-agent以后，使用ssh-add将私钥交给ssh-agent保管,其他程序需要身份验证的，时候,可以将验证申请交给ssh-agent来完成整个认证过程.
-
- 这个过程在终端输入: 
+这个过程在终端输入:
 
 ```sh
 ssh-agent bash
@@ -1542,12 +1508,12 @@ ssh -T 地址 // 测试是否连上
 // 例如：
 // ssh -T git@github.com
 // ssh -T git@gitee.com
-// ssh -T git@saasdev.fastlion.cn 
+// ssh -T git@saasdev.fastlion.cn
 // github的时候，如果user 不是 git，则ssh -T时需要在github.com前加上git@，即
 // ssh -T git@github.com
 ```
 
-> 如果仓库是公司内网的话，需要通过公司提供的VPN连上内网，ssh-add和 ssh -T 才能添加成功
+> 如果仓库是公司内网的话，需要通过公司提供的 VPN 连上内网，ssh-add 和 ssh -T 才能添加成功
 
 #### github 在线 IDE
 
@@ -1559,7 +1525,7 @@ ssh -T 地址 // 测试是否连上
 
 例如：`https://github1s.com/Jay-Ohhh/rolib-cli`
 
-8个github技巧
+8 个 github 技巧
 
 https://mp.weixin.qq.com/s/BpmyTfdI9BUrMnL8k2r1BQ
 
@@ -1569,7 +1535,7 @@ https://cli.vuejs.org/zh/guide/deployment.html#github-pages
 
 #### 提交规范(Angular)
 
-使用VSCode插件 git-commit-plugin
+使用 VSCode 插件 git-commit-plugin
 
 https://marketplace.visualstudio.com/items?itemName=redjue.git-commit-plugin
 
@@ -1612,9 +1578,9 @@ You can use `*` when the change affects more than a single scope.
 
 The subject contains succinct description of the change:
 
-- use the imperative, present tense: "change" not "changed" nor "changes"
-- don't capitalize first letter
-- no dot (`.`) at the end
+-   use the imperative, present tense: "change" not "changed" nor "changes"
+-   don't capitalize first letter
+-   no dot (`.`) at the end
 
 **Body**
 
@@ -1634,9 +1600,9 @@ A detailed explanation can be found in this [document](https://docs.google.com/d
 
 出现这个问题的最主要原因还是在于本地仓库和远程仓库实际上是独立的两个仓库。
 
-解决：在git pull 或 git merge 命令后加上--allow-unrelated-histories
+解决：在 git pull 或 git merge 命令后加上--allow-unrelated-histories
 
-##### .gitignore无效
+##### .gitignore 无效
 
 `.gitignore` 只对**未跟踪的文件**起作用
 
@@ -1646,31 +1612,25 @@ A detailed explanation can be found in this [document](https://docs.google.com/d
 
 例如我想让已经被跟踪的 yarn.lock 被 git 忽略，但还想保存在本地，gitigonore 加上 yarn.lock
 
-- 先把本地的 yarn.lock 剪切到项目以外的目录（相当于删除了该文件），然后提交到远程仓库
-- 其他协作者 git pull，也会删除掉 yarn.lock
-- 然后把 yarn.lock 拷贝回本项目
-
-
+-   先把本地的 yarn.lock 剪切到项目以外的目录（相当于删除了该文件），然后提交到远程仓库
+-   其他协作者 git pull，也会删除掉 yarn.lock
+-   然后把 yarn.lock 拷贝回本项目
 
 ##### 加速几十倍 git clone 速度的 --depth 1，它的后遗症怎么解决？
 
 https://mp.weixin.qq.com/s/6VaV70zbnfzWBRxHGbmTcw
 
-
-
 ##### 用 git bisect 快速定位你想找的 commit
 
 https://mp.weixin.qq.com/s/vKi0nKlmrIvLP42aDdnKZg
 
+##### vscode 解决 windows 换行 crlf 与 lf 冲突
 
+vscode 点击文件 --》首选项 --》 设置 --》 搜索 eol，改变 eol 为\n(指 lf)或者改为(\r\n)，有一个统一的标准就好了。
 
-##### vscode解决 windows换行crlf与lf冲突
-
-vscode 点击文件 --》首选项 --》 设置 --》 搜索 eol，改变eol为\n(指lf)或者改为(\r\n)，有一个统一的标准就好了。
-
-git在维护版本库的时候统一使用的是LF，这样就可以保证文件跨平台的时候保持一致。
-在Linux下默认的换行符也是LF，那也就不存在什么问题。
-在Windows下默认的换行符是CRLF，那么我们需要保证在文件提交到版本库的时候文件的换行符是LF，通常来说就是上面的两种方法。
+git 在维护版本库的时候统一使用的是 LF，这样就可以保证文件跨平台的时候保持一致。
+在 Linux 下默认的换行符也是 LF，那也就不存在什么问题。
+在 Windows 下默认的换行符是 CRLF，那么我们需要保证在文件提交到版本库的时候文件的换行符是 LF，通常来说就是上面的两种方法。
 
 如果你同事中有使用其它系统开发的
 你需要先执行上面的操作，再行 以下代码才能解决
@@ -1679,8 +1639,6 @@ git在维护版本库的时候统一使用的是LF，这样就可以保证文件
 git config --global core.autocrlf false
 ```
 
-
-
 ##### 如果提交文件太大
 
 ```bash
@@ -1688,17 +1646,13 @@ git config --global http.postBuffer 524288000
 # 然后使用 SSH 推送
 ```
 
-
-
-
-
 #### Github
 
 ##### Github 搜索技巧
 
 Awesome + keyword：关键字 Awesome,帮忙找到优秀的工具列表
 
-关键字 in 是用来限定搜索的范围，可以指定是在名称、描述、readme文档中搜索关键字
+关键字 in 是用来限定搜索的范围，可以指定是在名称、描述、readme 文档中搜索关键字
 
 ```
 in:name xxx 名称条件
@@ -1722,11 +1676,9 @@ is:public
 is:private
 ```
 
-##### Gitee搜索技巧
+##### Gitee 搜索技巧
 
 用户可以通过组合「关键字」+「开发语言类型」+「项目收藏数(Watch)」+「项目克隆数(Fork)」+「项目更新时间」等筛选条件，查找用户需要的项目。
-
-
 
 ##### pull request
 
@@ -1745,44 +1697,44 @@ https://zhuanlan.zhihu.com/p/87603185
 
 **pull request 步骤**
 
-- fork 到自己的仓库
+-   fork 到自己的仓库
 
-- git clone 到本地
+-   git clone 到本地
 
-- 上游建立连接
-  `git remote add upstream 开源项目地址`
+-   上游建立连接
+    `git remote add upstream 开源项目地址`
 
-- 创建开发分支 (非必须)
-  `git checkout -b test`
+-   创建开发分支 (非必须)
+    `git checkout -b test`
 
-- 推送到远程仓库
+-   推送到远程仓库
 
-  `git push -u origin test`
+    `git push -u origin test`
 
-- 修改提交代码
-  `git status` `git add .` `git commit -m`  `git pull upstream dev ` `git push`
+-   修改提交代码
+    `git status` `git add .` `git commit -m` `git pull upstream dev ` `git push`
 
-- 提交pr
-  去自己github仓库对应fork的项目下new pull request
+-   提交 pr
+    去自己 github 仓库对应 fork 的项目下 new pull request
 
-**pr之后自动关闭相应的issue**
+**pr 之后自动关闭相应的 issue**
 
-Github提供了自动关联功能，commit提交代码时只需要在注释中包含issue编号，#issue_id
+Github 提供了自动关联功能，commit 提交代码时只需要在注释中包含 issue 编号，#issue_id
 
-关闭相应的issue：在commit 的最后加上
+关闭相应的 issue：在 commit 的最后加上
 
-- `fixes #xxx`
-- `fixed #xxx`
-- `fix #xxx`
-- `closes #xxx`
-- `close #xxx`
-- `closed #xxx`
+-   `fixes #xxx`
+-   `fixed #xxx`
+-   `fix #xxx`
+-   `closes #xxx`
+-   `close #xxx`
+-   `closed #xxx`
 
 ```sh
 git commit -m "Fix screwup, fixes #12"
 ```
 
-**pr之后自动删除 remote 分支**
+**pr 之后自动删除 remote 分支**
 
 拥有仓库管理员权限的用户可以配置 PR 合并后自动删除相应的分支。
 
@@ -1790,26 +1742,22 @@ git commit -m "Fix screwup, fixes #12"
 2. 打开 **Settings**
 3. 在 **Merge button** 下面，勾选 **Automatically delete head branches**
 
-
-
 ##### 跳过工作流程运行
 
 https://docs.github.com/zh/actions/managing-workflow-runs/skipping-workflow-runs
 
 如果将以下任何字符串添加到推送中的提交消息，或拉取请求的 HEAD 提交中，则不会触发原本使用 `on: push` 或 `on: pull_request` 进行触发的工作流：
 
-- `[skip ci]`
-- `[ci skip]`
-- `[no ci]`
-- `[skip actions]`
-- `[actions skip]`
+-   `[skip ci]`
+-   `[ci skip]`
+-   `[no ci]`
+-   `[skip actions]`
+-   `[actions skip]`
 
 或者，可以用两个空行结束提交消息，后跟：
 
-- `skip-checks:true`
-- `skip-checks: true`
-
-
+-   `skip-checks:true`
+-   `skip-checks: true`
 
 ##### README CHANGELOG CONTRIBUILDING
 
@@ -1819,24 +1767,22 @@ https://docs.github.com/zh/actions/managing-workflow-runs/skipping-workflow-runs
 
 如果将 README 文件添加到与用户名同名的公共仓库的根目录，则该 README 将自动显示在您的个人资料页面上。 您可以使用 GitHub Flavored Markdown 编辑您的个人资料以在您的个人资料 README，以在您的个人资料上创建个性化的区域。 更多信息请参阅“[管理个人资料自述文件](https://docs.github.com/cn/github/setting-up-and-managing-your-github-profile/managing-your-profile-readme)”。
 
-
-
-#### Gitlab 
+#### Gitlab
 
 ##### 请求合并
 
 https://blog.csdn.net/panjunnn/article/details/106388986
 
-
-
 #### 设置代理了 github push 依旧很慢
 
 https://zhuanlan.zhihu.com/p/481574024
 
+需要查看自己 vpn 的端口号
+
 **全局设置（不推荐）**
 
 ```bash
-#使用http代理 
+#使用http代理
 git config --global http.proxy http://127.0.0.1:58591
 git config --global https.proxy https://127.0.0.1:58591
 #使用socks5代理
@@ -1844,8 +1790,7 @@ git config --global http.proxy socks5://127.0.0.1:51837
 git config --global https.proxy socks5://127.0.0.1:51837
 ```
 
-
-**只对Github代理（推荐）**
+**只对 Github 代理（推荐）**
 
 ```bash
 #使用socks5代理（推荐）
@@ -1853,7 +1798,6 @@ git config --global http.https://github.com.proxy socks5://127.0.0.1:51837
 #使用http代理（不推荐）
 git config --global http.https://github.com.proxy http://127.0.0.1:58591
 ```
-
 
 **取消代理**
 当你不需要使用代理时，可以取消之前设置的代理。
@@ -1866,4 +1810,3 @@ git config --global --unset http.https://github.com.proxy
 # 可以通过打开 .gitconfig 进行编辑
 open ~/.gitconfig
 ```
-
