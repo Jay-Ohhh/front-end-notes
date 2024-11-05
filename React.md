@@ -7993,6 +7993,8 @@ function BatchedComponent() {
 
 **惰性初始 state**
 
+https://react.dev/reference/react/useState#avoiding-recreating-the-initial-state
+
 `initialState` 参数只会在组件的初始渲染中起作用，后续渲染时会被忽略。如果初始 state 需要通过复杂计算获得，则可以传入一个函数，在函数中计算并返回初始的 state，此函数只在初始渲染时被调用：
 
 ```js
@@ -8001,6 +8003,7 @@ class A {}
 const [state, setState] = useState(fn()); // fn() 每次渲染都会被调用
 const [state, setState] = useState(new A()); // new A() 每次渲染都会被调用
 
+const [state, setState] = useState(fn); // fn() 整个生命周期只会被调用一次
 const [state, setState] = useState(() => fn()); // fn() 整个生命周期只会被调用一次
 const [state, setState] = useState(() => new A()); // new A() 整个生命周期只会被调用一次
 
