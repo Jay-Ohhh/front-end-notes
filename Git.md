@@ -337,6 +337,25 @@ git fetch origin master:local-master
 2. `git fetch origin`: 这个命令将从名为 "origin" 的远程仓库下载代码更新。这是 Git 默认使用的远程仓库名称，通常用于与 GitHub 上的代码仓库进行交互。
 3. `git fetch upstream`: 这个命令将从名为 "upstream" 的远程仓库下载代码更新。这个命令通常用于与上游代码库进行交互，例如，如果您要将您的分支更新为上游分支的最新版本。
 4. `git fetch --all`: 这个命令将从所有已配置的远程仓库下载代码更新。这是一个很有用的命令，因为它可以帮助您保持所有远程仓库的最新状态。
+   
+
+##### 远程仓库的分支删除了，本地的分支还在，如何将本地与远程同步
+
+```bash
+git fetch --prune
+```
+
+`--prune` 选项会清理本地已不存在的远程分支引用，例如删除了本地的 origin/branch-a
+
+**删除本地分支**
+
+如果远程分支已删除，删除对应的本地分支：
+
+```bash
+git branch -D <branch-name>
+```
+
+
 
 ##### pull 从远程获取代码并合并本地的版本
 
@@ -1514,6 +1533,27 @@ ssh -T 地址 // 测试是否连上
 ```
 
 > 如果仓库是公司内网的话，需要通过公司提供的 VPN 连上内网，ssh-add 和 ssh -T 才能添加成功
+
+如果提示 Host key verification failed.
+
+```bash
+bash-3.2$ ssh -T git@github.com
+The authenticity of host 'github.com (20.205.243.166)' can't be established.
+ED25519 key fingerprint is SHA256:+DiY3wvvV6TuJJhbpZisF/zLDA0zPMSvHdkr4UvCOqU.
+This key is not known by any other names.
+Are you sure you want to continue connecting (yes/no/[fingerprint])? 
+Host key verification failed.
+```
+
+执行
+
+https://stackoverflow.com/a/29380765/25070986
+
+```bash
+ssh-keyscan -t rsa github.com >> ~/.ssh/known_hosts
+```
+
+
 
 #### github 在线 IDE
 
