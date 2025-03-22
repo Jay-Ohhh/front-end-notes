@@ -176,7 +176,9 @@ https://www.jianshu.com/p/4a8f4af4e803
 git rebase -i [startpoint] [endpoint]
 ```
 
-其中`-i`的意思是`--interactive`，即弹出交互式的界面让用户编辑完成合并操作，`[startpoint]` `[endpoint]`则指定了一个编辑区间，如果不指定`[endpoint]`，则该区间的终点默认是当前分支`HEAD`所指向的`commit`(注：该区间指定的是一个前开后开的区间)。
+- `-i` 或 `--interactive`：以交互模式运行rebase
+- `[startpoint]`：要重写的提交历史的开始点（不包括该点）
+- `[endpoint]`：要重写的提交历史的结束点（包括该点），如果省略则默认为当前分支的HEAD
 
 例如 把最后三个提交合并为一个提交：
 

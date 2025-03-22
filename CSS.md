@@ -1239,3 +1239,41 @@ Ordering is important. To future proof your code you need to make the W3C spec c
     -webkit-border-radius: 10px; /* Webkit */
 }
 ```
+
+
+
+#### CSS动态检测屏幕视口尺寸
+
+https://www.bilibili.com/video/BV1zNDrYEEcx/?buvid=XX86A928DD6A16D806A4C137433A44B5790D4&from_spmid=tm.recommend.0.0&is_story_h5=false&mid=KFYSn0kHLC5rrNYp8jMuEQ%3D%3D&plat_id=116&share_from=ugc&share_medium=android&share_plat=android&share_session_id=efb976a9-84b3-4a5f-abf1-692521065bbe&share_source=WEIXIN&share_tag=s_i&spmid=united.player-video-detail.0.0&timestamp=1731692616&unique_k=SB0XunL&up_id=651444241&vd_source=30951f1bb74f9e10ab92917414929bae
+
+```css
+@property --vw {
+  syntax: "<length>";
+  inherits: true;
+  initial-value: 100vw;
+}
+@property --vh {
+  syntax: "<length>";
+  inherits: true;
+  initial-value: 100vh;
+}
+
+:root {
+  --w: tan(atan2(var(--vw), 1px));
+  --h: tan(atan2(var(--vh), 1px));
+}
+
+body::before {
+  content: counter(w) "X" counter(h);
+  counter-reset: w var(--w) h var(--h);
+  font-size: 150px;
+  font-weight: 900;
+  position: fixed;
+  inset: 0;
+  width: fit-content;
+  height: fit-content;
+  margin: auto;
+}
+
+```
+
