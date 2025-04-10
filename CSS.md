@@ -1024,6 +1024,51 @@ This question: https://stackoverflow.com/a/45530506 answers the problem.
 
 Once the "sticky div" reaches the edge of the screen, it is at the end of the viewport of the parent element. This causes the sticky element to stop and stay at the end of parent's viewport. This code pen provides an example: https://codepen.io/anon/pen/JOOBxg
 
+
+
+##### 扫光效果
+
+```css
+.flash-card {
+  &::after {
+    content: "";
+    position: absolute;
+    top: -450%;
+    left: -50%;
+    width: 200%;
+    height: 1000%;
+    background: linear-gradient(
+      90deg,
+      hsla(0, 0%, 100%, 0),
+      hsla(0, 0%, 100%, 0.12) 44.6%,
+      hsla(0, 0%, 100%, 0.12) 56.31%,
+      hsla(0, 0%, 100%, 0) 99.37%
+    );
+    background-repeat: no-repeat;
+    background-size: 50% 100%;
+    transform: rotate(22.5deg);
+    transform-origin: center;
+    animation: light 2s linear 10000;
+  }
+}
+
+@keyframes light {
+  0% {
+    background-position: -200% 0;
+  }
+  70% {
+    background-position: right -100% top 0;
+  }
+  100% {
+    background-position: right -100% top 0;
+  }
+}
+```
+
+
+
+
+
 #### 现代布局
 
 https://1linelayouts.glitch.me/
