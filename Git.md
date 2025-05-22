@@ -174,6 +174,14 @@ https://www.jianshu.com/p/4a8f4af4e803
 
 ```sh
 git rebase -i [startpoint] [endpoint]
+
+例如
+d
+c
+b
+a
+合并 b ～ d 为一个commit，则
+git rebase -i a-commit-id
 ```
 
 - `-i` 或 `--interactive`：以交互模式运行rebase

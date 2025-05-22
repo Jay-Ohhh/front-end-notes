@@ -556,7 +556,7 @@ Star.prototype.dance = () => {};
     Star instanceof Function; // true
     // isPrototypeOf: 判断调用对象是否在参数对象的原型链上
     Function.prototype.isPrototypeOf(Star); // true
-
+    
     class A {}
     class B extends A {}
     A instanceof Function; // true
@@ -4949,6 +4949,16 @@ Other-header: other-header-value
 这里创建的 cookie 对所有 wrox.com 的子域及该域中的所有页面有效（通过 path=/指定）。不过，这个 cookie 只能在 SSL 连接上发送，因为设置了 secure 标志。
 
 要知道，**域、路径、过期时间和 secure 标志用于告诉浏览器什么情况下应该在请求中包含 cookie**。这些参数并不会随请求发送给服务器，**实际发送的只有 cookie 的名/值对**。
+
+
+
+###### Cookie Domain 带点的区别
+
+带点`.aaa.com`：子域名可以访问
+
+不带点`aaa.com`：子域名不可以访问
+
+
 
 ###### JavaScript 中的 Cookie
 
