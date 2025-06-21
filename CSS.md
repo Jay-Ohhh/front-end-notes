@@ -1030,6 +1030,9 @@ Once the "sticky div" reaches the edge of the screen, it is at the end of the vi
 
 ```css
 .flash-card {
+  position: relative;
+  overflow: hidden;
+  
   &::after {
     content: "";
     position: absolute;
@@ -1048,11 +1051,11 @@ Once the "sticky div" reaches the edge of the screen, it is at the end of the vi
     background-size: 50% 100%;
     transform: rotate(22.5deg);
     transform-origin: center;
-    animation: light 2s linear 10000;
+    animation: flash-card 2s linear 10000;
   }
 }
 
-@keyframes light {
+@keyframes flash-card {
   0% {
     background-position: -200% 0;
   }
