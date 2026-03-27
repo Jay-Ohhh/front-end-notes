@@ -1423,7 +1423,7 @@ https://www.cnblogs.com/feiquan/p/11538433.html
 
 2. 配置两个不同邮箱下的 ssh
 
--   生成 key 命令 ssh-keygen -t rsa -C "your_email"
+-   生成 key 命令 ssh-keygen -t rsa -C [username]
 
     > ```
     > # 添加一条注释，说明是哪个用户何时在哪台机器上创建的密钥。
@@ -1484,6 +1484,7 @@ IdentityFile ~/.ssh/id_rsa_gitlab
 当前我的配置
 
 ```
+# config 文件
 #Default gitee user Self
 Host gitee.com
 HostName gitee.com
